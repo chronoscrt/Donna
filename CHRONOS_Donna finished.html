@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Donna — CHRONOS CRT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;overflow:hidden;position:fixed;width:100%}
+
+/* SETUP */
+#setup{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px 24px;z-index:999;overflow-y:auto}
+.s-logo{width:82px;height:82px;border-radius:22px;background:linear-gradient(145deg,#6B0000,#C41E3A);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 8px 32px rgba(196,30,58,0.35)}
+.s-title{font-size:28px;font-weight:700;color:#fff;text-align:center}
+.s-sub{font-size:14px;color:#8E8E93;text-align:center;line-height:1.7;max-width:300px}
+.s-field{width:100%;max-width:340px;display:flex;flex-direction:column;gap:7px}
+.s-lbl{font-size:12px;color:#636366;text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
+.s-inp{width:100%;padding:15px 16px;background:#1C1C1E;border:1px solid #38383A;border-radius:13px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;transition:border-color 0.2s}
+.s-inp:focus{border-color:#0A84FF}
+.s-inp::placeholder{color:#48484A}
+.s-hint{font-size:11px;color:#48484A;line-height:1.6}
+.s-hint a{color:#0A84FF;text-decoration:none}
+.s-btn{width:100%;max-width:340px;padding:16px;background:#C41E3A;border:none;border-radius:14px;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:-apple-system,sans-serif}
+.s-btn:active{opacity:0.82}
+.s-div{width:100%;max-width:340px;height:1px;background:#1C1C1E}
+.s-err{font-size:13px;color:#FF453A;text-align:center;display:none;max-width:300px;line-height:1.5}
+
+/* APP */
+#app{height:100%;display:none;flex-direction:column;background:#000;max-width:430px;margin:0 auto}
+
+/* STATUS BAR */
+.sbar{background:#000;padding:13px 20px 4px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.sb-time{color:#fff;font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.sb-right{display:flex;gap:6px;align-items:center}
+.sb-sig{display:flex;gap:2px;align-items:flex-end;height:12px}
+.sb-b{background:#fff;border-radius:1px;width:3px}
+.sb-bat{width:25px;height:12px;border:1.5px solid rgba(255,255,255,0.5);border-radius:3.5px;padding:1.5px;position:relative;display:flex;align-items:center}
+.sb-bat::after{content:'';position:absolute;right:-5px;width:3px;height:5px;background:rgba(255,255,255,0.5);border-radius:0 2px 2px 0;top:50%;transform:translateY(-50%)}
+.sb-fill{background:#fff;border-radius:1.5px;height:100%;width:62%}
+
+/* NAV */
+.nbar{background:#000;padding:4px 14px 10px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid #1C1C1E;flex-shrink:0}
+.nb-bk{display:flex;align-items:center;color:#0A84FF;font-size:17px;cursor:pointer;min-width:70px;gap:1px;user-select:none}
+.nb-arr{font-size:26px;line-height:1;margin-top:-2px}
+.nb-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(145deg,#6B0000,#C41E3A);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff}
+.nb-nm{color:#fff;font-size:13px;font-weight:600}
+.nb-rl{color:#8E8E93;font-size:10px}
+.nb-acts{display:flex;gap:12px;min-width:70px;justify-content:flex-end}
+.nb-act{color:#0A84FF;font-size:20px;cursor:pointer;background:none;border:none;padding:4px;line-height:1;font-family:-apple-system,sans-serif}
+
+/* MESSAGES */
+.msgs{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:8px 0 4px;display:flex;flex-direction:column;gap:2px}
+.msgs::-webkit-scrollbar{display:none}
+.date-sep{text-align:center;font-size:12px;color:#636366;padding:10px 0 6px;font-weight:500;flex-shrink:0}
+.mrow{display:flex;padding:1px 12px;align-items:flex-end;gap:6px;flex-shrink:0}
+.mrow.out{flex-direction:row-reverse}
+.bub{max-width:75%;padding:9px 14px;font-size:16px;line-height:1.45;word-wrap:break-word;letter-spacing:-0.1px}
+.bub.out{background:#0A84FF;color:#fff;border-radius:18px 18px 4px 18px}
+.bub.in{background:#1C1C1E;color:#fff;border-radius:18px 18px 18px 4px}
+.bts{font-size:11px;color:#636366;padding:1px 14px 4px;flex-shrink:0}
+.bts.r{text-align:right}.bts.l{text-align:left}
+
+/* IMAGE BUBBLE */
+.img-bub{max-width:75%;border-radius:18px;overflow:hidden;cursor:pointer}
+.img-bub img{width:100%;display:block;max-height:280px;object-fit:cover}
+.img-bub.out{border-bottom-right-radius:4px}
+.img-bub.in{border-bottom-left-radius:4px}
+
+/* TYPING */
+.typing-wrap{background:#1C1C1E;border-radius:18px 18px 18px 4px;padding:12px 16px;width:fit-content}
+.tdots{display:flex;gap:4px;align-items:center}
+.td{width:7px;height:7px;border-radius:50%;background:#636366;animation:tdp 1.4s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdp{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1.1)}}
+
+/* CARDS */
+.card{background:#1C1C1E;border-radius:16px;padding:14px;width:100%}
+.card-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:10px}
+
+/* CHECKLIST */
+.cl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cl-ttl{font-size:14px;font-weight:600;color:#fff}
+.cl-pill{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(10,132,255,.18);color:#0A84FF;transition:all .2s}
+.cl-pill.full{background:rgba(48,209,88,.18);color:#30D158}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid #2C2C2E;min-height:50px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.cl-item:last-of-type{border-bottom:none;padding-bottom:2px}
+.cl-dot{width:24px;height:24px;min-width:24px;border-radius:50%;border:1.5px solid #48484A;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;flex-shrink:0}
+.cl-dot.on{background:#30D158;border-color:#30D158}
+.cl-ck{display:none;width:11px;height:7px;border-left:2.5px solid #000;border-bottom:2.5px solid #000;transform:rotate(-45deg) translate(1px,-1px);margin-top:1px}
+.cl-dot.on .cl-ck{display:block}
+.cl-main{font-size:13px;font-weight:500;color:#fff;line-height:1.3}
+.cl-main.on{color:#636366;text-decoration:line-through}
+.cl-desc{font-size:11px;color:#636366;margin-top:2px;line-height:1.4}
+.cl-desc.on{color:#3A3A3A}
+.cl-btns{display:flex;gap:8px;margin-top:11px}
+.cl-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:-apple-system,sans-serif}
+.cl-btn:active{opacity:.8}
+.cl-rst{background:#2C2C2E;color:#fff}
+.cl-ev{background:#0A84FF;color:#fff}
+
+/* STATS */
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid #2C2C2E;font-size:13px}
+.stat-row:last-child{border-bottom:none}
+.stat-l{color:#8E8E93}
+.stat-v{font-weight:600;color:#fff}
+.stat-v.g{color:#30D158}.stat-v.r{color:#FF453A}
+
+/* LOG FORM */
+.lf-row{display:flex;gap:8px}
+.lf{flex:1;display:flex;flex-direction:column;gap:5px}
+.lf label{font-size:11px;color:#8E8E93;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.lf input,.lf select,.lf textarea{background:#2C2C2E;border:.5px solid #48484A;border-radius:9px;padding:9px 11px;color:#fff;font-size:14px;font-family:-apple-system,sans-serif;outline:none;width:100%;-webkit-appearance:none;transition:border-color .2s}
+.lf input:focus,.lf select:focus,.lf textarea:focus{border-color:#0A84FF}
+.lf input::placeholder,.lf textarea::placeholder{color:#48484A}
+.lf textarea{resize:none;min-height:60px;line-height:1.4}
+.log-img-area{border:.5px solid #48484A;border-radius:9px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;background:#2C2C2E}
+.log-img-preview{width:44px;height:44px;border-radius:8px;object-fit:cover;display:none}
+.log-img-txt{font-size:13px;color:#636366;flex:1}
+.log-img-txt.has{color:#0A84FF}
+.log-sub{background:#0A84FF;color:#fff;border:none;border-radius:11px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;font-family:-apple-system,sans-serif;width:100%}
+.log-sub:active{opacity:.8}
+
+/* HISTORY */
+.hist-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid #2C2C2E;font-size:12px}
+.hist-row:last-child{border-bottom:none}
+.h-p{font-weight:600;color:#fff;min-width:68px}
+.h-d{padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700}
+.h-d.long{background:rgba(48,209,88,.15);color:#30D158}
+.h-d.short{background:rgba(255,69,58,.15);color:#FF453A}
+.h-m{flex:1;color:#636366;font-size:10px}
+.h-pnl{font-weight:600}
+.h-pnl.pos{color:#30D158}.h-pnl.neg{color:#FF453A}
+.h-thumb{width:32px;height:32px;border-radius:6px;object-fit:cover;cursor:pointer}
+
+/* LIGHTBOX */
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+#lightbox img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
+#lightbox-close{position:absolute;top:20px;right:20px;color:#fff;font-size:28px;cursor:pointer;background:rgba(255,255,255,.15);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1}
+
+/* CHIPS */
+.chips{background:#000;padding:6px 12px 8px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;background:#1C1C1E;border:.5px solid #2C2C2E;border-radius:16px;color:#0A84FF;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:-apple-system,sans-serif;user-select:none}
+.chip:active{background:#2C2C2E}
+
+/* INPUT */
+.ibar{background:#000;padding:8px 12px 28px;display:flex;align-items:flex-end;gap:8px;border-top:.5px solid #1C1C1E;flex-shrink:0}
+.i-img-btn{color:#0A84FF;font-size:26px;line-height:1;cursor:pointer;padding-bottom:4px;flex-shrink:0;user-select:none;background:none;border:none;font-family:-apple-system,sans-serif}
+.i-wrap{flex:1;background:#1C1C1E;border-radius:20px;border:.5px solid #38383A;display:flex;align-items:flex-end;padding:8px 12px;gap:8px}
+.i-ta{flex:1;background:none;border:none;outline:none;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;resize:none;max-height:100px;line-height:1.4;padding:0}
+.i-ta::placeholder{color:#636366}
+.i-send{width:30px;height:30px;border-radius:50%;background:#0A84FF;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:1px}
+.i-send:disabled{background:#2C2C2E}
+.i-send:active{opacity:.8}
+.i-send svg{fill:#fff;width:14px;height:14px}
+
+/* HIDDEN FILE INPUT */
+#file-in{display:none}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:flex-end;justify-content:center;z-index:200;padding:16px}
+.modal{background:#1C1C1E;border-radius:20px;padding:22px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:14px}
+.modal-t{font-size:17px;font-weight:700;color:#fff;text-align:center}
+.modal-s{font-size:13px;color:#8E8E93;text-align:center;line-height:1.6}
+.modal-inp{background:#2C2C2E;border:.5px solid #48484A;border-radius:10px;padding:13px;color:#fff;font-size:15px;font-family:-apple-system,sans-serif;outline:none;width:100%;-webkit-appearance:none}
+.modal-inp:focus{border-color:#0A84FF}
+.m-ok{padding:14px;border-radius:12px;font-size:16px;font-weight:600;border:none;cursor:pointer;font-family:-apple-system,sans-serif;background:#0A84FF;color:#fff}
+.m-ok:active{opacity:.8}
+.m-cancel{padding:14px;border-radius:12px;font-size:16px;font-weight:600;border:none;cursor:pointer;font-family:-apple-system,sans-serif;background:#2C2C2E;color:#8E8E93}
+.modal-note{font-size:11px;color:#48484A;text-align:center;line-height:1.6}
+.modal-note a{color:#0A84FF;text-decoration:none}
+
+/* MENU */
+.menu-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;z-index:200;padding:16px}
+.menu{background:#1C1C1E;border-radius:16px;padding:8px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:2px}
+.menu-item{padding:14px 16px;border-radius:10px;font-size:16px;color:#0A84FF;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center;font-weight:500;background:none;border:none;width:100%}
+.menu-item:active{background:#2C2C2E}
+.menu-item.dest{color:#FF453A}
+.menu-cancel{margin-top:6px;padding:14px;border-radius:12px;font-size:16px;font-weight:600;border:none;cursor:pointer;font-family:-apple-system,sans-serif;background:#2C2C2E;color:#fff;width:100%}
+</style>
+</head>
+<body>
+<input type="file" id="file-in" accept="image/*">
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLB()">
+  <div id="lightbox-close">&#x2715;</div>
+  <img id="lb-img" src="">
+</div>
+
+<!-- SETUP -->
+<div id="setup">
+  <div class="s-logo">D</div>
+  <div class="s-title">Meet Donna.</div>
+  <div class="s-sub">Your CHRONOS CRT accountability mentor. Sharp, warm, and she knows the system inside out.</div>
+
+  <div class="s-field">
+    <div class="s-lbl">Your name</div>
+    <input class="s-inp" id="sname" placeholder="What should Donna call you?" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="words">
+  </div>
+
+  <div class="s-field">
+    <div class="s-lbl">Anthropic API Key</div>
+    <input class="s-inp" id="skey" placeholder="sk-ant-api03-..." type="password" autocomplete="off" autocorrect="off" autocapitalize="none">
+    <div class="s-hint">
+      Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key. Starts with <strong style="color:#8E8E93">sk-ant-</strong>. Your first $5 of usage is free.
+    </div>
+  </div>
+
+  <div class="s-err" id="serr"></div>
+  <button class="s-btn" onclick="doSetup()">Start trading with Donna</button>
+  <div class="s-div"></div>
+  <div class="s-hint" style="text-align:center">Your API key and all trade data is stored only on this device. Nothing is sent to any server except directly to Anthropic for Donna's responses.</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sbar">
+    <span class="sb-time" id="clock">9:41</span>
+    <div class="sb-right">
+      <div class="sb-sig">
+        <div class="sb-b" style="height:4px"></div>
+        <div class="sb-b" style="height:6px"></div>
+        <div class="sb-b" style="height:8px"></div>
+        <div class="sb-b" style="height:11px"></div>
+      </div>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="white" style="margin:0 2px">
+        <path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5L0 3.2C2.2 1.2 5 0 8 0s5.8 1.2 8 3.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4z" opacity=".45"/>
+        <path d="M8 5.6c-1.6 0-3 .6-4.1 1.6L2.1 5.4C3.6 4.1 5.7 3.2 8 3.2s4.4.9 5.9 2.2L12.1 7.2C11 6.2 9.6 5.6 8 5.6z" opacity=".7"/>
+        <circle cx="8" cy="10" r="2"/>
+      </svg>
+      <div class="sb-bat"><div class="sb-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="nbar">
+    <div class="nb-bk" onclick="showMenu()"><span class="nb-arr">&#8249;</span><span>Messages</span></div>
+    <div class="nb-mid">
+      <div class="nb-av">D</div>
+      <div class="nb-nm">Donna</div>
+      <div class="nb-rl">CHRONOS CRT Mentor</div>
+    </div>
+    <div class="nb-acts">
+      <button class="nb-act" onclick="triggerStats()" title="Stats">&#9783;</button>
+      <button class="nb-act" onclick="triggerLog()" title="Log Trade">&#43;</button>
+    </div>
+  </div>
+
+  <div class="msgs" id="msgs"></div>
+
+  <div class="chips">
+    <div class="chip" onclick="chip('Show me the pre-trade checklist')">Checklist</div>
+    <div class="chip" onclick="chip('Show my trading stats and record')">My stats</div>
+    <div class="chip" onclick="chip('I want to log a trade')">Log trade</div>
+    <div class="chip" onclick="chip('Am I ready to trade right now?')">Ready to trade?</div>
+    <div class="chip" onclick="chip('Explain turtle soup to me in detail')">Turtle soup</div>
+    <div class="chip" onclick="chip('Walk me through Model 1 step by step')">Model 1</div>
+    <div class="chip" onclick="chip('What is The Sequence and all 5 phases?')">The Sequence</div>
+    <div class="chip" onclick="chip('What kill zone is active right now?')">Kill zone now?</div>
+    <div class="chip" onclick="chip('What are the weekly profiles?')">Weekly profiles</div>
+    <div class="chip" onclick="chip('What are the daily profiles?')">Daily profiles</div>
+    <div class="chip" onclick="chip('Explain CRT and how candles are ranges')">What is CRT?</div>
+    <div class="chip" onclick="chip('How do I read order flow correctly?')">Order flow</div>
+    <div class="chip" onclick="chip('Explain liquidity — ERL and IRL')">Liquidity</div>
+    <div class="chip" onclick="chip('What is the Draw on Liquidity?')">Draw on Liq</div>
+    <div class="chip" onclick="chip('Explain SMT and how to use it')">SMT</div>
+    <div class="chip" onclick="chip('What is Quarterly Theory and true opens?')">Quarterly theory</div>
+    <div class="chip" onclick="chip('How do I identify a high probability key level?')">Key levels</div>
+    <div class="chip" onclick="chip('Explain the 3-factor setup')">3-Factor setup</div>
+    <div class="chip" onclick="chip('I just won a trade')">Won a trade</div>
+    <div class="chip" onclick="chip('I just got stopped out')">Got stopped</div>
+    <div class="chip" onclick="chip('Review my last trade')">Last trade review</div>
+    <div class="chip" onclick="chip('I am feeling emotional and struggling with trading')">Feeling emotional</div>
+  </div>
+
+  <div class="ibar">
+    <button class="i-img-btn" onclick="openFileChooser()" title="Send chart photo">&#128247;</button>
+    <div class="i-wrap">
+      <textarea class="i-ta" id="inp" placeholder="Ask Donna anything..." rows="1" onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
+      <button class="i-send" id="sbtn" onclick="sendText()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- KEY MODAL -->
+<div class="modal-bg" id="key-modal" style="display:none" onclick="if(event.target===this)hideKeyModal()">
+  <div class="modal">
+    <div class="modal-t">Update API Key</div>
+    <div class="modal-s">Enter your Anthropic API key. Get one free at console.anthropic.com</div>
+    <input class="modal-inp" id="modal-key" placeholder="sk-ant-..." type="password" autocomplete="off" autocapitalize="none">
+    <button class="m-ok" onclick="saveKey()">Save</button>
+    <button class="m-cancel" onclick="hideKeyModal()">Cancel</button>
+    <div class="modal-note"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key</div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="menu-bg" id="menu-modal" style="display:none" onclick="if(event.target===this)hideMenu()">
+  <div>
+    <div class="menu">
+      <button class="menu-item" onclick="hideMenu();showKeyModal()">Update API Key</button>
+      <button class="menu-item" onclick="hideMenu();triggerHistory()">Trade History</button>
+      <button class="menu-item dest" onclick="hideMenu();clearData()">Clear All Data</button>
+    </div>
+    <button class="menu-cancel" onclick="hideMenu()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ── CHECKLIST ITEMS ──────────────────────────────────────────────────────────
+const CL = [
+  {t:'HTF Bias confirmed', d:'Close above/below + wick direction both align with your trade direction'},
+  {t:'Order flow identified', d:'Rejecting lows + breaking highs (bullish) or rejecting highs + breaking lows (bearish)'},
+  {t:'HTF Key Level marked', d:'FVG, order block, or rejection block — must follow the order flow'},
+  {t:'Draw on Liquidity defined', d:'Where is price actually going? Define it clearly before entering'},
+  {t:'CRT candle selected (ITF)', d:'The range is clearly defined on your intermediate timeframe'},
+  {t:'Kill zone active', d:'London 2–5am UTC-5 or New York 7–11am UTC-5. Only these two windows.'},
+  {t:'Model 1 confirmed', d:'Purge → close above/below the purge candle → price retests → entry'},
+  {t:'Stop loss and target set', d:'Stop below/above protected swing. Minimum 1:2 risk-to-reward.'}
+];
+
+// ── DONNA SYSTEM PROMPT ──────────────────────────────────────────────────────
+const DONNA_SYSTEM = `You are Donna — the CHRONOS CRT trading accountability mentor. You have the personality of Donna Paulsen from Suits: warm, sharp, witty, occasionally sarcastic, deeply competent, always one step ahead, and you genuinely care about the trader's success. You're the person who knows everything before they say it. You don't coddle but you always push people forward.
+
+TRADER NAME: {NAME}
+TRADER STATS: {STATS}
+
+You are a complete expert in the CHRONOS CRT trading system and ALL aspects of trading. You can answer any question about:
+- Technical analysis, candlestick patterns, support and resistance
+- Risk management, position sizing, psychology
+- Forex, indices, crypto trading mechanics
+- Market sessions, economic events, fundamentals
+- Any trading concept the trader asks about
+
+But your PRIMARY expertise is the CHRONOS CRT system:
+
+THE CHRONOS CRT SYSTEM IN FULL:
+
+FOUNDATION:
+Every candle is a time-based range (CRT = Candle Range Theory). Three pillars: Liquidity, Time, Price. CRT without a key level = zero. Rule 1: Buy Low Sell High. Never buy above a high. Never sell below a low. The system is perfect — losses come from the operator.
+
+TIMEFRAME ALIGNMENT (HTF/ITF/LTF):
+Daily CRT → ITF: 4H/1H → LTF entry: 15m
+4H CRT → ITF: 1H/15m → LTF entry: 5m
+1H CRT → ITF: 15m/5m → LTF entry: 1m
+HTF = the CRT candle being traded plus everything above it.
+ITF = where you identify key levels and narrative.
+LTF = where you execute Model 1 only.
+
+BIAS (HTF candle closures):
+Close above previous candle = bullish. Close below = bearish.
+Wick below current candle = bullish. Wick above = bearish.
+Bodies tell the story. Wicks do the damage.
+
+ORDER FLOW:
+Bullish: rejecting lows + breaking highs + disrespecting bearish PD arrays + respecting bullish PD arrays.
+Bearish: opposite of above.
+Order flow shifts when the HIGH THAT TOOK THE LOW is flipped WITH SPEED (displacement + FVG forms above it).
+Probe order flow with 3 tools: 1) Important H&L (high that broke a low, etc) 2) Disrespected PD arrays 3) Forming and respecting new PD arrays.
+After probing ask: Has DOL been met? Have we reached 50%? Has price shifted against bias?
+
+LIQUIDITY:
+Buyside liquidity = above highs (seller stops + breakout trader entries).
+Sellside liquidity = below lows (buyer stops + breakdown trader entries).
+ERL (External Range Liquidity) = old swing highs and lows. Primary targets.
+IRL (Internal Range Liquidity) = FVGs, OBs, breakers, rejection blocks.
+Market cycle: Take ERL → come to IRL → take next ERL → IRL. 100% always. Never stops.
+
+THREE-FACTOR SETUP (the core edge):
+1. Plan HTF Key Level (MOST IMPORTANT): FVGs, OBs, rejection blocks, major swing H/L. No key level = no trade.
+2. Mark Manipulation Time: London 2-5am UTC-5 OR New York 7-11am UTC-5. ONLY these two windows.
+3. Mark Pre-Manipulation Swing H/L: becomes your Model 1 reference.
+Factors 1 and 2 are more important than 3. Ignore FVGs/OBs/patterns — focus on these 3.
+
+TURTLE SOUP:
+False breakout/breakdown against HTF order flow. Traps: breakout traders, SMC structure traders, retest traders.
+Requirements: key level sponsorship + BODY close (not just wick) + time-based liquidity pool + order flow alignment.
+Three types: Continuation turtle soup (within trend), Range turtle soup (at range extremes), Reversal turtle soup (at major HTF key level).
+After EVERY turtle soup on EVERY timeframe → expansion follows. Always.
+High quality turtle soup = body close beyond old high or low, into HTF key level.
+
+MODEL 1 (the LTF entry):
+Sequence: Purge → Close above/below purge candle → Price retests → ENTRY.
+Form 1: Purging liquidity (candle breaks H/L, next candle engulfs it, retest = entry).
+Form 2: Filling FVG (candle fills imbalance, engulfs it, retest = entry).
+Best: one candle does BOTH — purges AND fills FVG simultaneously.
+Entry refinement: Strong/large candle = use body (opening price). Small body + long wick = use wick level.
+Stop: below/above the protected swing that created Model 1.
+Target 1: 50% of CRT range (ALWAYS take partial here).
+Target 2: opposing CRT high or low.
+Minimum R:R: 1:2. Aim for 1:3.
+Important: sometimes price expands immediately without retesting — this means missed entry. Accept it and move on. Never force.
+
+THE SEQUENCE (5 phases of price delivery inside CRT):
+Phase 1 — Turtle Soup: The Sequence STARTS and ENDS here. No turtle soup = no Sequence.
+Phase 2 — Model 1: Turtle Soup = the trap. Model 1 = the confirmation. The engine of the whole move.
+Phase 3 — Breaker Block: True MSS. Last candle before structure breaks. Retest = continuation entry.
+Phase 4 — OTE (Optimal Trade Entry): 60-75% Fibonacci retracement. Smart money re-entry before next expansion.
+Phase 5 — Kiss of Death: Last turtle soup BEFORE the Draw on Liquidity. Final trap. Fastest most powerful move of the Sequence.
+Note: Not every setup shows all 5 phases. 2-3 is enough to trade confidently.
+
+WEEKLY PROFILES (all bullish — mirror for bearish):
+1. Monday Low of Week: Monday = manipulation low. Expansion Tuesday onwards.
+2. Classic Buy Week / Tuesday Low: Most common. Monday bearish, Tuesday = manipulation low.
+3. Wednesday Low: Mon-Tue accumulation. Wednesday = manipulation low.
+4. Thursday Reversal: Mon-Wed range. Thursday = manipulation low.
+5. Friday Reversal: Week-long consolidation. Friday = manipulation low. Sets up following week.
+Key rules: Bullish = ALL buys below weekly open. Bearish = ALL sells above weekly open.
+
+DAILY PROFILES:
+1. Classic Buy/Sell Day (highest probability): London SMR → New York OT.
+   2-4am: low/high of day forms here. Flip in this window.
+   5-8am: time-based range. DO NOT TRADE. Skip completely.
+   9-10am: New York OT. 9:30am = key time for indices.
+   PM session: caps the daily range.
+2. New York Flip: London makes fake low/high (NO key level sponsorship). NY reverses entire day.
+3. Range to NY Reversal: Asia + London range. NY spikes key level and completely reverses.
+4. Seek & Destroy: Rejects both highs AND lows. Ranging day. Do not trade this.
+
+KEY TIMES (all UTC-5):
+12:00am = Daily open / liquidity injection time.
+2:00-4:00am = London kill zone. Most important window.
+3:00am = London Stock Exchange open + DXY 4H candle open.
+5:00-8:00am = Time-based range. Skip completely.
+9:00am = 4H candle open. Key for indices.
+9:30am = NYSE open. Highest probability manipulation time.
+1:30pm = NY PM true open. Kiss of Death territory.
+
+8-STEP PRE-TRADE CHECKLIST:
+1. HTF bias confirmed (closure + wick direction)
+2. Order flow direction (H&L analysis)
+3. HTF key level identified (FVG/OB/RB)
+4. Draw on Liquidity defined
+5. CRT candle selected on ITF
+6. Kill zone active (London 2-5am or NY 7-11am)
+7. Model 1 confirmed (purge + close + retest)
+8. Stop and target defined (min 1:2 R:R)
+Score under 6/8 = do not trade. That is operator error, not system failure.
+
+HIGH PROBABILITY ORDER BLOCKS:
+4 requirements: 1) Taken out liquidity 2) Thick/high-volume candle 3) Caused order flow shift (high that took low was flipped) 4) FVG created after it.
+Order blocks are balanced price areas — equal buy and sell side delivery inside them. This is why they give instant reactions.
+
+SMT (Smart Money Technique):
+One correlated asset purges a H/L while the other makes a failure swing = SMT.
+Types: Session SMT, Daily H/L SMT (strongest = Monday vs Tuesday), Weekly SMT, Monthly SMT.
+Confirm with: flip the low that took the high + strength switch (stronger asset forms bigger FVGs going against).
+SMT is CONFLUENCE only — never an entry signal. Need order flow + key level + time + Model 1.
+Do not use SMT forming against order flow.
+
+QUARTERLY THEORY:
+True Opens: Monthly = Week 2 open. Weekly = Tuesday 5pm. Daily = 12am midnight. London = 1:30am. NY = 7:30am.
+Stack true opens below price = extreme discount (buy zone). Above price = extreme premium (sell zone).
+Sequential SMT (SS-SMT): SMT between quarters on correlated assets. Q2 vs Q3 = strongest.
+90-minute cycles: each session divided into 4 × 90min windows. Q3 = highest probability distribution.
+
+DONNA'S COMMUNICATION STYLE:
+- This is iMessage. Keep responses conversational and SHORT — max 3-5 sentences for casual questions.
+- For concept explanations, you can go longer and be thorough — the trader is asking to learn.
+- No markdown formatting. No asterisks. No bullet points in casual responses. Plain conversational text.
+- Never say "Great question!" or "Certainly!" Just answer directly like Donna would.
+- Win + clean checklist (6+/8): briefly celebrate, reinforce what they did right.
+- Loss + clean checklist (6+/8): acknowledge it, the process was right, push forward.
+- Loss + dirty checklist (under 6/8): be direct — "That wasn't the system. That was you." Then help them understand and fix it.
+- Use the trader's name occasionally — naturally, not robotically.
+- Always give a path forward. Never just criticize without direction.
+- Wit and dry humour when appropriate — natural, not forced.
+- You know what they're going to say before they say it.
+- If they send a chart image, analyze it using CHRONOS CRT principles. Look for: the CRT range, key levels, turtle soup setups, Model 1 opportunities, kill zone timing, order flow direction.`;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let S = {name:'', key:'', checks:new Array(8).fill(false), trades:[], hist:[], busy:false, pendingImg:null};
+
+function load() {
+  try {
+    const d = localStorage.getItem('donna_v5');
+    if (d) {
+      const p = JSON.parse(d);
+      S.name = p.name||''; S.key = p.key||'';
+      S.checks = p.checks||new Array(8).fill(false);
+      S.trades = p.trades||[]; S.hist = p.hist||[];
+    }
+  } catch(e) {}
+}
+
+function persist() {
+  try {
+    localStorage.setItem('donna_v5', JSON.stringify({
+      name:S.name, key:S.key, checks:S.checks,
+      trades:S.trades, hist:S.hist.slice(-50)
+    }));
+  } catch(e) {}
+}
+
+load();
+
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+function doSetup() {
+  const name = document.getElementById('sname').value.trim();
+  const key  = document.getElementById('skey').value.trim();
+  const err  = document.getElementById('serr');
+  if (!name) { showErr('Please enter your name so Donna knows what to call you.'); return; }
+  if (!key)  { showErr('Please enter your Anthropic API key.'); return; }
+  if (!key.startsWith('sk-')) { showErr('That doesn\'t look right. Your API key should start with sk-ant-'); return; }
+  err.style.display = 'none';
+  S.name = name; S.key = key; persist();
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  init();
+}
+
+function showErr(msg) {
+  const e = document.getElementById('serr');
+  e.textContent = msg; e.style.display = 'block';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  tick(); setInterval(tick, 30000);
+  document.getElementById('msgs').innerHTML = '';
+  if (!S.hist.length) {
+    const g = `${S.name}. Finally. I was wondering when you'd show up. I'm Donna — I know the CHRONOS CRT system inside out, and I'll be here before every single trade you take. Before you even think about opening a chart, run your checklist. Tap "Checklist" below and let's see if you actually have a setup.`;
+    addMsg('in', g);
+    S.hist.push({role:'assistant', content:g});
+    persist();
+  } else {
+    S.hist.slice(-20).forEach(m => {
+      if (m.img) addImgMsg('out', m.img);
+      else addMsg(m.role === 'user' ? 'out' : 'in', m.content);
+    });
+    scrollB();
+  }
+
+  // File input handler
+  document.getElementById('file-in').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const dataUrl = ev.target.result;
+      S.pendingImg = dataUrl;
+      sendImage(dataUrl);
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+  });
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.getHours().toString().padStart(2,'0') + ':' + n.getMinutes().toString().padStart(2,'0');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function scrollB() { const m = document.getElementById('msgs'); setTimeout(() => m.scrollTop = m.scrollHeight, 80); }
+
+function fmtTs(role) {
+  const n = new Date(); let h = n.getHours(), m = n.getMinutes(), ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${role==='out' ? S.name||'You' : 'Donna'}  ${h}:${m.toString().padStart(2,'0')} ${ap}`;
+}
+
+function addMsg(role, text) {
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div'); row.className = 'mrow ' + role;
+  const b = document.createElement('div'); b.className = 'bub ' + role; b.textContent = text;
+  row.appendChild(b); msgs.appendChild(row);
+  const t = document.createElement('div'); t.className = 'bts ' + (role==='out'?'r':'l'); t.textContent = fmtTs(role);
+  msgs.appendChild(t); scrollB();
+}
+
+function addImgMsg(role, dataUrl, tradeId) {
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div'); row.className = 'mrow ' + role;
+  const wrap = document.createElement('div'); wrap.className = 'img-bub ' + role;
+  const img = document.createElement('img'); img.src = dataUrl;
+  img.onclick = () => openLB(dataUrl);
+  if (tradeId) img.dataset.tradeId = tradeId;
+  wrap.appendChild(img); row.appendChild(wrap); msgs.appendChild(row);
+  const t = document.createElement('div'); t.className = 'bts ' + (role==='out'?'r':'l'); t.textContent = fmtTs(role);
+  msgs.appendChild(t); scrollB();
+}
+
+function addCard(node, width) {
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div'); row.className = 'mrow in';
+  const wrap = document.createElement('div'); wrap.style.cssText = `max-width:${width||90}%;width:${width||90}%`;
+  wrap.appendChild(node); row.appendChild(wrap); msgs.appendChild(row);
+  const t = document.createElement('div'); t.className = 'bts l'; t.textContent = fmtTs('in');
+  msgs.appendChild(t); scrollB();
+}
+
+function showTyping() {
+  const msgs = document.getElementById('msgs');
+  const row = document.createElement('div'); row.className = 'mrow in'; row.id = 'typing';
+  const w = document.createElement('div'); w.className = 'typing-wrap';
+  w.innerHTML = '<div class="tdots"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  row.appendChild(w); msgs.appendChild(row); scrollB();
+}
+function rmTyping() { const el = document.getElementById('typing'); if (el) el.remove(); }
+
+function grow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(); } }
+
+// ── LIGHTBOX ──────────────────────────────────────────────────────────────────
+function openLB(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLB() { document.getElementById('lightbox').style.display = 'none'; }
+
+// ── FILE / IMAGE ──────────────────────────────────────────────────────────────
+function openFileChooser() {
+  if (S.busy) return;
+  document.getElementById('file-in').click();
+}
+
+async function sendImage(dataUrl) {
+  if (S.busy) return;
+  S.busy = true; document.getElementById('sbtn').disabled = true;
+  addImgMsg('out', dataUrl);
+  // Ask Donna to analyse the chart
+  await callDonna(null, dataUrl);
+  S.busy = false; document.getElementById('sbtn').disabled = false;
+}
+
+// ── SEND TEXT ─────────────────────────────────────────────────────────────────
+async function sendText() {
+  if (S.busy) return;
+  const inp = document.getElementById('inp');
+  const txt = inp.value.trim(); if (!txt) return;
+  inp.value = ''; grow(inp);
+  S.busy = true; document.getElementById('sbtn').disabled = true;
+  addMsg('out', txt);
+  S.hist.push({role:'user', content:txt});
+
+  // LOCAL CARD TRIGGERS — only for visual cards
+  const lo = txt.toLowerCase();
+  if (lo.includes('checklist') && (lo.includes('show') || lo.includes('run') || lo.includes('pre-trade') || lo.includes('pre trade'))) {
+    persist(); rmTyping(); buildChecklist(); S.busy=false; document.getElementById('sbtn').disabled=false; return;
+  }
+  if ((lo.includes('log') && lo.includes('trade')) || lo.includes('i want to log')) {
+    persist(); rmTyping(); buildLog(); S.busy=false; document.getElementById('sbtn').disabled=false; return;
+  }
+  if ((lo.includes('stat') || lo.includes('record') || lo.includes('win rate')) && (lo.includes('my') || lo.includes('show'))) {
+    persist(); rmTyping(); buildStats(); S.busy=false; document.getElementById('sbtn').disabled=false; return;
+  }
+  if (lo.includes('trade history') || lo.includes('show history') || lo.includes('recent trade')) {
+    persist(); rmTyping(); buildHistory(); S.busy=false; document.getElementById('sbtn').disabled=false; return;
+  }
+
+  // Everything else → Donna AI
+  await callDonna(txt, null);
+  S.busy = false; document.getElementById('sbtn').disabled = false;
+}
+
+function chip(txt) { if (S.busy) return; document.getElementById('inp').value = txt; sendText(); }
+function triggerStats() { chip('Show my trading stats and record'); }
+function triggerLog()   { chip('I want to log a trade'); }
+function triggerHistory(){ chip('Show trade history'); }
+
+// ── DONNA AI CALL ─────────────────────────────────────────────────────────────
+async function callDonna(text, imageDataUrl) {
+  showTyping();
+
+  const tr = S.trades;
+  const wins = tr.filter(t => t.result==='W').length;
+  const wr = tr.length ? Math.round(wins/tr.length*100) : 0;
+  const pnl = tr.reduce((s,t) => s+(parseFloat(t.pnl)||0), 0);
+  const statsCtx = tr.length
+    ? `${tr.length} trades logged. Win rate: ${wr}%. Wins: ${wins}. Losses: ${tr.filter(t=>t.result==='L').length}. Net P&L: $${pnl.toFixed(0)}. Current checklist: ${S.checks.filter(Boolean).length}/8 confirmed.`
+    : `No trades logged yet. Checklist: ${S.checks.filter(Boolean).length}/8 confirmed.`;
+
+  const sysPrompt = DONNA_SYSTEM
+    .replace('{NAME}', S.name || 'Trader')
+    .replace('{STATS}', statsCtx);
+
+  // Build messages array
+  const apiMsgs = [];
+  // Add recent history (text only for history)
+  S.hist.slice(-10).forEach(m => {
+    if (m.content) apiMsgs.push({role: m.role, content: m.content});
+  });
+
+  // Build the current user message
+  if (imageDataUrl) {
+    // Vision message with image
+    const base64 = imageDataUrl.split(',')[1];
+    const mime = imageDataUrl.split(';')[0].split(':')[1];
+    apiMsgs.push({
+      role: 'user',
+      content: [
+        {type:'image', source:{type:'base64', media_type:mime, data:base64}},
+        {type:'text', text:'I\'m sending you a chart. Please analyse it using the CHRONOS CRT system. Tell me what you see — the CRT range, order flow, key levels, any turtle soup or Model 1 setup, and whether this is a valid trade opportunity.'}
+      ]
+    });
+  } else {
+    // Make sure last message is from user
+    if (!apiMsgs.length || apiMsgs[apiMsgs.length-1].role !== 'user') {
+      apiMsgs.push({role:'user', content: text});
+    }
+  }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': S.key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 500,
+        system: sysPrompt,
+        messages: apiMsgs
+      })
+    });
+
+    rmTyping();
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        addMsg('in', 'Your API key isn\'t working. Tap "Messages" in the top left and update it.');
+      } else if (res.status === 429) {
+        addMsg('in', 'You\'ve hit the rate limit. Give it 30 seconds and send that again.');
+      } else if (res.status === 400) {
+        addMsg('in', `There was an issue with that request. Try rephrasing or send a different image.`);
+      } else {
+        addMsg('in', `Something went wrong on my end (${res.status}). Try again.`);
+      }
+      return;
+    }
+
+    const data = await res.json();
+    const reply = data?.content?.[0]?.text || 'Something went wrong. Try again.';
+    rmTyping();
+    addMsg('in', reply);
+    S.hist.push({role:'assistant', content:reply});
+    persist();
+
+  } catch(e) {
+    rmTyping();
+    addMsg('in', `Network error. Check your connection and try again.`);
+  }
+}
+
+// ── CHECKLIST CARD ────────────────────────────────────────────────────────────
+function buildChecklist() {
+  const card = document.createElement('div'); card.className = 'card';
+  const uid = 'cl' + Date.now();
+  const n = S.checks.filter(Boolean).length;
+
+  card.innerHTML = `
+    <div class="cl-head">
+      <div class="cl-ttl">Pre-trade checklist</div>
+      <div class="cl-pill ${n===8?'full':''}" id="${uid}pill">${n} / 8</div>
+    </div>
+    ${CL.map((item,i) => `
+      <div class="cl-item" id="${uid}row${i}">
+        <div class="cl-dot ${S.checks[i]?'on':''}" id="${uid}dot${i}"><div class="cl-ck"></div></div>
+        <div>
+          <div class="cl-main ${S.checks[i]?'on':''}" id="${uid}main${i}">${item.t}</div>
+          <div class="cl-desc ${S.checks[i]?'on':''}" id="${uid}desc${i}">${item.d}</div>
+        </div>
+      </div>`).join('')}
+    <div class="cl-btns">
+      <button class="cl-btn cl-rst" onclick="clReset('${uid}')">Reset</button>
+      <button class="cl-btn cl-ev" onclick="clEval('${uid}')">Is it clean?</button>
+    </div>`;
+
+  addCard(card, 92);
+
+  // Attach events after DOM insert
+  CL.forEach((_, i) => {
+    const row = document.getElementById(uid + 'row' + i);
+    if (!row) return;
+    const tap = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      S.checks[i] = !S.checks[i]; persist();
+      const dot  = document.getElementById(uid+'dot'+i);
+      const main = document.getElementById(uid+'main'+i);
+      const desc = document.getElementById(uid+'desc'+i);
+      const pill = document.getElementById(uid+'pill');
+      if (dot)  dot.className  = 'cl-dot'  + (S.checks[i] ? ' on' : '');
+      if (main) main.className = 'cl-main' + (S.checks[i] ? ' on' : '');
+      if (desc) desc.className = 'cl-desc' + (S.checks[i] ? ' on' : '');
+      const total = S.checks.filter(Boolean).length;
+      if (pill) { pill.textContent = total + ' / 8'; pill.className = 'cl-pill' + (total===8?' full':''); }
+    };
+    row.addEventListener('touchend', tap, {passive:false});
+    row.addEventListener('click', tap);
+  });
+}
+
+function clReset(uid) {
+  S.checks = new Array(8).fill(false); persist();
+  CL.forEach((_,i) => {
+    const d=document.getElementById(uid+'dot'+i); if(d) d.className='cl-dot';
+    const m=document.getElementById(uid+'main'+i); if(m) m.className='cl-main';
+    const s=document.getElementById(uid+'desc'+i); if(s) s.className='cl-desc';
+  });
+  const p=document.getElementById(uid+'pill'); if(p){p.textContent='0 / 8';p.className='cl-pill';}
+}
+
+function clEval(uid) {
+  const n = S.checks.filter(Boolean).length;
+  let msg;
+  if (n===8)     msg = `All 8. The setup is clean. Execute the plan exactly as you drew it up — 50% partial, trail your stop, no second-guessing once you're in. The checklist said yes. Trust it.`;
+  else if (n>=6) msg = `${n}/8. You're close but those last ${8-n} items exist for a reason. What's blocking them? Figure it out before you touch the button. Marginal setups produce marginal results, ${S.name}.`;
+  else if (n>=4) msg = `${n}/8. I'm stopping you right there. That is not a setup — that is hope. Step away from the chart and come back when you have at least 6 confirmed. I'm serious.`;
+  else           msg = `${n}/8, ${S.name}. No. Absolutely not. Put the phone down. You are about to gamble, not trade. Come back when you have a real setup.`;
+  addMsg('in', msg);
+  S.hist.push({role:'assistant', content:msg}); persist();
+}
+
+// ── STATS CARD ────────────────────────────────────────────────────────────────
+function buildStats() {
+  const tr=S.trades;
+  const wins=tr.filter(t=>t.result==='W').length;
+  const losses=tr.filter(t=>t.result==='L').length;
+  const wr=tr.length?Math.round(wins/tr.length*100):0;
+  const pnl=tr.reduce((s,t)=>s+(parseFloat(t.pnl)||0),0);
+  const lots=tr.reduce((s,t)=>s+(parseFloat(t.lots)||0),0);
+  const lon=tr.filter(t=>t.kz==='London');
+  const ny=tr.filter(t=>t.kz==='New York');
+  const lonWR=lon.length?Math.round(lon.filter(t=>t.result==='W').length/lon.length*100):0;
+  const nyWR=ny.length?Math.round(ny.filter(t=>t.result==='W').length/ny.length*100):0;
+  const avgCL=tr.length?Math.round(tr.reduce((s,t)=>s+(parseInt(t.clscore)||0),0)/tr.length):0;
+
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<div class="card-title">${S.name}'s Trading Record</div>
+    <div class="stat-row"><span class="stat-l">Win rate</span><span class="stat-v ${wr>=50?'g':'r'}">${wr}%</span></div>
+    <div class="stat-row"><span class="stat-l">Total trades</span><span class="stat-v">${tr.length}</span></div>
+    <div class="stat-row"><span class="stat-l">Wins / Losses</span><span class="stat-v">${wins}W &nbsp;·&nbsp; ${losses}L</span></div>
+    <div class="stat-row"><span class="stat-l">Net P&amp;L</span><span class="stat-v ${pnl>=0?'g':'r'}">$${pnl.toFixed(0)}</span></div>
+    <div class="stat-row"><span class="stat-l">Total lots traded</span><span class="stat-v">${lots.toFixed(2)}</span></div>
+    <div class="stat-row"><span class="stat-l">London win rate</span><span class="stat-v ${lonWR>=50?'g':'r'}">${lonWR}% &nbsp;(${lon.length} trades)</span></div>
+    <div class="stat-row"><span class="stat-l">New York win rate</span><span class="stat-v ${nyWR>=50?'g':'r'}">${nyWR}% &nbsp;(${ny.length} trades)</span></div>
+    <div class="stat-row"><span class="stat-l">Avg checklist score</span><span class="stat-v ${avgCL>=6?'g':'r'}">${avgCL}/8</span></div>`;
+  addCard(card, 88);
+
+  let c;
+  if (!tr.length) c=`No trades logged yet, ${S.name}. Use the + button after every trade — wins and losses. I can't hold you accountable without the data.`;
+  else if (avgCL<6) c=`Average checklist score of ${avgCL}/8. That's where the losses are coming from. Fix the process and the numbers will fix themselves.`;
+  else if (wr>=60) c=`${wr}% win rate with a ${avgCL}/8 average checklist score. The system is working because you're working it. Keep going.`;
+  else if (wr>=50) c=`${wr}% — you're above water. But there's room. Are the losing trades coming with dirty checklists? Because I suspect they are.`;
+  else c=`${wr}% and a ${avgCL}/8 average checklist score. The data doesn't lie, ${S.name}. Every skipped checklist item is a trade you gave away. Fix the process.`;
+  addMsg('in', c);
+  S.hist.push({role:'assistant', content:c}); persist();
+}
+
+// ── TRADE LOG CARD ────────────────────────────────────────────────────────────
+function buildLog() {
+  const card=document.createElement('div'); card.className='card';
+  const id='log'+Date.now();
+  card.innerHTML=`<div class="card-title">Log a trade</div>
+    <div class="lf-row">
+      <div class="lf"><label>Pair / Instrument</label><input id="${id}pair" placeholder="EURUSD, NAS100, BTCUSD..." autocorrect="off" autocapitalize="characters"></div>
+      <div class="lf"><label>Direction</label><select id="${id}dir"><option>Long</option><option>Short</option></select></div>
+    </div>
+    <div class="lf-row">
+      <div class="lf"><label>Result</label><select id="${id}res"><option>Win</option><option>Loss</option><option>Break Even</option></select></div>
+      <div class="lf"><label>P&amp;L ($)</label><input id="${id}pnl" type="number" placeholder="250 or -150" inputmode="decimal"></div>
+    </div>
+    <div class="lf-row">
+      <div class="lf"><label>Lots / Contracts</label><input id="${id}lots" type="number" placeholder="0.5" step="0.01" inputmode="decimal"></div>
+      <div class="lf"><label>Kill Zone</label><select id="${id}kz"><option>London</option><option>New York</option><option>Outside KZ</option></select></div>
+    </div>
+    <div class="lf-row">
+      <div class="lf"><label>Checklist score</label><input id="${id}cl" type="number" placeholder="${S.checks.filter(Boolean).length}" min="0" max="8" inputmode="numeric"></div>
+      <div class="lf"><label>Weekly profile</label><select id="${id}wp"><option>Monday Low</option><option>Tuesday Low</option><option>Wednesday Low</option><option>Thursday Reversal</option><option>Friday Reversal</option><option>Unknown</option></select></div>
+    </div>
+    <div class="lf"><label>Notes</label><textarea id="${id}notes" placeholder="What went well? What to improve? Any observations..." rows="2"></textarea></div>
+    <div class="lf">
+      <label>Chart screenshot (optional)</label>
+      <div class="log-img-area" onclick="pickLogImg('${id}')">
+        <img class="log-img-preview" id="${id}imgprev" src="">
+        <div class="log-img-txt" id="${id}imgtxt">Tap to attach a chart photo</div>
+      </div>
+      <input type="file" id="${id}imgfile" accept="image/*" style="display:none" onchange="handleLogImg('${id}',this)">
+    </div>
+    <button class="log-sub" onclick="submitLog('${id}')">Submit trade</button>`;
+  addCard(card, 92);
+}
+
+function pickLogImg(id) {
+  document.getElementById(id+'imgfile').click();
+}
+
+function handleLogImg(id, input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const prev = document.getElementById(id+'imgprev');
+    const txt  = document.getElementById(id+'imgtxt');
+    if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
+    if (txt)  { txt.textContent = 'Chart attached ✓'; txt.className = 'log-img-txt has'; }
+    input._imgData = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitLog(id) {
+  const pair  = (document.getElementById(id+'pair')?.value||'').trim()||'Unknown';
+  const dir   = document.getElementById(id+'dir')?.value||'Long';
+  const rv    = document.getElementById(id+'res')?.value||'Win';
+  const result= rv==='Win'?'W':rv==='Loss'?'L':'BE';
+  const pnl   = parseFloat(document.getElementById(id+'pnl')?.value)||0;
+  const lots  = parseFloat(document.getElementById(id+'lots')?.value)||0;
+  const kz    = document.getElementById(id+'kz')?.value||'';
+  const cl    = parseInt(document.getElementById(id+'cl')?.value)||S.checks.filter(Boolean).length;
+  const wp    = document.getElementById(id+'wp')?.value||'';
+  const notes = (document.getElementById(id+'notes')?.value||'').trim();
+  const imgFile = document.getElementById(id+'imgfile');
+  const imgData = imgFile?._imgData || null;
+
+  const tradeId = 'trade_' + Date.now();
+  S.trades.push({id:tradeId, pair, dir, result, pnl, lots, kz, clscore:cl, wp, notes, img:imgData, date:new Date().toLocaleDateString()});
+  S.checks = new Array(8).fill(false);
+  persist();
+
+  // Show chart in chat if attached
+  if (imgData) addImgMsg('out', imgData, tradeId);
+
+  const isWin=result==='W'; const clean=cl>=6;
+  let rep;
+  if (isWin&&clean)   rep=`${pair} ${dir.toLowerCase()} — logged.${pnl>0?' $'+pnl+' P&L.':''} Checklist ${cl}/8. That's what a clean trade looks like. Reset and wait for the next one.`;
+  else if(isWin&&!clean) rep=`Win on ${pair} logged. But ${cl}/8 on the checklist, ${S.name}. I'll take the result. Fix the habits before the luck runs out.`;
+  else if(!isWin&&clean) rep=`${pair} loss logged. Checklist ${cl}/8 — the process was right.${Math.abs(pnl)>0?' $'+Math.abs(pnl)+' down.':''} That's an acceptable loss. Move on. Don't revenge trade.`;
+  else rep=`${pair} loss with ${cl}/8. Those ${8-cl} missing checklist items cost you this trade, ${S.name}. Notes: "${notes||'none'}". Figure out which ones you skipped and why.`;
+
+  addMsg('in', rep);
+  S.hist.push({role:'assistant', content:rep}); persist();
+}
+
+// ── HISTORY CARD ──────────────────────────────────────────────────────────────
+function buildHistory() {
+  const trades = [...S.trades].reverse().slice(0, 12);
+  if (!trades.length) {
+    addMsg('in', `No trades logged yet, ${S.name}. Every trade needs to be in the record — wins and losses. Use the + button.`);
+    return;
+  }
+  const card = document.createElement('div'); card.className = 'card';
+  card.innerHTML = `<div class="card-title">Recent trades</div>` +
+    trades.map(t => `
+      <div class="hist-row">
+        <span class="h-p">${t.pair}</span>
+        <span class="h-d ${t.dir==='Long'?'long':'short'}">${t.dir}</span>
+        <span class="h-m">${t.kz||'—'} · CL ${t.clscore||'?'}/8</span>
+        <span class="h-pnl ${t.result==='W'?'pos':'neg'}">$${(parseFloat(t.pnl)||0).toFixed(0)}</span>
+        ${t.img?`<img class="h-thumb" src="${t.img}" onclick="openLB('${t.img}')">`:``}
+      </div>`).join('');
+  addCard(card, 92);
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function showMenu()    { document.getElementById('menu-modal').style.display='flex'; }
+function hideMenu()    { document.getElementById('menu-modal').style.display='none'; }
+function showKeyModal(){ document.getElementById('modal-key').value=S.key; document.getElementById('key-modal').style.display='flex'; }
+function hideKeyModal(){ document.getElementById('key-modal').style.display='none'; }
+function saveKey() {
+  const k = document.getElementById('modal-key').value.trim();
+  if (k) { S.key=k; persist(); }
+  hideKeyModal();
+}
+function clearData() {
+  if (confirm('This will delete all your trade history and conversation. Are you sure?')) {
+    localStorage.removeItem('donna_v5');
+    location.reload();
+  }
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+if (S.name && S.key) {
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  init();
+}
+</script>
+</body>
+</html>
