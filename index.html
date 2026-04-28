@@ -308,7 +308,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
       <button class="s-sel-btn" id="s-madv" onclick="pickMode('advanced')"><span class="s-ico">⚡</span><div id="mode-adv-lbl">Advanced</div><div class="s-lbl2" id="mode-adv-sub">No hand-holding</div></button>
     </div>
   </div>
-  <div class="s-field"><div class="s-lbl" id="s-lbl-key">API Key</div><input class="s-inp" id="skey" placeholder="sk-ant-api03-..." type="password" autocomplete="off" autocorrect="off" autocapitalize="none"><div class="s-hint" id="s-key-hint">Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div></div>
+
   <div class="s-err" id="serr"></div>
   <button class="s-btn" id="s-start-btn" onclick="doSetup()">Start with Donna</button>
   <div class="s-div"></div>
@@ -409,11 +409,8 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
   <button class="rv-btn" id="rv-btn" onclick="closeResults()">Continue</button>
 </div>
 
-<div class="modal-bg" id="key-modal" style="display:none" onclick="if(event.target===this)hideKeyModal()">
-  <div class="modal"><div class="modal-t" id="modal-key-title">Update API Key</div><input class="modal-inp" id="modal-key" placeholder="sk-ant-..." type="password" autocomplete="off"><button class="m-ok" onclick="saveKey()" id="modal-save-btn">Save</button><button class="m-cancel" onclick="hideKeyModal()" id="modal-cancel-btn">Cancel</button><div class="modal-note"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div></div>
-</div>
 <div class="menu-bg" id="menu-modal" style="display:none" onclick="if(event.target===this)hideMenu()">
-  <div><div class="menu"><button class="menu-item" id="menu-key-btn" onclick="hideMenu();showKeyModal()">Update API Key</button><button class="menu-item" id="menu-hist-btn" onclick="hideMenu();triggerHistory()">Trade History</button><button class="menu-item dest" id="menu-clear-btn" onclick="hideMenu();clearData()">Clear All Data</button></div><button class="menu-cancel" id="menu-cancel-btn" onclick="hideMenu()">Cancel</button></div>
+  <div><div class="menu"><button class="menu-item" id="menu-hist-btn" onclick="hideMenu();triggerHistory()">Trade History</button><button class="menu-item dest" id="menu-clear-btn" onclick="hideMenu();clearData()">Clear All Data</button></div><button class="menu-cancel" id="menu-cancel-btn" onclick="hideMenu()">Cancel</button></div>
 </div>
 
 <script>
@@ -1686,14 +1683,13 @@ function applySetupStrings(){
 }
 function doSetup(){
   const nm=document.getElementById('sname').value.trim();
-  const key=document.getElementById('skey').value.trim();
+  const key='';
   const err=document.getElementById('serr');
   const errs = (L[setupLang]||L.en).errors||{};
   if(!nm){err.style.display='block';err.textContent=errs.noName||'Enter your name.';return;}
-  if(!key){err.style.display='block';err.textContent=errs.noKey||'Enter API key.';return;}
-  if(!key.startsWith('sk-ant-')){err.style.display='block';err.textContent=errs.badKey||'Check your key.';return;}
+
   err.style.display='none';
-  S.name=nm; S.key=key; S.mode=setupMode; S.lang=setupLang;
+  S.name=nm; S.key=''; S.mode=setupMode; S.lang=setupLang;
   save();
   document.getElementById('setup').style.display='none';
   document.getElementById('app').style.display='flex';
@@ -1801,9 +1797,9 @@ async function callAI(userMsg, imageB64){
   chatHistory.push({role:'user',content});
   if(chatHistory.length > 30){ chatHistory = chatHistory.slice(-28); }
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages',{
+  const resp = await fetch('/api/chat',{
     method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:getSysPrompt(),messages:chatHistory})
   });
   if(!resp.ok){ const e=await resp.json(); throw new Error(e.error?.message||'API error'); }
@@ -1895,9 +1891,7 @@ function setMode(m){
 // ── MENU & MODALS ──────────────────────────────────────────────────────────
 function showMenu(){ document.getElementById('menu-modal').style.display='flex'; }
 function hideMenu(){ document.getElementById('menu-modal').style.display='none'; }
-function showKeyModal(){ document.getElementById('key-modal').style.display='flex'; }
-function hideKeyModal(){ document.getElementById('key-modal').style.display='none'; }
-function saveKey(){ const k=document.getElementById('modal-key').value.trim(); if(k&&k.startsWith('sk-ant-')){S.key=k;save();hideKeyModal();} }
+function showKeyModal(){} function hideKeyModal(){} function saveKey(){}
 function openLB(src){ document.getElementById('lb-img').src=src; document.getElementById('lightbox').style.display='flex'; }
 function closeLB(){ document.getElementById('lightbox').style.display='none'; }
 
@@ -2287,7 +2281,7 @@ function closeResults(){
 
 // ── INIT ────────────────────────────────────────────────────────────────────
 load();
-if(S.name&&S.key){
+if(S.name){
   document.getElementById('setup').style.display='none';
   document.getElementById('app').style.display='flex';
   applyAppStrings(); buildAcademy();
