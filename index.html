@@ -389,8 +389,8 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
       <div class="nb-mid"><div class="nb-av">D</div><div class="nb-nm">Donna</div><div class="nb-rl" id="nb-mode-lbl">Mentor</div></div>
       <div class="nb-acts">
         <div class="mode-pill"><button class="m-btn" id="btn-beg" onclick="setMode('beginner')">BEG</button><button class="m-btn" id="btn-adv" onclick="setMode('advanced')">ADV</button></div>
-        <button class="nb-act" onclick="triggerStats()">&#9783;</button>
-        <button class="nb-act" onclick="triggerLog()">&#43;</button>
+        <button class="nb-act" id="nb-stats-btn" onclick="triggerStats()">&#9783;</button>
+        <button class="nb-act" id="nb-log-btn" onclick="triggerLog()">&#43;</button>
       </div>
     </div>
     
@@ -2067,7 +2067,27 @@ async function sendMsg(txt, imgB64){
     const reply = await callAI(txt||'[Image attached]',imgB64);
     removeTyping(); addMsg('in',reply);
   }catch(e){
-    removeTyping(); addMsg('in',(S.lang==='es'?'Error: ':'Error: ')+e.message);
+    removeTyping();
+    const em = e.message||'';
+    let friendly;
+    if(em.toLowerCase().includes('overload') || em.toLowerCase().includes('529')){
+      friendly = S.lang==='es'
+        ? 'Donna está muy ocupada ahora mismo. Espera unos segundos e intenta de nuevo.'
+        : 'Donna is busy right now. Wait a few seconds and try again.';
+    } else if(em.toLowerCase().includes('fetch') || em.toLowerCase().includes('network') || em.toLowerCase().includes('failed')){
+      friendly = S.lang==='es'
+        ? 'Sin conexión. Revisa tu internet e intenta de nuevo.'
+        : 'No connection. Check your internet and try again.';
+    } else if(em.toLowerCase().includes('429') || em.toLowerCase().includes('rate')){
+      friendly = S.lang==='es'
+        ? 'Demasiadas preguntas seguidas. Espera un momento.'
+        : 'Too many messages at once. Wait a moment and try again.';
+    } else {
+      friendly = S.lang==='es'
+        ? 'Algo salió mal. Intenta de nuevo.'
+        : 'Something went wrong. Try again.';
+    }
+    addMsg('in', friendly);
   }
   document.getElementById('sbtn').disabled=false;
   pendingImg=null; pendingB64=null;
@@ -2676,7 +2696,7 @@ function getOnboardSteps(name, mode, lang) {
       next: es ? 'Mostrarme →' : 'Show me →'
     },
     {
-      target: 'tab-chat',
+      target: 'tb-chat',
       pos: 'top',
       title: es ? '💬 Habla conmigo' : '💬 Talk to me',
       body: es
@@ -2685,7 +2705,7 @@ function getOnboardSteps(name, mode, lang) {
       next: es ? 'Siguiente →' : 'Next →'
     },
     {
-      target: 'tab-academy',
+      target: 'tb-academy',
       pos: 'top',
       title: es ? '📚 El Curso — 22 Capítulos' : '📚 The Course — 22 Chapters',
       body: es
@@ -2694,21 +2714,21 @@ function getOnboardSteps(name, mode, lang) {
       next: es ? 'Siguiente →' : 'Next →'
     },
     {
-      target: 'tab-log',
+      target: 'nb-log-btn',
       pos: 'top',
-      title: es ? '📓 Tu Diario de Trades' : '📓 Your Trade Journal',
+      title: es ? '📓 Registra tus trades' : '📓 Log your trades',
       body: es
-        ? `Registra cada operación con foto de tu gráfica, resultado y notas. El diario es donde mejoras de verdad — no en estudiar más, sino en revisar tus propios patrones.`
-        : `Log every trade with a chart screenshot, result, and notes. The journal is where real improvement happens — not from studying more, but from reviewing your own patterns.`,
+        ? `Toca el + para registrar cada operación — resultado, foto de tu gráfica y notas. El diario es donde mejoras de verdad, no estudiando más.`
+        : `Tap + to log every trade — result, chart screenshot, and notes. The journal is where real improvement happens, not from studying more.`,
       next: es ? 'Siguiente →' : 'Next →'
     },
     {
-      target: 'tab-stats',
+      target: 'nb-stats-btn',
       pos: 'top',
-      title: es ? '📊 Tus Estadísticas' : '📊 Your Stats',
+      title: es ? '📊 Tus estadísticas' : '📊 Your stats',
       body: es
-        ? `Tu tasa de acierto, promedio de R:R, rachas — todo aquí. Los números no mienten. Esto te dice si estás mejorando o si hay un patrón de error que tienes que corregir.`
-        : `Win rate, average R:R, streaks — all here. Numbers don't lie. This tells you if you're improving or if there's an error pattern you need to fix.`,
+        ? `Toca el ☷ para ver tu tasa de acierto, R:R promedio y rachas. Los números no mienten — esto te dice si estás mejorando.`
+        : `Tap ☷ to see your win rate, average R:R, and streaks. Numbers don't lie — this tells you if you're actually improving.`,
       next: es ? 'Empezar →' : "Let's go →"
     },
     {
@@ -2727,7 +2747,7 @@ let obSteps = [];
 let obIdx = 0;
 
 function startOnboarding(name, mode, lang) {
-  if(localStorage.getItem('donna_onboard_v8')) return;
+  if(localStorage.getItem('donna_onboard_v9')) return;
   obSteps = getOnboardSteps(name, mode, lang);
   obIdx = 0;
   showOnboardStep();
@@ -2789,7 +2809,7 @@ function finishOnboard() {
   document.getElementById('onboard-overlay').classList.remove('show');
   document.getElementById('ob-tooltip').style.display = 'none';
   document.getElementById('ob-highlight').style.display = 'none';
-  localStorage.setItem('donna_onboard_v8', '1');
+  localStorage.setItem('donna_onboard_v9', '1');
 }
 
 </script>
