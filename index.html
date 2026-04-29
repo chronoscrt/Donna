@@ -27,9 +27,9 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .s-btn:active{opacity:.82}
 .s-div{width:100%;max-width:340px;height:1px;background:#1C1C1E}
 .s-row{display:flex;gap:9px;width:100%;max-width:340px}
-.s-sel-btn{flex:1;padding:12px 8px;border-radius:12px;font-size:13px;font-weight:600;border:1.5px solid #2C2C2E;color:#8E8E93;background:#1C1C1E;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center}
+.s-sel-btn{flex:1;padding:14px 8px;border-radius:12px;font-size:13px;font-weight:600;border:1.5px solid #2C2C2E;color:#8E8E93;background:#1C1C1E;cursor:pointer;font-family:-apple-system,sans-serif;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .s-sel-btn.sel{border-color:#C41E3A;color:#fff;background:rgba(196,30,58,.15)}
-.s-sel-btn .s-ico{font-size:20px;margin-bottom:4px;display:block}
+.s-sel-btn .s-ico{font-size:28px;margin-bottom:6px;display:block;line-height:1.2;font-family:apple color emoji,segoe ui emoji,noto color emoji,sans-serif}
 .s-sel-btn .s-lbl2{font-size:10px;color:#8E8E93;margin-top:3px}
 
 #app{height:100%;display:none;flex-direction:column;background:#000;max-width:430px;margin:0 auto}
@@ -282,6 +282,36 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .slide-svg{width:100%;flex-shrink:0;display:none;margin:4px 0}
 .slide-svg svg{width:100%;height:auto;display:block;max-height:200px}
 
+
+#paywall{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px 24px;z-index:9999;overflow-y:auto}
+.pw-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(145deg,#6B0000,#C41E3A);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 8px 32px rgba(196,30,58,0.35)}
+.pw-title{font-size:24px;font-weight:800;color:#fff;text-align:center;line-height:1.3}
+.pw-sub{font-size:13px;color:#8E8E93;text-align:center;line-height:1.7;max-width:300px}
+.pw-divider{width:100%;max-width:340px;height:1px;background:#1C1C1E}
+.pw-section-lbl{font-size:11px;color:#636366;text-transform:uppercase;letter-spacing:.06em;font-weight:600;text-align:center}
+.pw-code-wrap{width:100%;max-width:340px;display:flex;gap:8px}
+.pw-inp{flex:1;padding:13px 16px;background:#1C1C1E;border:1px solid #38383A;border-radius:13px;color:#fff;font-size:16px;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;text-transform:uppercase;letter-spacing:.05em}
+.pw-inp:focus{border-color:#C41E3A}
+.pw-inp::placeholder{color:#48484A;text-transform:none;letter-spacing:0}
+.pw-apply{padding:13px 18px;background:#C41E3A;border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;flex-shrink:0}
+.pw-apply:disabled{background:#2C2C2E;color:#48484A;cursor:not-allowed}
+.pw-apply:active:not(:disabled){opacity:.82}
+.pw-err{font-size:13px;color:#FF453A;text-align:center;line-height:1.5;max-width:300px;display:none}
+.pw-ok{font-size:13px;color:#30D158;text-align:center;line-height:1.5;max-width:300px;display:none}
+.pw-pay-btn{width:100%;max-width:340px;padding:16px;background:linear-gradient(135deg,#8B1A1A,#C41E3A);border:none;border-radius:14px;color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;letter-spacing:.02em}
+.pw-pay-btn:active{opacity:.85}
+.pw-hint{font-size:11px;color:#48484A;text-align:center;line-height:1.6;max-width:300px}
+.pw-trial-badge{background:#1C1C1E;border:1px solid #2C2C2E;border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:10px;max-width:340px;width:100%}
+.pw-trial-ico{font-size:22px}
+.pw-trial-txt{flex:1}
+.pw-trial-days{font-size:17px;font-weight:800;color:#C41E3A}
+.pw-trial-lbl{font-size:11px;color:#636366;margin-top:1px}
+/* Trial indicator in chat */
+#trial-banner{background:linear-gradient(135deg,#1A0000,#2A0808);border-bottom:.5px solid #C41E3A33;padding:6px 16px;display:none;align-items:center;justify-content:space-between;flex-shrink:0}
+#trial-banner.show{display:flex}
+.tb-txt{font-size:11px;color:#C41E3A;font-weight:600}
+.tb-days{font-size:11px;color:#8E8E93}
+
 </style>
 </head>
 <body>
@@ -312,6 +342,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
   <div class="s-err" id="serr"></div>
   <button class="s-btn" id="s-start-btn" onclick="doSetup()">Start with Donna</button>
   <div class="s-div"></div>
+  <div class="s-hint" style="text-align:center;margin-bottom:2px;font-size:12px;color:#48484A" id="s-disclaimer">Not financial advice. Just candle theory.</div>
   <div class="s-hint" style="text-align:center" id="s-privacy">All data stays on your device only.</div>
 </div>
 
@@ -327,10 +358,15 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
         <button class="nb-act" onclick="triggerLog()">&#43;</button>
       </div>
     </div>
+    
+  <div id="trial-banner">
+    <span class="tb-txt">🕐 Free Trial</span>
+    <span class="tb-days" id="trial-days-left"></span>
+  </div>
+
     <div class="msgs" id="msgs"></div>
     <div class="chips" id="chips-bar"></div>
     <div class="ibar">
-      <button class="i-img-btn" onclick="openFileChooser()">&#128247;</button>
       <div class="i-wrap"><textarea class="i-ta" id="inp" rows="1" onkeydown="handleKey(event)" oninput="grow(this)"></textarea><button class="i-send" id="sbtn" onclick="sendText()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button></div>
     </div>
   </div>
@@ -411,6 +447,32 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 
 <div class="menu-bg" id="menu-modal" style="display:none" onclick="if(event.target===this)hideMenu()">
   <div><div class="menu"><button class="menu-item" id="menu-hist-btn" onclick="hideMenu();triggerHistory()">Trade History</button><button class="menu-item dest" id="menu-clear-btn" onclick="hideMenu();clearData()">Clear All Data</button></div><button class="menu-cancel" id="menu-cancel-btn" onclick="hideMenu()">Cancel</button></div>
+</div>
+
+
+<div id="paywall">
+  <div class="pw-logo">D</div>
+  <div class="pw-title">Your free trial has ended</div>
+  <div class="pw-sub">Enter an access code or unlock full access to keep training with Donna.</div>
+  <div class="pw-trial-badge">
+    <div class="pw-trial-ico">⏱️</div>
+    <div class="pw-trial-txt">
+      <div class="pw-trial-days" id="pw-days-used">15 days</div>
+      <div class="pw-trial-lbl">of free trial used</div>
+    </div>
+  </div>
+  <div class="pw-divider"></div>
+  <div class="pw-section-lbl">Have an access code?</div>
+  <div class="pw-code-wrap">
+    <input class="pw-inp" id="pw-code" placeholder="Enter code..." maxlength="32" autocomplete="off" autocorrect="off" autocapitalize="characters">
+    <button class="pw-apply" id="pw-apply-btn" onclick="applyCode()">Apply</button>
+  </div>
+  <div class="pw-err" id="pw-err">That code isn't valid. Check it and try again.</div>
+  <div class="pw-ok" id="pw-ok">✓ Access granted! Loading...</div>
+  <div class="pw-divider"></div>
+  <div class="pw-section-lbl">Unlock full access</div>
+  <button class="pw-pay-btn" id="pw-pay-btn" onclick="goToPay()">Get Full Access →</button>
+  <div class="pw-hint" id="pw-hint-txt">After payment you'll receive an access code by email. Enter it above to unlock.</div>
 </div>
 
 <script>
@@ -1628,6 +1690,104 @@ const CHAPTERS = [
    a:2,exp:{en:'Your edge. The CRT framework — price moves for two reasons, Turtle Soup before every expansion, AMD in every candle, three factors to align — puts you in a completely different category from 99% of traders. Guard it.',
              es:'Tu ventaja. El marco CRT — el precio se mueve por dos razones, Turtle Soup antes de cada expansion, AMD en cada vela, tres factores a alinear — te pone en una categoria completamente diferente al 99% de los traders. Cuidala.'}}
  ]}
+
+,
+{id:21,icon:'⏱️',color:'#1A2A3A',
+ title:{en:'Trading the 4H CRT',es:'Operando el CRT de 4H'},
+ desc:{en:'The 4H candle is your range. Drop to 1H and 15M to execute inside it.',es:'La vela de 4H es tu rango. Baja a 1H y 15M para ejecutar dentro de ella.'},
+ slides:[
+  {type:'concept',icon:'⏱️',
+   title:{en:'The 4H Candle Is the CRT',es:'La Vela de 4H Es el CRT'},
+   body:{en:'When you trade a 4H CRT, the 4H candle itself is your Candle 1 — the Accumulation range. You are reading that 4H candle and waiting for its internal AMD to play out. Candle 2 (Manipulation) sweeps one side of the 4H range. Candle 3 (Distribution) delivers to the opposite extreme. You do not execute on the 4H chart. You drop to the 1H or 15M to find your entry inside the move.',
+         es:'Cuando operas un CRT de 4H, la propia vela de 4H es tu Vela 1 — el rango de Acumulacion. Lees esa vela de 4H y esperas que su AMD interno se desarrolle. La Vela 2 (Manipulacion) barre un lado del rango de 4H. La Vela 3 (Distribucion) entrega al extremo opuesto. No ejecutas en el grafico de 4H. Bajas a 1H o 15M para encontrar tu entrada dentro del movimiento.'},
+   key:{en:'4H candle = your Accumulation range. Execute the entry on 1H or 15M inside the 4H AMD.',es:'Vela de 4H = tu rango de Acumulacion. Ejecuta la entrada en 1H o 15M dentro del AMD de 4H.'}},
+  {type:'rule',icon:'🏔️',
+   title:{en:'The Key Level Requirement',es:'El Requisito del Nivel Clave'},
+   body:{en:'Before anything else: the 4H CRT must be at a valid HTF key level. Daily, weekly, or monthly — the 4H candle needs to be forming AT a level that matters on the chart above it. This is the filter most beginners miss. They see a clean 4H AMD pattern and enter — without checking whether the daily or weekly chart even supports the move. No key level on HTF means no trade, no matter how clean the 4H pattern looks.',
+         es:'Antes que nada: el CRT de 4H debe estar en un nivel clave HTF valido. Diario, semanal o mensual — la vela de 4H necesita formarse EN un nivel que importa en el grafico superior. Este es el filtro que la mayoria de los principiantes pasa por alto. Sin nivel clave en HTF, no hay trade, sin importar lo limpio que se vea el patron de 4H.'},
+   key:{en:'4H CRT only valid at a daily, weekly, or monthly key level. Check the higher chart first.',es:'CRT de 4H solo valido en un nivel clave diario, semanal o mensual. Revisa el grafico superior primero.'}},
+  {type:'rule',icon:'🕐',
+   title:{en:'Kill Zone Alignment',es:'Alineacion de la Kill Zone'},
+   body:{en:'The 4H candle must open inside a kill zone for the setup to have full probability. The three 4H candles that close inside the daily AMD are the 1am, 5am, and 9am NY candles — these align with the Asian close, London open, and New York open kill zones. If the 4H CRT is forming outside of a kill zone it is still readable but the probability drops significantly. Time is part of the edge.',
+         es:'La vela de 4H debe abrirse dentro de una kill zone para que el setup tenga maxima probabilidad. Las tres velas de 4H que cierran dentro del AMD diario son las de la 1am, 5am y 9am NY — estas se alinean con el cierre asiatico, apertura de Londres y apertura de Nueva York. El tiempo es parte de la ventaja.'},
+   key:{en:'Best 4H CRTs: 1am candle (Asian), 5am candle (London), 9am candle (New York). Align time with the pattern.',es:'Mejores CRTs de 4H: vela de 1am (Asia), 5am (Londres), 9am (Nueva York). Alinea el tiempo con el patron.'}},
+  {type:'concept',icon:'🔬',
+   title:{en:'Drilling Down to Execute',es:'Bajando Para Ejecutar'},
+   body:{en:'Once you identify the 4H CRT setup — key level confirmed, kill zone active, Candle 2 sweeping — you drop to the 1H chart to see the AMD forming in real time. On the 1H you look for the Model 1 entry: Turtle Soup confirmation, then a retest of the FVG or Order Block left behind by the Manipulation sweep. Your entry is a limit order on the 1H or 15M. Stop loss goes above or below the sweep wick of Candle 2.',
+         es:'Una vez que identificas el setup de CRT de 4H — nivel clave confirmado, kill zone activa, Vela 2 barriendo — bajas al grafico de 1H para ver el AMD formandose en tiempo real. En el 1H buscas la entrada del Model 1: confirmacion del Turtle Soup, luego un retest del FVG o Order Block dejado por el barrido de Manipulacion. Tu entrada es una orden limite en 1H o 15M.'},
+   key:{en:'4H identifies the setup. 1H/15M is where you execute. Never execute directly on the 4H candle.',es:'4H identifica el setup. 1H/15M es donde ejecutas. Nunca ejecutes directamente en la vela de 4H.'}}
+ ],
+ questions:[
+  {q:{en:'In a 4H CRT, your Candle 1 (Accumulation range) is:',es:'En un CRT de 4H, tu Vela 1 (rango de Acumulacion) es:'},
+   opts:{en:['A 15-minute candle','The 4H candle itself','A daily candle','Any candle that forms a range'],
+         es:['Una vela de 15 minutos','La propia vela de 4H','Una vela diaria','Cualquier vela que forme un rango']},
+   a:1,exp:{en:'The 4H candle is Candle 1 — the Accumulation range. You are reading the internal AMD of that 4H candle and executing inside it on lower timeframes.',
+             es:'La vela de 4H ES la Vela 1 — el rango de Acumulacion. Lees el AMD interno de esa vela de 4H y ejecutas dentro de ella en temporalidades inferiores.'}},
+  {q:{en:'Where do you execute your entry on a 4H CRT?',es:'¿Donde ejecutas tu entrada en un CRT de 4H?'},
+   opts:{en:['Directly on the 4H chart when you see the pattern','On the 1H or 15M chart inside the 4H move','On the daily chart for confirmation','On the 1-minute chart only'],
+         es:['Directamente en el grafico de 4H cuando ves el patron','En el grafico de 1H o 15M dentro del movimiento de 4H','En el grafico diario para confirmacion','Solo en el grafico de 1 minuto']},
+   a:1,exp:{en:'You never execute on the 4H chart itself. You identify the setup on 4H, then drop to 1H or 15M to find the Model 1 entry inside the Candle 2 sweep.',
+             es:'Nunca ejecutas en el grafico de 4H en si. Identificas el setup en 4H, luego bajas a 1H o 15M para encontrar la entrada del Model 1 dentro del barrido de la Vela 2.'}},
+  {q:{en:'A 4H CRT setup requires what as the most important filter?',es:'Un setup de CRT de 4H requiere que como el filtro mas importante?'},
+   opts:{en:['A clean AMD pattern on the 4H','A valid HTF key level (daily, weekly, or monthly)','A strong news event','The 4H candle closing with a long wick'],
+         es:['Un patron AMD limpio en el 4H','Un nivel clave HTF valido (diario, semanal o mensual)','Un evento de noticias fuerte','La vela de 4H cerrando con una mecha larga']},
+   a:1,exp:{en:'The HTF key level is the most important filter. A clean 4H pattern with no HTF support is not a trade. Daily, weekly, or monthly level must be present before anything else.',
+             es:'El nivel clave HTF es el filtro mas importante. Un patron de 4H limpio sin soporte HTF no es un trade. El nivel diario, semanal o mensual debe estar presente antes que nada.'}},
+  {q:{en:'The 4H candles with the highest probability align with which NY times?',es:'Las velas de 4H con mayor probabilidad se alinean con que horarios NY?'},
+   opts:{en:['3am, 7am, and 11am','1am, 5am, and 9am','6am, 10am, and 2pm','12am, 4am, and 8am'],
+         es:['3am, 7am y 11am','1am, 5am y 9am','6am, 10am y 2pm','12am, 4am y 8am']},
+   a:1,exp:{en:'The 1am, 5am, and 9am NY candles align with the Asian close, London open, and New York open kill zones — the highest probability times for 4H CRT setups.',
+             es:'Las velas de 1am, 5am y 9am NY se alinean con el cierre asiatico, apertura de Londres y apertura de Nueva York — los horarios de mayor probabilidad para setups de CRT de 4H.'}}
+ ]},
+
+{id:22,icon:'🕐',color:'#1A1A2E',
+ title:{en:'Trading the 1H CRT',es:'Operando el CRT de 1H'},
+ desc:{en:'The 1H is your range. You need a 1H or higher key level. Execute on 15M, 5M, even 1M.',es:'El 1H es tu rango. Necesitas un nivel clave de 1H o superior. Ejecuta en 15M, 5M, incluso 1M.'},
+ slides:[
+  {type:'concept',icon:'🕐',
+   title:{en:'The 1H CRT Setup',es:'El Setup del CRT de 1H'},
+   body:{en:'In a 1H CRT, the 1-hour candle is your Candle 1 — the range. The internal AMD plays out within that single hourly candle: Candle 2 sweeps liquidity on one side of the 1H range, then Candle 3 distributes to the other extreme. This is a faster, more precise setup than the 4H. The rules are the same — but everything moves quicker. You must be ready to execute when the sweep happens, not after.',
+         es:'En un CRT de 1H, la vela de 1 hora es tu Vela 1 — el rango. El AMD interno se desarrolla dentro de esa unica vela horaria: la Vela 2 barre liquidez en un lado del rango de 1H, luego la Vela 3 distribuye al otro extremo. Es un setup mas rapido y preciso que el de 4H. Las reglas son las mismas — pero todo se mueve mas rapido.'},
+   key:{en:'1H candle = your range. AMD plays out inside that one hourly candle. Speed is higher — precision must match.',es:'Vela de 1H = tu rango. AMD se desarrolla dentro de esa vela horaria. Velocidad es mayor — la precision debe igualarla.'}},
+  {type:'rule',icon:'📍',
+   title:{en:'Key Level Rule — 1H or Higher Required',es:'Regla del Nivel Clave — 1H o Superior Requerido'},
+   body:{en:'A 1H CRT is only valid if the 1H candle is forming at a key level that exists on the 1H chart OR a higher timeframe. A key level only visible on the 5M or 15M is not enough — the level must be meaningful from the 1H perspective or above. Daily levels, 4H levels, and 1H levels all qualify. This keeps you anchored in the right context and prevents trading noise.',
+         es:'Un CRT de 1H solo es valido si la vela de 1H se forma en un nivel clave que existe en el grafico de 1H O una temporalidad superior. Un nivel solo visible en 5M o 15M no es suficiente — el nivel debe ser significativo desde la perspectiva de 1H o superior. Los niveles diarios, de 4H y de 1H califican.'},
+   key:{en:'1H CRT key level must be visible on 1H or higher. Levels below 1H are noise — not context.',es:'El nivel clave del CRT de 1H debe ser visible en 1H o superior. Los niveles por debajo del 1H son ruido, no contexto.'}},
+  {type:'concept',icon:'🔭',
+   title:{en:'ITF and Entry Timeframes',es:'ITF y Temporalidades de Entrada'},
+   body:{en:'The 1H CRT has a clear three-layer structure. HTF (4H, daily, weekly): overall bias and context. ITF — Intermediate Timeframe (15M/5M): where you confirm the AMD is forming and the Candle 2 sweep is happening. Entry — execution layer (5M or 1M): where you place your limit order on the retest of the FVG or Order Block left by the manipulation sweep. Most traders go straight to the 1H and miss the ITF confirmation entirely.',
+         es:'El CRT de 1H tiene una estructura clara de tres capas. HTF (4H, diario, semanal): sesgo y contexto general. ITF — Temporalidad Intermedia (15M/5M): donde confirmas que el AMD se esta formando y el barrido de la Vela 2 esta ocurriendo. Entrada — capa de ejecucion (5M o 1M): donde colocas tu orden limite en el retest del FVG o Order Block.'},
+   key:{en:'1H = the range. 15M/5M = confirm AMD. 5M/1M = execute. Each layer has one job.',es:'1H = el rango. 15M/5M = confirmar AMD. 5M/1M = ejecutar. Cada capa tiene un trabajo.'}},
+  {type:'warning',icon:'⚠️',
+   title:{en:'The Context Trap',es:'La Trampa del Contexto'},
+   body:{en:'The most common mistake on 1H CRTs: trading the 1H AMD without checking what the 4H and daily chart say. A bearish 1H CRT inside a bullish 4H candle is fighting the real direction. The 1H CRT must agree with the higher timeframe structure — if the daily is bullish, you only take bullish 1H CRTs. You need as much context as possible, at the right time, at the right key level. All three together.',
+         es:'El error mas comun en CRTs de 1H: operar el AMD de 1H sin revisar lo que dice el grafico de 4H y diario. Un CRT de 1H bajista dentro de una vela de 4H alcista esta peleando contra la direccion real. El CRT de 1H debe estar de acuerdo con la estructura de temporalidad superior — si el diario es alcista, solo tomas CRTs de 1H alcistas. Necesitas tanto contexto como sea posible, en el momento correcto, en el nivel clave correcto.'},
+   key:{en:'Right context + right time + right key level = all three required. Miss one and the 1H CRT fails.',es:'Contexto correcto + momento correcto + nivel clave correcto = los tres requeridos. Falta uno y el CRT de 1H falla.'}}
+ ],
+ questions:[
+  {q:{en:'For a valid 1H CRT, the key level must be visible on:',es:'Para un CRT de 1H valido, el nivel clave debe ser visible en:'},
+   opts:{en:['The 5-minute chart or lower','The 1H chart or a higher timeframe','Any timeframe as long as the pattern is clean','The 15-minute chart only'],
+         es:['El grafico de 5 minutos o inferior','El grafico de 1H o una temporalidad superior','Cualquier temporalidad siempre que el patron sea limpio','Solo el grafico de 15 minutos']},
+   a:1,exp:{en:'The key level must be meaningful from the 1H perspective or above. A 5M or 15M level is not enough context to validate a 1H CRT setup.',
+             es:'El nivel clave debe ser significativo desde la perspectiva de 1H o superior. Un nivel de 5M o 15M no tiene suficiente contexto para validar un setup de CRT de 1H.'}},
+  {q:{en:'In the 1H CRT three-layer structure, what is the job of the 15M/5M?',es:'En la estructura de tres capas del CRT de 1H, cual es el trabajo del 15M/5M?'},
+   opts:{en:['Execute limit orders directly','Confirm the HTF bias','Confirm the AMD forming and the Candle 2 sweep happening (ITF)','Determine the weekly direction'],
+         es:['Ejecutar ordenes limite directamente','Confirmar el sesgo HTF','Confirmar el AMD formandose y el barrido de la Vela 2 ocurriendo (ITF)','Determinar la direccion semanal']},
+   a:2,exp:{en:'15M/5M is the ITF — Intermediate Timeframe. Its job is to confirm the AMD is forming and verify the Candle 2 sweep. Entry (limit order) happens on the 5M or 1M.',
+             es:'15M/5M es el ITF — Temporalidad Intermedia. Su trabajo es confirmar que el AMD se esta formando y verificar el barrido de la Vela 2. La entrada (orden limite) ocurre en 5M o 1M.'}},
+  {q:{en:'A bearish 1H CRT inside a bullish 4H candle is:',es:'Un CRT de 1H bajista dentro de una vela de 4H alcista es:'},
+   opts:{en:['A strong short opportunity','Valid if the pattern is clean','Fighting the real direction — avoid it','Only valid in ranging markets'],
+         es:['Una fuerte oportunidad corta','Valido si el patron es limpio','Peleando contra la direccion real — evitalo','Solo valido en mercados laterales']},
+   a:2,exp:{en:'A bearish 1H CRT inside a bullish 4H candle is going against the higher timeframe context. The 1H CRT must agree with the 4H and daily direction. Context first, always.',
+             es:'Un CRT de 1H bajista dentro de una vela de 4H alcista va contra el contexto de temporalidad superior. El CRT de 1H debe estar de acuerdo con la direccion de 4H y diario. Contexto primero, siempre.'}},
+  {q:{en:'You enter a 1H CRT on:',es:'Entras un CRT de 1H en:'},
+   opts:{en:['The 1H candle close directly','A limit order on the 5M or 1M retest of the FVG/OB left by the sweep','A market order when you see Candle 3 forming','The 4H chart for a wider stop'],
+         es:['El cierre de la vela de 1H directamente','Una orden limite en el retest del FVG/OB en 5M o 1M dejado por el barrido','Una orden de mercado cuando ves la Vela 3 formandose','El grafico de 4H para un stop mas amplio']},
+   a:1,exp:{en:'Entry = limit order on the 5M or 1M retest of the FVG or Order Block left behind when Candle 2 swept liquidity. That is the execution layer.',
+             es:'Entrada = orden limite en el retest del FVG o Order Block en 5M o 1M dejado cuando la Vela 2 barro liquidez. Esa es la capa de ejecucion.'}}
+ ]}
+
 ];
 
 // ── STATE ──────────────────────────────────────────────────────────────────
@@ -1690,6 +1850,7 @@ function doSetup(){
 
   err.style.display='none';
   S.name=nm; S.key=''; S.mode=setupMode; S.lang=setupLang;
+  startTrial();
   save();
   document.getElementById('setup').style.display='none';
   document.getElementById('app').style.display='flex';
@@ -1774,6 +1935,20 @@ function addTyping(){
 function removeTyping(){ const t=document.getElementById('typing-row'); if(t)t.remove(); }
 
 function getSysPrompt(){
+  const now = new Date();
+  const timeStr = now.toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short',hour12:true});
+  const dayOfWeek = now.toLocaleString('en-US',{weekday:'long'});
+  const hour = now.getHours();
+  // Determine current kill zone
+  const nyOffset = -(new Date().getTimezoneOffset()); // rough - use UTC-4 for NY summer
+  const utcH = now.getUTCHours();
+  const nyH = (utcH - 4 + 24) % 24; // EDT approx
+  let kzNow = 'Dead Zone / No active kill zone';
+  if(nyH >= 20 || nyH < 0) kzNow = 'Asian Kill Zone (8pm-midnight NY)';
+  else if(nyH >= 1 && nyH < 5) kzNow = 'London Kill Zone (1am-5am NY)';
+  else if(nyH >= 7 && nyH < 14) kzNow = 'New York Kill Zone (7am-2pm NY)';
+  else if(nyH >= 5 && nyH < 8) kzNow = 'Dead Zone (5am-8am NY — do not trade)';
+  const timeContext = `Current time: ${timeStr} | Day: ${dayOfWeek} | Approx NY Kill Zone: ${kzNow}`;
   const langLine = S.lang==='es'
     ? 'CRITICAL: The trader speaks Spanish. Respond ONLY in Spanish, always, no matter what.'
     : 'The trader speaks English. Respond in English.';
@@ -1787,7 +1962,7 @@ function getSysPrompt(){
 
   return `${persona}\\n\\n${langLine}\\n\\nYou are the official mentor for the CHRONOS CRT trading system. Romeo TPT created CRT and Turtle Soup. ICT taught institutional price level concepts (FVG, OB, SMT, OTE). CHRONOS applies and teaches the system. Do NOT mention Sebastian or any other person by name.\\n\\nCANDLE DIRECTION: Bullish candle = Open -> Low -> High -> Close. Bearish candle = Open -> High -> Low -> Close. NEVER use the word 'steer'.\\n\\nAMD RULE: ALWAYS number the candles: 'Candle 1 - Accumulation (the range)', 'Candle 2 - Manipulation (sweeps outside range, closes back inside)', 'Candle 3 - Distribution (to the other extreme)'. Never say 'manipulation candle' without the number.\\n\\nMARKETS: CRT works on ALL liquid markets - Forex, crypto, gold, futures, indices, commodities. Not indices only.\\n\\nCORE: Price moves for ONLY two reasons: (1) attack liquidity at highs/lows, (2) rebalance a Fair Value Gap.\\n\\nTHREE TIMEFRAMES: HTF=direction only. ITF=key levels. LTF=execute only. Never mix.\\n\\nMARKET STATES: Trending (breaking highs + rejecting lows = bullish) or Ranging (extremes only, NEVER the 50% middle).\\n\\nKEY LEVELS: Mark as HORIZONTAL LINES not zones. FVG=3-candle imbalance (C1 high to C3 low). Valid OB: liquidity swept + thick body + order flow change + FVG after. Buy PDAs at DISCOUNT (below 50%). Sell at PREMIUM (above 50%).\\n\\nKILL ZONES (Romeo exact): Asian=8pm-midnight NY. London=1am-5am NY. NY=7am-2pm NY (9:30am NYSE highest prob). Dead Zone=5am-8am (NEVER). Both displacements inside kill zones.\\n\\nTURTLE SOUP: False breakout before EVERY significant move. No raid = no trade. Close back = confirm. Retest = entry.\\n\\nTHREE FACTORS: F1=HTF key level (most important). F2=Kill zone. F3=Pre-manipulation swing. CRT without key level = ZERO.\\n\\nMODEL 1: Purge -> Close above/below -> Retest -> LIMIT ORDER. T1=50% (partial+BE). T2=DOL. Min 1:2 R:R. Two entries: E1=Soup, E2=OTE 60-75%.\\n\\nSEQUENCE: P1=Turtle Soup. P2=Model 1 (engine). P3=Breaker Block. P4=OTE. P5=Kiss of Death. 2-3 phases enough.\\n\\nX-RAY VISION: Read HTF candle shape to predict LTF price action inside it. Bullish HTF close near high = LTF delivered Low->High inside.\\n\\nCANDLE TRADER: Trade SPECIFIC CANDLES (weekly/daily/4H minimum). You are not a swing or scalp trader.\\n\\nONE MARKET: Master one market before diversifying.\\n\\nTHREE REASONS CRT FAILS: (1) SMT ignored. (2) 50% already taken in Candle 2. (3) Wrong HTF context.\\n\\nSMT RULE: Bullish SMT in bullish HTF only. Bearish SMT in bearish HTF only.\\n\\n1-5-9: Daily AMD internal candles = 1am, 5am, 9am NY (futures: 2am, 6am, 10am).\\n\\nJOURNALING: Win=journal+repeat. Loss=journal+avoid. Missed=journal+catch next.\\n\\nBEGINNER ENTRY: Candle 3 is the beginner trade. Avoid Candle 2. Never trade Candle 1.\\n\\nIRL->ERL: Price moves Internal Range Liquidity -> External Range Liquidity -> back to IRL. Always.\\n\\nWEEKLY: Sunday=prep. Monday=WATCH ONLY. Tuesday London=PRIMARY ENTRY. Wednesday=execute. Thu/Fri=profits only.\\n\\nDAILY PROFILES: Classic. NY Flip. Range-to-NY. Seek and Destroy=DO NOT TRADE.\\n\\nCHECKLIST (8pts, need 6+): HTF bias, order flow, key level, DOL, CRT candle, kill zone, Model 1, stop+target.\\n\\nTERMINOLOGY (Spanish): Smart Money=Dinero Inteligente, DOL=Objetivo de Liquidez, OTE=Punto Optimo de Entrada, AMD=Acumulacion/Manipulacion/Distribucion, MSS=Cambio de Tendencia, Premium/Discount=Premium/Descuento, ERL=Liquidez Externa, IRL=Liquidez Interna. Keep in English: Turtle Soup, FVG, OB, Breaker Block, Kill Zone, SMT, Model 1, CRT, IPDA.\\n\\nBREVITY RULE: Keep EVERY response under 4 sentences. NO bullet lists unless asked. Ask one sharp question instead of explaining. If they ask 'what is X' — give 1 sentence definition + 1 question back to test them. Donna does not lecture.
 
-MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang}`;
+MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang} | ${timeContext}`;
 }
 
 async function callAI(userMsg, imageB64){
@@ -2282,6 +2457,8 @@ function closeResults(){
 // ── INIT ────────────────────────────────────────────────────────────────────
 load();
 if(S.name){
+  const canProceed = checkAccessAndShow();
+  if(!canProceed){ } else {
   document.getElementById('setup').style.display='none';
   document.getElementById('app').style.display='flex';
   applyAppStrings(); buildAcademy();
@@ -2293,9 +2470,121 @@ if(S.name){
     :(S.lang==='es'?`${S.name}. Donna. ¿En qué trabajamos?`
       :`${S.name}. Donna. What are we working on?`);
   addMsg('in',greet);
+  }
 } else {
   applySetupStrings();
 }
+
+
+// ── TRIAL & ACCESS ─────────────────────────────────────────────────────────
+const TRIAL_DAYS = 15;
+const STRIPE_URL = 'https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_LINK';
+
+function getTrialState(){
+  try {
+    const acc = localStorage.getItem('donna_access');
+    if(acc){ const a=JSON.parse(acc); if(a && a.granted) return {status:'paid', data:a}; }
+    const tr = localStorage.getItem('donna_trial');
+    if(!tr) return {status:'no_trial'};
+    const start = new Date(JSON.parse(tr).startDate);
+    const now = new Date();
+    const daysUsed = Math.floor((now - start) / (1000*60*60*24));
+    const daysLeft = TRIAL_DAYS - daysUsed;
+    if(daysLeft > 0) return {status:'trial', daysLeft, daysUsed};
+    return {status:'expired', daysUsed};
+  } catch(e){ return {status:'no_trial'}; }
+}
+
+function startTrial(){
+  if(!localStorage.getItem('donna_trial')){
+    localStorage.setItem('donna_trial', JSON.stringify({startDate: new Date().toISOString()}));
+  }
+}
+
+function checkAccessAndShow(){
+  const state = getTrialState();
+  if(state.status === 'paid'){
+    document.getElementById('paywall').style.display='none';
+    updateTrialBanner(null);
+    return true;
+  }
+  if(state.status === 'trial'){
+    document.getElementById('paywall').style.display='none';
+    updateTrialBanner(state.daysLeft);
+    return true;
+  }
+  if(state.status === 'no_trial'){
+    document.getElementById('paywall').style.display='none';
+    return true;
+  }
+  // expired
+  showPaywall(state.daysUsed);
+  return false;
+}
+
+function updateTrialBanner(daysLeft){
+  const banner = document.getElementById('trial-banner');
+  const lbl = document.getElementById('trial-days-left');
+  if(daysLeft !== null && daysLeft <= 5){
+    banner.classList.add('show');
+    lbl.textContent = daysLeft === 1 ? '1 day left' : `${daysLeft} days left`;
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+function showPaywall(daysUsed){
+  const pw = document.getElementById('paywall');
+  pw.style.display='flex';
+  document.getElementById('pw-days-used').textContent = (daysUsed||TRIAL_DAYS)+' days';
+  // Hide app
+  document.getElementById('app').style.display='none';
+  document.getElementById('setup').style.display='none';
+}
+
+function goToPay(){
+  window.open(STRIPE_URL,'_blank');
+}
+
+async function applyCode(){
+  const code = document.getElementById('pw-code').value.trim().toUpperCase();
+  if(!code) return;
+  const btn = document.getElementById('pw-apply-btn');
+  const errEl = document.getElementById('pw-err');
+  const okEl = document.getElementById('pw-ok');
+  btn.disabled=true; btn.textContent='Checking...';
+  errEl.style.display='none'; okEl.style.display='none';
+  try {
+    const resp = await fetch('/api/verify-code', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({code})
+    });
+    const data = await resp.json();
+    if(data.valid){
+      localStorage.setItem('donna_access', JSON.stringify({granted:true, type:data.type, code, grantedAt:new Date().toISOString()}));
+      okEl.style.display='block';
+      setTimeout(()=>{
+        document.getElementById('paywall').style.display='none';
+        document.getElementById('app').style.display='flex';
+        updateTrialBanner(null);
+      }, 1200);
+    } else {
+      errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Apply';
+    }
+  } catch(e){
+    errEl.textContent='Connection error. Try again.';
+    errEl.style.display='block';
+    btn.disabled=false; btn.textContent='Apply';
+  }
+}
+
+// Allow pressing Enter on code input
+document.addEventListener('DOMContentLoaded', ()=>{
+  const inp = document.getElementById('pw-code');
+  if(inp) inp.addEventListener('keydown', e=>{ if(e.key==='Enter') applyCode(); });
+});
 
 </script>
 </body>
