@@ -2031,7 +2031,7 @@ BREVITY RULE: Keep EVERY response under 4 sentences. NO bullet lists unless aske
 
 MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang} | ${timeContext}
 
-${buildChapterContext()}`;
+${(()=>{try{return buildChapterContext();}catch(e){return '';}})()}`;
 }
 
 function buildChapterContext(){
@@ -2061,7 +2061,14 @@ async function callAI(userMsg, imageB64){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,system:getSysPrompt(),messages:chatHistory})
   });
-  if(!resp.ok){ const e=await resp.json(); throw new Error(e.error?.message||'API error'); }
+  if(!resp.ok){
+    let errMsg = 'API error';
+    try { const e=await resp.json(); errMsg = e.error?.message || e.message || e.error || errMsg; } catch(_){}
+    if(resp.status===529) throw new Error('overloaded');
+    if(resp.status===429) throw new Error('rate limit');
+    if(resp.status>=500) throw new Error('server error '+resp.status);
+    throw new Error(String(errMsg));
+  }
   const data=await resp.json();
   const reply = data.content.map(b=>b.type==='text'?b.text:'').join('');
   chatHistory.push({role:'assistant',content:reply});
@@ -2079,20 +2086,24 @@ async function sendMsg(txt, imgB64){
     removeTyping(); addMsg('in',reply);
   }catch(e){
     removeTyping();
-    const em = e.message||'';
+    const em = (e.message||'').toLowerCase();
     let friendly;
-    if(em.toLowerCase().includes('overload') || em.toLowerCase().includes('529')){
+    if(em.includes('overload') || em.includes('529')){
       friendly = S.lang==='es'
         ? 'Donna está muy ocupada ahora mismo. Espera unos segundos e intenta de nuevo.'
         : 'Donna is busy right now. Wait a few seconds and try again.';
-    } else if(em.toLowerCase().includes('fetch') || em.toLowerCase().includes('network') || em.toLowerCase().includes('failed')){
+    } else if(em.includes('fetch') || em.includes('network') || em.includes('failed') || em.includes('load')){
       friendly = S.lang==='es'
         ? 'Sin conexión. Revisa tu internet e intenta de nuevo.'
         : 'No connection. Check your internet and try again.';
-    } else if(em.toLowerCase().includes('429') || em.toLowerCase().includes('rate')){
+    } else if(em.includes('429') || em.includes('rate')){
       friendly = S.lang==='es'
         ? 'Demasiadas preguntas seguidas. Espera un momento.'
         : 'Too many messages at once. Wait a moment and try again.';
+    } else if(em.includes('server error') || em.includes('500') || em.includes('502') || em.includes('503')){
+      friendly = S.lang==='es'
+        ? 'El servidor tuvo un problema. Intenta de nuevo en un momento.'
+        : 'Server hiccup. Try again in a moment.';
     } else {
       friendly = S.lang==='es'
         ? 'Algo salió mal. Intenta de nuevo.'
@@ -2493,6 +2504,34 @@ function selectOpt(i){
   chk.className='q-check ready'; chk.disabled=false;
 }
 
+// ── QUIZ SOUNDS ────────────────────────────────────────────────────────────
+function playSound(type){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    if(type==='correct'){
+      // Duolingo-style ascending two-note chime
+      [[523.25,0],[659.25,0.13]].forEach(([freq,delay])=>{
+        const osc=ctx.createOscillator(), gain=ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type='sine'; osc.frequency.value=freq;
+        const t=ctx.currentTime+delay;
+        gain.gain.setValueAtTime(0,t);
+        gain.gain.linearRampToValueAtTime(0.28,t+0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+        osc.start(t); osc.stop(t+0.3);
+      });
+    } else {
+      // Wrong — low dull thud
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type='sine'; osc.frequency.value=170;
+      gain.gain.setValueAtTime(0.28,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.35);
+    }
+  }catch(e){}
+}
+
 function checkAnswer(){
   if(LS.selected===null||LS.answered) return;
   LS.answered=true;
@@ -2510,7 +2549,7 @@ function checkAnswer(){
   document.getElementById('fb-title').textContent=correct?(t('correctLbl')||'Correct! ✓'):(t('wrongLbl')||'Not quite');
   document.getElementById('fb-exp').textContent=q.exp[S.lang]||q.exp.en;
   document.getElementById('fb-btn').textContent=t('continueLbl')||'Continue';
-  if(correct){ LS.xp+=15; } else { LS.hearts=Math.max(0,LS.hearts-1); }
+  if(correct){ LS.xp+=15; playSound('correct'); } else { LS.hearts=Math.max(0,LS.hearts-1); playSound('wrong'); }
   updateHearts();
 }
 
