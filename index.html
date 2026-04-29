@@ -323,7 +323,40 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .pw-divider{width:100%;max-width:340px;height:1px;background:#1C1C1E}
 
 
-/* ── ONBOARDING TOOLTIPS ───────────────────────────────────────────────── */
+.chips-lbl{background:#000;padding:6px 14px 0;font-size:10px;font-weight:700;color:#48484A;letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0}
+/* ── PRE-TRADE CHECKLIST ──────────────────────────────────────────────── */
+#checklist-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:flex-end;justify-content:center;z-index:300;padding:0 0 0 0}
+#checklist-modal.show{display:flex}
+.cl-sheet{background:#1C1C1E;border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:0 0 env(safe-area-inset-bottom,16px) 0;max-height:88vh;display:flex;flex-direction:column}
+.cl-sheet-hdr{padding:18px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:.5px solid #2C2C2E}
+.cl-sheet-title{font-size:17px;font-weight:700;color:#fff}
+.cl-sheet-close{background:none;border:none;color:#8E8E93;font-size:22px;cursor:pointer;padding:0;line-height:1;font-family:-apple-system,sans-serif}
+.cl-score-wrap{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cl-score-lbl{font-size:13px;color:#8E8E93;font-weight:500}
+.cl-score-num{font-size:28px;font-weight:800;color:#fff;transition:color .2s}
+.cl-score-num.go{color:#30D158}
+.cl-score-num.nogo{color:#FF453A}
+.cl-items{overflow-y:auto;flex:1;padding:0 16px 10px}
+.cl-row{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:.5px solid #2C2C2E;cursor:pointer;user-select:none}
+.cl-row:last-child{border-bottom:none}
+.cl-check{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid #48484A;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.cl-check.on{background:#30D158;border-color:#30D158}
+.cl-check-icon{display:none;width:12px;height:8px;border-left:2.5px solid #000;border-bottom:2.5px solid #000;transform:rotate(-45deg) translate(1px,-1px)}
+.cl-check.on .cl-check-icon{display:block}
+.cl-row-text{flex:1}
+.cl-row-title{font-size:15px;font-weight:600;color:#fff;line-height:1.3;transition:color .15s}
+.cl-row-title.on{color:#48484A}
+.cl-row-sub{font-size:11px;color:#636366;margin-top:2px;line-height:1.4}
+.cl-verdict{margin:10px 16px 12px;padding:14px 18px;border-radius:14px;text-align:center;transition:all .2s;background:#2C2C2E}
+.cl-verdict.go{background:rgba(48,209,88,.15);border:1px solid rgba(48,209,88,.3)}
+.cl-verdict.nogo{background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.25)}
+.cl-verdict-txt{font-size:15px;font-weight:700;color:#636366;transition:color .2s}
+.cl-verdict.go .cl-verdict-txt{color:#30D158}
+.cl-verdict.nogo .cl-verdict-txt{color:#FF453A}
+.cl-verdict-sub{font-size:11px;color:#636366;margin-top:3px}
+.cl-reset{background:none;border:none;color:#636366;font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;padding:4px 0 14px;width:100%;text-align:center}
+
+
 #onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;display:none}
 #onboard-overlay.show{display:block}
 .ob-tooltip{position:fixed;background:#1C1C1E;border:1px solid #C41E3A55;border-radius:14px;padding:14px 16px;max-width:240px;z-index:9001;box-shadow:0 8px 32px rgba(0,0,0,0.6)}
@@ -400,7 +433,8 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
   </div>
 
     <div class="msgs" id="msgs"></div>
-    <div class="chips" id="chips-bar"></div>
+    <div class="chips-lbl" id="chips-lbl">Quick Questions</div>
+    <div class="chips" id="chips-bar"><button class="chip" style="background:rgba(196,30,58,.18);border-color:#C41E3A55;color:#C41E3A;font-weight:700" onclick="showChecklist()" id="chip-checklist">📋 Checklist</button></div>
     <div class="ibar">
       <div class="i-wrap"><textarea class="i-ta" id="inp" rows="1" onkeydown="handleKey(event)" oninput="grow(this)"></textarea><button class="i-send" id="sbtn" onclick="sendText()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button></div>
     </div>
@@ -524,6 +558,25 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
   <div class="pw-hint" id="pw-hint-txt">🚀 Launch special — $24.99/month (usually $50). Lock in this price before it goes up. After payment you'll receive an access code by email — enter it above to activate.</div>
 </div>
 
+
+<div id="checklist-modal" onclick="if(event.target===this)hideChecklist()">
+  <div class="cl-sheet">
+    <div class="cl-sheet-hdr">
+      <div class="cl-sheet-title" id="cl-title">📋 Pre-Trade Checklist</div>
+      <button class="cl-sheet-close" onclick="hideChecklist()">&#x2715;</button>
+    </div>
+    <div class="cl-score-wrap">
+      <div class="cl-score-lbl" id="cl-score-lbl">Score</div>
+      <div class="cl-score-num" id="cl-score-num">0 / 8</div>
+    </div>
+    <div class="cl-items" id="cl-items"></div>
+    <div class="cl-verdict" id="cl-verdict">
+      <div class="cl-verdict-txt" id="cl-verdict-txt">—</div>
+      <div class="cl-verdict-sub" id="cl-verdict-sub"></div>
+    </div>
+    <button class="cl-reset" id="cl-reset-btn" onclick="resetChecklist()">↺ Reset</button>
+  </div>
+</div>
 
 <div id="onboard-overlay"></div>
 <div id="ob-highlight" class="ob-highlight" style="display:none"></div>
@@ -1939,6 +1992,7 @@ function applyAppStrings(){
   document.getElementById('streak-lbl').textContent = t('streak_lbl');
   document.getElementById('level-lbl').textContent = t('level_lbl');
   renderChips();
+  updateChipsLabel();
   updateAcadStats();
 }
 
@@ -2504,6 +2558,119 @@ function selectOpt(i){
   chk.className='q-check ready'; chk.disabled=false;
 }
 
+// ── PRE-TRADE CHECKLIST ────────────────────────────────────────────────────
+const CL_ITEMS = [
+  {en:'HTF Bias confirmed',       es:'Sesgo HTF confirmado',
+   en_sub:'Weekly/daily direction is clear',          es_sub:'Dirección semanal/diaria clara'},
+  {en:'Order Flow aligned',       es:'Flujo de órdenes alineado',
+   en_sub:'Breaking highs (bull) or lows (bear)',     es_sub:'Rompiendo máximos (alcista) o mínimos (bajista)'},
+  {en:'HTF Key Level present',    es:'Nivel clave HTF presente',
+   en_sub:'Daily, weekly, or monthly horizontal line',es_sub:'Línea horizontal en diario, semanal o mensual'},
+  {en:'Draw on Liquidity set',    es:'Objetivo de Liquidez identificado',
+   en_sub:'Know exactly where price is targeting',    es_sub:'Saber exactamente a dónde va el precio'},
+  {en:'CRT candle forming',       es:'Vela CRT formándose',
+   en_sub:'Candle 1 range, Candle 2 sweep visible',  es_sub:'Rango Vela 1, barrido Vela 2 visible'},
+  {en:'Kill Zone active',         es:'Kill Zone activa',
+   en_sub:'London 1–5am NY  /  New York 7am–2pm NY', es_sub:'Londres 1–5am NY  /  Nueva York 7am–2pm NY'},
+  {en:'Model 1 setup visible',    es:'Setup Model 1 visible',
+   en_sub:'Purge + close back + retest ready',        es_sub:'Barrida + cierre de vuelta + retest listo'},
+  {en:'Stop & target defined',    es:'Stop y objetivo definidos',
+   en_sub:'R:R is at least 1:2 before entry',         es_sub:'R:R mínimo 1:2 antes de entrar'},
+];
+let clChecked = new Array(8).fill(false);
+
+function showChecklist(){
+  const es = S.lang === 'es';
+  document.getElementById('cl-title').textContent    = es ? '📋 Lista Pre-Operación' : '📋 Pre-Trade Checklist';
+  document.getElementById('cl-score-lbl').textContent= es ? 'Puntaje' : 'Score';
+  document.getElementById('cl-reset-btn').textContent= es ? '↺ Reiniciar' : '↺ Reset';
+  renderChecklistItems();
+  updateClScore();
+  document.getElementById('checklist-modal').classList.add('show');
+}
+
+function hideChecklist(){
+  document.getElementById('checklist-modal').classList.remove('show');
+}
+
+function resetChecklist(){
+  clChecked = new Array(8).fill(false);
+  renderChecklistItems();
+  updateClScore();
+}
+
+function toggleCl(i){
+  clChecked[i] = !clChecked[i];
+  const row = document.getElementById('cl-row-'+i);
+  const check = document.getElementById('cl-check-'+i);
+  const label = document.getElementById('cl-label-'+i);
+  check.classList.toggle('on', clChecked[i]);
+  label.classList.toggle('on', clChecked[i]);
+  updateClScore();
+}
+
+function renderChecklistItems(){
+  const es = S.lang === 'es';
+  const container = document.getElementById('cl-items');
+  container.innerHTML = '';
+  CL_ITEMS.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'cl-row'; row.id = 'cl-row-'+i;
+    row.onclick = () => toggleCl(i);
+    row.innerHTML = `
+      <div class="cl-check${clChecked[i]?' on':''}" id="cl-check-${i}"><div class="cl-check-icon"></div></div>
+      <div class="cl-row-text">
+        <div class="cl-row-title${clChecked[i]?' on':''}" id="cl-label-${i}">${es ? item.es : item.en}</div>
+        <div class="cl-row-sub">${es ? item.es_sub : item.en_sub}</div>
+      </div>`;
+    container.appendChild(row);
+  });
+}
+
+function updateClScore(){
+  const es = S.lang === 'es';
+  const score = clChecked.filter(Boolean).length;
+  const numEl    = document.getElementById('cl-score-num');
+  const verdict  = document.getElementById('cl-verdict');
+  const vtxt     = document.getElementById('cl-verdict-txt');
+  const vsub     = document.getElementById('cl-verdict-sub');
+
+  numEl.textContent = score + ' / 8';
+  numEl.className   = 'cl-score-num' + (score >= 5 ? ' go' : score > 0 ? ' nogo' : '');
+
+  if(score === 0){
+    verdict.className  = 'cl-verdict';
+    vtxt.textContent   = '—';
+    vsub.textContent   = '';
+  } else if(score < 5){
+    verdict.className  = 'cl-verdict nogo';
+    vtxt.textContent   = es ? '🚫 No tomes este trade.' : '🚫 Do not take this trade.';
+    vsub.textContent   = es
+      ? 'El setup no está listo. Espera o busca otra oportunidad.'
+      : 'The setup is not ready. Wait or find a better opportunity.';
+  } else if(score < 8){
+    verdict.className  = 'cl-verdict go';
+    vtxt.textContent   = es ? '⚠️ Procede — pero gestiona el riesgo.' : '⚠️ Proceed — but manage your risk.';
+    vsub.textContent   = es
+      ? 'Reduce el tamaño. Solo arriesga lo que no te duela perder. No hay setup perfecto.'
+      : 'Size down. Only risk what you can afford to lose. No setup is perfect.';
+  } else {
+    verdict.className  = 'cl-verdict go';
+    vtxt.textContent   = es ? '✅ Luz verde. Ejecuta con disciplina.' : '✅ Green light. Execute with discipline.';
+    vsub.textContent   = es
+      ? '8/8 — el mejor setup posible. Aún así, respeta tu stop. El mercado siempre gana.'
+      : '8/8 — the best possible setup. Still respect your stop. The market always wins.';
+  }
+}
+
+// Update chips label language
+function updateChipsLabel(){
+  const el = document.getElementById('chips-lbl');
+  if(el) el.textContent = S.lang==='es' ? 'Preguntas Rápidas' : 'Quick Questions';
+  const cl = document.getElementById('chip-checklist');
+  if(cl) cl.textContent = S.lang==='es' ? '📋 Lista' : '📋 Checklist';
+}
+
 // ── QUIZ SOUNDS ────────────────────────────────────────────────────────────
 function playSound(type){
   try{
@@ -2519,6 +2686,18 @@ function playSound(type){
         gain.gain.linearRampToValueAtTime(0.28,t+0.01);
         gain.gain.exponentialRampToValueAtTime(0.001,t+0.28);
         osc.start(t); osc.stop(t+0.3);
+      });
+    } else if(type==='chapter'){
+      // 4-note ascending fanfare — chapter complete celebration
+      [[523.25,0],[659.25,0.12],[783.99,0.24],[1046.5,0.38]].forEach(([freq,delay])=>{
+        const osc=ctx.createOscillator(), gain=ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type='sine'; osc.frequency.value=freq;
+        const t=ctx.currentTime+delay;
+        gain.gain.setValueAtTime(0,t);
+        gain.gain.linearRampToValueAtTime(0.3,t+0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001,t+0.38);
+        osc.start(t); osc.stop(t+0.4);
       });
     } else {
       // Wrong — low dull thud
@@ -2579,6 +2758,7 @@ function finishChapter(){
     a.lastDate=today;
   }
   save();
+  playSound('chapter');
   // show results
   const rv=document.getElementById('results-view');
   rv.style.display='flex';
