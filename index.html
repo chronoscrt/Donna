@@ -1923,13 +1923,7 @@ function doSetup(){
   document.getElementById('app').style.display='flex';
   applyAppStrings(); buildAcademy();
   updateClock(); setInterval(updateClock,30000);
-  const greet=S.mode==='beginner'
-    ?(S.lang==='es'
-      ?`Hola ${nm} 👋 Soy Donna — tu mentora de trading. Estoy aquí para responder esas preguntas que siempre tuviste sin respuesta sobre los mercados. Piénsame como un amigo que sabe de trading y siempre está disponible. ¿Por dónde empezamos?`
-      :`Hey ${nm} 👋 I'm Donna — your trading mentor. I'm here to answer every question about the markets you never got a straight answer to. Think of me like a trading friend you can text anytime. What do you want to start with?`)
-    :(S.lang==='es'
-      ?`${nm}. Donna. Todo listo. ¿Qué refinamos hoy?`
-      :`${nm}. Donna. All set. What are we sharpening today?`);
+  const greet = buildIntroMessage(nm, S.mode, S.lang);
   addMsg('in', greet);
   // Start onboarding tour for new users
   setTimeout(()=>startOnboarding(S.name, S.mode, S.lang), 800);
@@ -2035,7 +2029,24 @@ function getSysPrompt(){
 
 BREVITY RULE: Keep EVERY response under 4 sentences. NO bullet lists unless asked. Ask one sharp question instead of explaining. If they ask 'what is X' — give 1 sentence definition + 1 question back to test them. Donna does not lecture.
 
-MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang} | ${timeContext}`;
+MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang} | ${timeContext}
+
+${buildChapterContext()}`;
+}
+
+function buildChapterContext(){
+  if(S.mode !== 'beginner') {
+    return 'ADVANCED MODE — FULL ACCESS: No topic restrictions. All 22 chapters, pre-trade checklist, and advanced CRT concepts are fair game.';
+  }
+  const completed = (S.academy && S.academy.completed) ? S.academy.completed : [];
+  if(completed.length === 0){
+    return 'BEGINNER CHAPTER LOCK: This student has NOT started the Academy yet. Teach ONLY candle basics (Chapter 1 level). For any advanced topic (Turtle Soup, Model 1, CRT patterns, AMD, Kill Zones, etc.), redirect: "We\'ll get to that — start with Chapter 1 in the Academy first. It\'ll make sense when you get there." Keep it simple and foundational only.';
+  }
+  const highest = Math.max(...completed);
+  const completedTitles = completed.sort((a,b)=>a-b).map(id => CHAPTER_MAP[id]).filter(Boolean).join(' | ');
+  const nextChapter = highest < 22 ? CHAPTER_MAP[highest + 1] : null;
+  const nextLine = nextChapter ? ` Next up for them: ${nextChapter} — you can spark curiosity about it but don't fully teach it yet.` : '';
+  return `BEGINNER CHAPTER LOCK: Student has completed ${completed.length}/22 chapters. Their knowledge covers: ${completedTitles}.${nextLine} Do NOT explain concepts from chapters beyond ${highest + 1}. If they ask about untaught topics, say "That's coming in Chapter [number] — finish the earlier ones first, it'll make sense when you get there." You can name what's ahead to motivate them, but no full explanations of uncovered material.`;
 }
 
 async function callAI(userMsg, imageB64){
@@ -2105,7 +2116,7 @@ function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendT
 function grow(el){ el.style.height=''; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
 
 function renderChips(){
-  const chips = [
+  const allChips = [
     [t('turtleSoup'),'turtleSoup'],
     [t('modelOne'),'model1'],
     [t('threeFactors'),'threeFactors'],
@@ -2122,6 +2133,10 @@ function renderChips(){
     [t('gotStopped'),'gotStopped'],
     [t('quizMe'),'quizMe'],
   ];
+  // Advanced: checklist first. Beginner: start with fundamentals.
+  const chips = S.mode === 'advanced'
+    ? [allChips[9], ...allChips.filter((_,i)=>i!==9)]
+    : allChips;
   const bar = document.getElementById('chips-bar');
   bar.innerHTML='';
   const msgs = {
@@ -2557,13 +2572,7 @@ if(S.name){
   applyAppStrings(); buildAcademy();
   updateClock(); setInterval(updateClock,30000);
   setMode(S.mode);
-  const greet=S.mode==='beginner'
-    ?(S.lang==='es'
-      ?`Hola ${S.name} 👋 Soy Donna — tu mentora de trading. Estoy aquí para responder esas preguntas que siempre tuviste sin respuesta sobre los mercados. Piénsame como un amigo que sabe de trading y siempre está disponible. ¿Por dónde empezamos?`
-      :`Hey ${S.name} 👋 I'm Donna — your trading mentor. I'm here to answer every question about the markets you never got a straight answer to. Think of me like a trading friend you can text anytime. What do you want to start with?`)
-    :(S.lang==='es'
-      ?`${S.name}. Donna. Todo listo. ¿Qué refinamos hoy?`
-      :`${S.name}. Donna. All set. What are we sharpening today?`);
+  const greet = buildIntroMessage(S.name, S.mode, S.lang, true);
   addMsg('in',greet);
   }
 } else {
@@ -2683,6 +2692,62 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 
 // ── ONBOARDING ──────────────────────────────────────────────────────────────
+// ── CHAPTER MAP ────────────────────────────────────────────────────────────
+const CHAPTER_MAP = [
+  '',
+  'Ch1: Anatomy of a Candle (bullish/bearish candle basics, body vs wick)',
+  'Ch2: The Two Market States (trending vs ranging)',
+  'Ch3: The Three Timeframes (HTF direction, ITF key levels, LTF execute)',
+  'Ch4: Reading Order Flow (MSS, IPDA data ranges)',
+  'Ch5: Liquidity — Why Price Moves (buy/sell side, ERL/IRL)',
+  'Ch6: The Draw on Liquidity (DOL, premium/discount, 50%)',
+  'Ch7: Key Levels and PD Arrays (FVG, Order Blocks)',
+  'Ch8: Kill Zones (Asian, London, New York times)',
+  'Ch9: Turtle Soup — The Foundation (false breakout, raid, close back)',
+  'Ch10: The 3-Factor Setup (HTF key level, kill zone, pre-manipulation swing)',
+  'Ch11: CRT — Every Candle Is a Range (Candle 1/2/3 AMD)',
+  'Ch12: Model 1 — The Entry (purge, close, retest, limit order)',
+  'Ch13: Entry Models (Model 1+, OTE 60-75%)',
+  'Ch14: The Sequence — 5 Phases (Turtle Soup → Model 1 → Breaker → OTE → KOD)',
+  'Ch15: Weekly and Daily Profiles (Classic, NY Flip, Range-to-NY)',
+  'Ch16: The Weekly Protocol (Sunday prep, Monday watch, Tuesday primary)',
+  'Ch17: Daily and 4H Protocols',
+  'Ch18: SMT Divergence — The Confirmation Tool',
+  'Ch19: Risk Management (0.25-0.5% risk, position sizing)',
+  'Ch20: Mastery — The Complete Trader (journaling, clean vs dirty losses)',
+  'Ch21: Trading the 4H CRT (full execution breakdown)',
+  'Ch22: Trading the 1H CRT (ITF/LTF layers)'
+];
+
+// ── INTRO MESSAGE ──────────────────────────────────────────────────────────
+function buildIntroMessage(name, mode, lang, returning=false){
+  const es = lang === 'es';
+  const beg = mode === 'beginner';
+
+  if(returning){
+    // Short returning greeting
+    if(beg){
+      return es
+        ? `${name} 👋 Bienvenido de nuevo. ¿Por dónde seguimos?`
+        : `${name} 👋 Welcome back. Where did we leave off?`;
+    } else {
+      return es
+        ? `${name}. Donna. **Modo Avanzado** listo. ¿Qué refinamos hoy?`
+        : `${name}. Donna. **Advanced mode** — ready. What are we sharpening?`;
+    }
+  }
+
+  if(beg){
+    return es
+      ? `Hola ${name} 👋 Soy Donna — tu mentora de trading.\n\nEstás en **Modo Principiante** — paso a paso, sin asumir nada.\n\n📚 **ACADEMIA** (tab inferior) — 22 capítulos que te llevan de cero a operar. Trabájalos en orden. Esa es tu base.\n\n💬 **CHAT** — Soy yo. Hazme cualquier pregunta sobre el mercado que nunca tuviste respuesta. Piénsame como un amigo que sabe de trading y siempre está disponible.\n\n📓 Cuando hayas practicado en demo, toca **+** para registrar tus operaciones con foto de tu gráfica. Si algo del curso no queda claro — pregúntame directamente, te lo explico en palabras simples.\n\n1% mejor cada día puede cambiar tu vida 🕯️ — empieza por el Capítulo 1.`
+      : `Hey ${name} 👋 I'm Donna — your trading mentor.\n\nYou're in **Beginner mode** — step by step, no assumptions.\n\n📚 **ACADEMY** (bottom tab) — 22 chapters that take you from zero to trading. Work through them in order. That's your foundation.\n\n💬 **CHAT** — That's me. Ask me anything about the markets you never got a real answer to. Think of me like a trading friend you can text anytime.\n\n📓 Once you've practiced on demo, tap **+** to log your trades and save your chart screenshots. Anything in the course that's not clear? Just ask me directly.\n\n1% better every day can change your life 🕯️ — start with Chapter 1.`;
+  } else {
+    return es
+      ? `${name}. Donna. **Modo Avanzado** — sin rodeos.\n\n📚 **ACADEMIA** — 22 capítulos del sistema CRT completo. Úsalo para refinar lo que ya sabes o llenar huecos.\n\n💬 **CHAT** — Preguntas reales, análisis post-trade, y todo lo del sistema.\n\n📋 **Checklist pre-operación** — antes de cada entrada, toca **"¿Listo para operar?"** y te paso los 8 puntos. Sin checklist, no hay trade.\n\n📓 **+** — Registra cada operación con foto de tu gráfica. Sin diario, sin mejora.\n\n1% mejor cada día puede cambiar tu vida 🕯️ — ¿qué refinamos hoy?`
+      : `${name}. Donna. **Advanced mode** — no hand-holding.\n\n📚 **ACADEMY** — 22 chapters on the full CRT system. Use it to sharpen what you know or fill gaps.\n\n💬 **CHAT** — Real questions, post-trade reviews, anything in the system.\n\n📋 **Pre-trade checklist** — before every entry, tap **"Ready to trade?"** and I'll run you through all 8 points. No checklist, no trade.\n\n📓 **+** — Log every trade with your chart screenshot. No journal, no improvement.\n\n1% better every day can change your life 🕯️ — what are we sharpening today?`;
+  }
+}
+
 function getOnboardSteps(name, mode, lang) {
   const es = lang === 'es';
   const beg = mode === 'beginner';
