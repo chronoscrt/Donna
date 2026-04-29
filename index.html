@@ -12,7 +12,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;overflow:hidden;position:fixed;width:100%}
 #setup{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px 24px;z-index:999;overflow-y:auto}
-.s-logo{width:78px;height:78px;border-radius:22px;background:linear-gradient(145deg,#6B0000,#C41E3A);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 8px 32px rgba(196,30,58,0.35)}
+.s-logo{width:78px;height:78px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
 .s-title{font-size:26px;font-weight:700;color:#fff;text-align:center}
 .s-sub{font-size:13px;color:#8E8E93;text-align:center;line-height:1.7;max-width:300px}
 .s-field{width:100%;max-width:340px;display:flex;flex-direction:column;gap:6px}
@@ -284,7 +284,7 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 
 
 #paywall{position:fixed;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px 24px;z-index:9999;overflow-y:auto}
-.pw-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(145deg,#6B0000,#C41E3A);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 8px 32px rgba(196,30,58,0.35)}
+.pw-logo{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
 .pw-title{font-size:24px;font-weight:800;color:#fff;text-align:center;line-height:1.3}
 .pw-sub{font-size:13px;color:#8E8E93;text-align:center;line-height:1.7;max-width:300px}
 .pw-divider{width:100%;max-width:340px;height:1px;background:#1C1C1E}
@@ -312,17 +312,52 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 .tb-txt{font-size:11px;color:#C41E3A;font-weight:600}
 .tb-days{font-size:11px;color:#8E8E93}
 
+
+#promo-banner{background:linear-gradient(135deg,#1A0000,#3A0808);border:.5px solid #C41E3A55;border-radius:14px;padding:14px 18px;max-width:340px;width:100%;text-align:center}
+.promo-tag{font-size:10px;font-weight:700;color:#C41E3A;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.promo-price-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px}
+.promo-new{font-size:26px;font-weight:800;color:#fff}
+.promo-old{font-size:15px;color:#636366;text-decoration:line-through}
+.promo-sub{font-size:11px;color:#8E8E93;line-height:1.5}
+.promo-urgency{font-size:11px;color:#FF9F0A;margin-top:6px;font-weight:600}
+.pw-divider{width:100%;max-width:340px;height:1px;background:#1C1C1E}
+
+
+/* ── ONBOARDING TOOLTIPS ───────────────────────────────────────────────── */
+#onboard-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;display:none}
+#onboard-overlay.show{display:block}
+.ob-tooltip{position:fixed;background:#1C1C1E;border:1px solid #C41E3A55;border-radius:14px;padding:14px 16px;max-width:240px;z-index:9001;box-shadow:0 8px 32px rgba(0,0,0,0.6)}
+.ob-tooltip::after{content:'';position:absolute;width:10px;height:10px;background:#1C1C1E;border:1px solid #C41E3A55;transform:rotate(45deg)}
+.ob-tooltip.arrow-bottom::after{bottom:-6px;left:50%;margin-left:-5px;border-top:none;border-left:none}
+.ob-tooltip.arrow-top::after{top:-6px;left:50%;margin-left:-5px;border-bottom:none;border-right:none}
+.ob-tooltip.arrow-left::after{left:-6px;top:50%;margin-top:-5px;border-bottom:none;border-left:none;border-top:none}
+.ob-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.ob-body{font-size:12px;color:#8E8E93;line-height:1.5}
+.ob-next{margin-top:10px;background:#C41E3A;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;font-family:-apple-system,sans-serif;float:right}
+.ob-skip{margin-top:10px;background:none;border:none;color:#48484A;font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;padding:7px 0}
+.ob-step{font-size:10px;color:#48484A;margin-top:10px;clear:both}
+.ob-highlight{position:fixed;border:2px solid #C41E3A;border-radius:10px;z-index:8999;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,0.55)}
+
 </style>
 </head>
 <body>
 
-<input type="file" id="file-in" accept="image/*">
+<input type="file" id="file-in" accept="image/*" style="display:none;position:absolute;left:-9999px">
 <div id="lightbox" onclick="closeLB()"><div id="lightbox-close">&#x2715;</div><img id="lb-img" src=""></div>
 
 <div id="setup">
-  <div class="s-logo">D</div>
+  <div class="s-logo" style="background:none;box-shadow:none;padding:0;overflow:hidden"><svg viewBox="0 0 78 78" xmlns="http://www.w3.org/2000/svg" style="display:block">
+  <!-- Black background -->
+  <rect width="78" height="78" fill="#000" rx="18"/>
+  <!-- Upper wick -->
+  <line x1="39" y1="8" x2="39" y2="18" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Candle body (bullish - hollow style, white filled) -->
+  <rect x="27" y="18" width="24" height="36" rx="1" fill="#fff"/>
+  <!-- Lower wick -->
+  <line x1="39" y1="54" x2="39" y2="68" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+</svg></div>
   <div class="s-title" id="s-title">Meet Donna.</div>
-  <div class="s-sub" id="s-sub">Your CHRONOS CRT mentor and daily coach. Study the system. Trade with discipline.</div>
+  <div class="s-sub" id="s-sub">Your trading mentor. 15-day free trial.</div>
   <div class="s-field"><div class="s-lbl" id="s-lbl-name">Your name</div><input class="s-inp" id="sname" placeholder="..." maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="words"></div>
   <div class="s-field">
     <div class="s-lbl" id="s-lbl-lang">Language / Idioma</div>
@@ -451,15 +486,29 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
 
 
 <div id="paywall">
-  <div class="pw-logo">D</div>
-  <div class="pw-title">Your free trial has ended</div>
+  <div class="pw-logo" style="background:none;box-shadow:none;padding:0;overflow:hidden"><svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" style="display:block">
+  <rect width="72" height="72" fill="#000" rx="16"/>
+  <line x1="36" y1="7" x2="36" y2="16" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="25" y="16" width="22" height="34" rx="1" fill="#fff"/>
+  <line x1="36" y1="50" x2="36" y2="63" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+</svg></div>
+  <div class="pw-title">Your 15-day free trial has ended</div>
   <div class="pw-sub">Enter an access code or unlock full access to keep training with Donna.</div>
   <div class="pw-trial-badge">
     <div class="pw-trial-ico">⏱️</div>
     <div class="pw-trial-txt">
       <div class="pw-trial-days" id="pw-days-used">15 days</div>
-      <div class="pw-trial-lbl">of free trial used</div>
+      <div class="pw-trial-lbl">of your 15-day free trial</div>
     </div>
+  </div>
+  <div id="promo-banner">
+    <div class="promo-tag">🚀 Launch Offer — Limited Time</div>
+    <div class="promo-price-row">
+      <span class="promo-new">$24.99<span style="font-size:14px;font-weight:500">/mo</span></span>
+      <span class="promo-old">$50/mo</span>
+    </div>
+    <div class="promo-sub">Full access to all 22 chapters + AI coaching</div>
+    <div class="promo-urgency">⚡ Lock in this price before it goes up</div>
   </div>
   <div class="pw-divider"></div>
   <div class="pw-section-lbl">Have an access code?</div>
@@ -471,8 +520,21 @@ html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFo
   <div class="pw-ok" id="pw-ok">✓ Access granted! Loading...</div>
   <div class="pw-divider"></div>
   <div class="pw-section-lbl">Unlock full access</div>
-  <button class="pw-pay-btn" id="pw-pay-btn" onclick="goToPay()">Get Full Access →</button>
-  <div class="pw-hint" id="pw-hint-txt">After payment you'll receive an access code by email. Enter it above to unlock.</div>
+  <button class="pw-pay-btn" id="pw-pay-btn" onclick="goToPay()">Get Launch Price — $24.99/month →</button>
+  <div class="pw-hint" id="pw-hint-txt">🚀 Launch special — $24.99/month (usually $50). Lock in this price before it goes up. After payment you'll receive an access code by email — enter it above to activate.</div>
+</div>
+
+
+<div id="onboard-overlay"></div>
+<div id="ob-highlight" class="ob-highlight" style="display:none"></div>
+<div id="ob-tooltip" class="ob-tooltip" style="display:none">
+  <div class="ob-title" id="ob-title"></div>
+  <div class="ob-body" id="ob-body"></div>
+  <div style="overflow:hidden;margin-top:8px">
+    <button class="ob-skip" onclick="skipOnboard()" id="ob-skip">Skip tour</button>
+    <button class="ob-next" onclick="nextOnboardStep()" id="ob-next">Next →</button>
+  </div>
+  <div class="ob-step" id="ob-step"></div>
 </div>
 
 <script>
@@ -1053,7 +1115,12 @@ const CHAPTERS = [
    title:{en:'Premium vs Discount Filter',es:'Filtro Premium vs Descuento'},
    body:{en:'This filter eliminates most losing trades. ONLY take bullish PDAs at DISCOUNT (below 50%). ONLY take bearish PDAs at PREMIUM (above 50%). Buying an FVG at premium = fighting the market. Selling one at discount = same mistake. Always know which zone you are in before entering.',
          es:'Este filtro elimina la mayoria de las operaciones perdedoras. SOLO toma PDAs alcistas en DESCUENTO (bajo el 50%). SOLO toma PDAs bajistas en PREMIUM (sobre el 50%). Comprar un FVG en premium = pelear contra el mercado.'},
-   key:{en:'Buy PDAs at Discount. Sell PDAs at Premium. This one filter changes everything.',es:'Compra PDAs en Descuento. Vende PDAs en Premium. Este solo filtro cambia todo.'}}
+   key:{en:'Buy PDAs at Discount. Sell PDAs at Premium. This one filter changes everything.',es:'Compra PDAs en Descuento. Vende PDAs en Premium. Este solo filtro cambia todo.'}},
+  {type:'rule',icon:'📊',
+   title:{en:'Drawing Levels on TradingView',es:'Dibujar Niveles en TradingView'},
+   body:{en:'Everything in this system is drawn as HORIZONTAL LINES — not boxes, not zones. On TradingView: press H for a horizontal line, press V for a vertical line, press Alt+H to lock it. Mark key levels at exact highs and lows. One line per level. Do not use rectangles or shaded zones — they create imprecision. If you do not know how to use TradingView yet, learning to draw and manage levels is your first technical skill before studying setups.',
+         es:'Todo en este sistema se dibuja como LINEAS HORIZONTALES — no cajas, no zonas. En TradingView: presiona H para una linea horizontal, V para una linea vertical, Alt+H para bloquearla. Marca niveles clave en maximos y minimos exactos. Una linea por nivel. No uses rectangulos ni zonas sombreadas — crean imprecision. Si aun no sabes usar TradingView, aprender a dibujar y gestionar niveles es tu primera habilidad tecnica antes de estudiar setups.'},
+   key:{en:'TradingView shortcuts: H = horizontal line, V = vertical line. One line. One level. No zones.',es:'Atajos de TradingView: H = linea horizontal, V = linea vertical. Una linea. Un nivel. Sin zonas.'}}
  ],
  questions:[
   {q:{en:'A Fair Value Gap (FVG) is:',es:'Un Fair Value Gap (FVG) es:'},
@@ -1827,7 +1894,7 @@ function pickMode(m){
 function applySetupStrings(){
   const ln = L[setupLang]||L.en;
   document.getElementById('s-title').textContent = setupLang==='es'?'Conoce a Donna.':'Meet Donna.';
-  document.getElementById('s-sub').textContent = setupLang==='es'?'Tu mentora de CHRONOS CRT. Estudia el sistema. Opera con disciplina.':'Your CHRONOS CRT mentor and daily coach. Study the system. Trade with discipline.';
+  document.getElementById('s-sub').textContent = setupLang==='es'?'Tu mentora de CHRONOS CRT. Estudia el sistema. Opera con disciplina.':'Your trading mentor. 15-day free trial.';
   document.getElementById('s-lbl-name').textContent = ln.setupName||'Your name';
   document.getElementById('s-lbl-lang').textContent = ln.setupLang||'Language';
   document.getElementById('s-lbl-mode').textContent = ln.setupMode||'Mode';
@@ -1857,11 +1924,15 @@ function doSetup(){
   applyAppStrings(); buildAcademy();
   updateClock(); setInterval(updateClock,30000);
   const greet=S.mode==='beginner'
-    ?(S.lang==='es'?`Hola ${nm}! Soy Donna — tu mentora de CHRONOS CRT. Por aqui empezamos desde cero y construimos paso a paso. ¿Que quieres explorar hoy?`
-      :`Hey ${nm}. I'm Donna — your CHRONOS CRT mentor. We go step by step here, no rushing. What do you want to explore today?`)
-    :(S.lang==='es'?`${nm}. Donna. Vamos al grano. ¿Que quieres afinar hoy?`
-      :`${nm}. Donna. Let's skip the pleasantries. What do you want to sharpen today?`);
+    ?(S.lang==='es'
+      ?`Hola ${nm} 👋 Soy Donna — tu mentora de trading. Estoy aquí para responder esas preguntas que siempre tuviste sin respuesta sobre los mercados. Piénsame como un amigo que sabe de trading y siempre está disponible. ¿Por dónde empezamos?`
+      :`Hey ${nm} 👋 I'm Donna — your trading mentor. I'm here to answer every question about the markets you never got a straight answer to. Think of me like a trading friend you can text anytime. What do you want to start with?`)
+    :(S.lang==='es'
+      ?`${nm}. Donna. Todo listo. ¿Qué refinamos hoy?`
+      :`${nm}. Donna. All set. What are we sharpening today?`);
   addMsg('in', greet);
+  // Start onboarding tour for new users
+  setTimeout(()=>startOnboarding(S.name, S.mode, S.lang), 800);
 }
 
 // ── APP STRINGS ────────────────────────────────────────────────────────────
@@ -1960,7 +2031,9 @@ function getSysPrompt(){
       ? `Eres Donna — mentora de trading, modo PRINCIPIANTE. Eres calida, paciente y Socratica. Explicas con analogias simples de la vida cotidiana. Haces preguntas para verificar la comprension. RESPUESTAS CORTAS — maximo 2-3 oraciones. Guias paso a paso.`
       : `You are Donna — trading mentor, BEGINNER mode. Warm, patient, Socratic. Explain with simple everyday analogies. Ask questions to verify understanding. Keep responses SHORT — 2-3 sentences. Guide step by step.`);
 
-  return `${persona}\\n\\n${langLine}\\n\\nYou are the official mentor for the CHRONOS CRT trading system. Romeo TPT created CRT and Turtle Soup. ICT taught institutional price level concepts (FVG, OB, SMT, OTE). CHRONOS applies and teaches the system. Do NOT mention Sebastian or any other person by name.\\n\\nCANDLE DIRECTION: Bullish candle = Open -> Low -> High -> Close. Bearish candle = Open -> High -> Low -> Close. NEVER use the word 'steer'.\\n\\nAMD RULE: ALWAYS number the candles: 'Candle 1 - Accumulation (the range)', 'Candle 2 - Manipulation (sweeps outside range, closes back inside)', 'Candle 3 - Distribution (to the other extreme)'. Never say 'manipulation candle' without the number.\\n\\nMARKETS: CRT works on ALL liquid markets - Forex, crypto, gold, futures, indices, commodities. Not indices only.\\n\\nCORE: Price moves for ONLY two reasons: (1) attack liquidity at highs/lows, (2) rebalance a Fair Value Gap.\\n\\nTHREE TIMEFRAMES: HTF=direction only. ITF=key levels. LTF=execute only. Never mix.\\n\\nMARKET STATES: Trending (breaking highs + rejecting lows = bullish) or Ranging (extremes only, NEVER the 50% middle).\\n\\nKEY LEVELS: Mark as HORIZONTAL LINES not zones. FVG=3-candle imbalance (C1 high to C3 low). Valid OB: liquidity swept + thick body + order flow change + FVG after. Buy PDAs at DISCOUNT (below 50%). Sell at PREMIUM (above 50%).\\n\\nKILL ZONES (Romeo exact): Asian=8pm-midnight NY. London=1am-5am NY. NY=7am-2pm NY (9:30am NYSE highest prob). Dead Zone=5am-8am (NEVER). Both displacements inside kill zones.\\n\\nTURTLE SOUP: False breakout before EVERY significant move. No raid = no trade. Close back = confirm. Retest = entry.\\n\\nTHREE FACTORS: F1=HTF key level (most important). F2=Kill zone. F3=Pre-manipulation swing. CRT without key level = ZERO.\\n\\nMODEL 1: Purge -> Close above/below -> Retest -> LIMIT ORDER. T1=50% (partial+BE). T2=DOL. Min 1:2 R:R. Two entries: E1=Soup, E2=OTE 60-75%.\\n\\nSEQUENCE: P1=Turtle Soup. P2=Model 1 (engine). P3=Breaker Block. P4=OTE. P5=Kiss of Death. 2-3 phases enough.\\n\\nX-RAY VISION: Read HTF candle shape to predict LTF price action inside it. Bullish HTF close near high = LTF delivered Low->High inside.\\n\\nCANDLE TRADER: Trade SPECIFIC CANDLES (weekly/daily/4H minimum). You are not a swing or scalp trader.\\n\\nONE MARKET: Master one market before diversifying.\\n\\nTHREE REASONS CRT FAILS: (1) SMT ignored. (2) 50% already taken in Candle 2. (3) Wrong HTF context.\\n\\nSMT RULE: Bullish SMT in bullish HTF only. Bearish SMT in bearish HTF only.\\n\\n1-5-9: Daily AMD internal candles = 1am, 5am, 9am NY (futures: 2am, 6am, 10am).\\n\\nJOURNALING: Win=journal+repeat. Loss=journal+avoid. Missed=journal+catch next.\\n\\nBEGINNER ENTRY: Candle 3 is the beginner trade. Avoid Candle 2. Never trade Candle 1.\\n\\nIRL->ERL: Price moves Internal Range Liquidity -> External Range Liquidity -> back to IRL. Always.\\n\\nWEEKLY: Sunday=prep. Monday=WATCH ONLY. Tuesday London=PRIMARY ENTRY. Wednesday=execute. Thu/Fri=profits only.\\n\\nDAILY PROFILES: Classic. NY Flip. Range-to-NY. Seek and Destroy=DO NOT TRADE.\\n\\nCHECKLIST (8pts, need 6+): HTF bias, order flow, key level, DOL, CRT candle, kill zone, Model 1, stop+target.\\n\\nTERMINOLOGY (Spanish): Smart Money=Dinero Inteligente, DOL=Objetivo de Liquidez, OTE=Punto Optimo de Entrada, AMD=Acumulacion/Manipulacion/Distribucion, MSS=Cambio de Tendencia, Premium/Discount=Premium/Descuento, ERL=Liquidez Externa, IRL=Liquidez Interna. Keep in English: Turtle Soup, FVG, OB, Breaker Block, Kill Zone, SMT, Model 1, CRT, IPDA.\\n\\nBREVITY RULE: Keep EVERY response under 4 sentences. NO bullet lists unless asked. Ask one sharp question instead of explaining. If they ask 'what is X' — give 1 sentence definition + 1 question back to test them. Donna does not lecture.
+  return `${persona}\\n\\n${langLine}\\n\\nYou are Donna — a trading mentor built on the CHRONOS CRT system by Chronos (@chronoscrt). ATTRIBUTION — always be accurate: Romeo TPT pioneered Candle Range Theory (CRT) and Turtle Soup. ICT (Inner Circle Trader) created the Smart Money Concepts framework — FVG, Order Blocks, SMT, OTE, liquidity theory. These are the two pioneers. Chronos (@chronoscrt) studies, applies, and teaches this system and built this app — he is a student and educator of the methodology, not its creator. Never claim otherwise. If a student asks who created CRT or SMC, credit Romeo TPT and ICT correctly.\\n\\nCANDLE DIRECTION: Bullish candle = Open -> Low -> High -> Close. Bearish candle = Open -> High -> Low -> Close. NEVER use the word 'steer'.\\n\\nAMD RULE: ALWAYS number the candles: 'Candle 1 - Accumulation (the range)', 'Candle 2 - Manipulation (sweeps outside range, closes back inside)', 'Candle 3 - Distribution (to the other extreme)'. Never say 'manipulation candle' without the number.\\n\\nMARKETS: CRT works on ALL liquid markets - Forex, crypto, gold, futures, indices, commodities. Not indices only.\\n\\nCORE: Price moves for ONLY two reasons: (1) attack liquidity at highs/lows, (2) rebalance a Fair Value Gap.\\n\\nTHREE TIMEFRAMES: HTF=direction only. ITF=key levels. LTF=execute only. Never mix.\\n\\nMARKET STATES: Trending (breaking highs + rejecting lows = bullish) or Ranging (extremes only, NEVER the 50% middle).\\n\\nKEY LEVELS: Mark as HORIZONTAL LINES not zones. FVG=3-candle imbalance (C1 high to C3 low). Valid OB: liquidity swept + thick body + order flow change + FVG after. Buy PDAs at DISCOUNT (below 50%). Sell at PREMIUM (above 50%).\\n\\nKILL ZONES (Romeo exact): Asian=8pm-midnight NY. London=1am-5am NY. NY=7am-2pm NY (9:30am NYSE highest prob). Dead Zone=5am-8am (NEVER). Both displacements inside kill zones.\\n\\nTURTLE SOUP: False breakout before EVERY significant move. No raid = no trade. Close back = confirm. Retest = entry.\\n\\nTHREE FACTORS: F1=HTF key level (most important). F2=Kill zone. F3=Pre-manipulation swing. CRT without key level = ZERO.\\n\\nMODEL 1: Primary entry = Purge -> Close above/below -> Retest -> LIMIT ORDER at retest. BUT: if the candle closes with strong body and the R:R is already 1:2 or better from the close price, entering at the close is valid — not every setup retests. Read the close. If price gives you the R:R at the close, take it. T1=50% (partial+BE). T2=DOL. Two entries: E1=Soup, E2=OTE 60-75%.\\n\\nSEQUENCE: P1=Turtle Soup. P2=Model 1 (engine). P3=Breaker Block. P4=OTE. P5=Kiss of Death. 2-3 phases enough.\\n\\nX-RAY VISION: Read HTF candle shape to predict LTF price action inside it. Bullish HTF close near high = LTF delivered Low->High inside.\\n\\nCANDLE TRADER: Trade SPECIFIC CANDLES (weekly/daily/4H minimum). You are not a swing or scalp trader.\\n\\nONE MARKET: Master one market before diversifying.\\n\\nTHREE REASONS CRT FAILS: (1) SMT ignored. (2) 50% already taken in Candle 2. (3) Wrong HTF context.\\n\\nSMT RULE: Bullish SMT in bullish HTF only. Bearish SMT in bearish HTF only.\\n\\n1-5-9: Daily AMD internal candles = 1am, 5am, 9am NY (futures: 2am, 6am, 10am).\\n\\nJOURNALING: Win=journal+repeat. Loss=journal+avoid. Missed=journal+catch next.\\n\\nBEGINNER ENTRY: Candle 3 is the beginner trade. Avoid Candle 2. Never trade Candle 1.\\n\\nIRL->ERL: Price moves Internal Range Liquidity -> External Range Liquidity -> back to IRL. Always.\\n\\nWEEKLY: Sunday=prep. Monday=WATCH ONLY. Tuesday London=PRIMARY ENTRY. Wednesday=execute. Thu/Fri=profits only.\\n\\nDAILY PROFILES: Classic. NY Flip. Range-to-NY. Seek and Destroy=DO NOT TRADE.\\n\\nCHECKLIST (8pts, need 6+): HTF bias, order flow, key level, DOL, CRT candle, kill zone, Model 1, stop+target.\\n\\nTERMINOLOGY (Spanish): Smart Money=Dinero Inteligente, DOL=Objetivo de Liquidez, OTE=Punto Optimo de Entrada, AMD=Acumulacion/Manipulacion/Distribucion, MSS=Cambio de Tendencia, Premium/Discount=Premium/Descuento, ERL=Liquidez Externa, IRL=Liquidez Interna. Keep in English: Turtle Soup, FVG, OB, Breaker Block, Kill Zone, SMT, Model 1, CRT, IPDA.\\n\\nIDENTITY: You are Donna — a trading mentor. You are simply Donna. The methodology you teach is Candle Range Theory (CRT), pioneered by Romeo TPT, built on Smart Money Concepts by ICT. Chronos (@chronoscrt) studies, applies, and teaches this system — he is not the creator of the methodology, never imply otherwise.
+
+BREVITY RULE: Keep EVERY response under 4 sentences. NO bullet lists unless asked. Ask one sharp question instead of explaining. If they ask 'what is X' — give 1 sentence definition + 1 question back to test them. Donna does not lecture.
 
 MINDSET: The system is perfect. Losses = operator error. Journal every trade. 0.25-0.5% risk. Demo first.\\n\\nChart photos: NEVER analyze for them. Ask: \"What do you see? Walk me through your analysis.\"\\n\\nTrader: ${S.name} | Mode: ${S.mode} | Lang: ${S.lang} | ${timeContext}`;
 }
@@ -1975,7 +2048,7 @@ async function callAI(userMsg, imageB64){
   const resp = await fetch('/api/chat',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:getSysPrompt(),messages:chatHistory})
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,system:getSysPrompt(),messages:chatHistory})
   });
   if(!resp.ok){ const e=await resp.json(); throw new Error(e.error?.message||'API error'); }
   const data=await resp.json();
@@ -2465,10 +2538,12 @@ if(S.name){
   updateClock(); setInterval(updateClock,30000);
   setMode(S.mode);
   const greet=S.mode==='beginner'
-    ?(S.lang==='es'?`Hola ${S.name}! Estoy aquí. ¿Qué quieres explorar hoy?`
-      :`Hey ${S.name}. What do you want to work on today?`)
-    :(S.lang==='es'?`${S.name}. Donna. ¿En qué trabajamos?`
-      :`${S.name}. Donna. What are we working on?`);
+    ?(S.lang==='es'
+      ?`Hola ${S.name} 👋 Soy Donna — tu mentora de trading. Estoy aquí para responder esas preguntas que siempre tuviste sin respuesta sobre los mercados. Piénsame como un amigo que sabe de trading y siempre está disponible. ¿Por dónde empezamos?`
+      :`Hey ${S.name} 👋 I'm Donna — your trading mentor. I'm here to answer every question about the markets you never got a straight answer to. Think of me like a trading friend you can text anytime. What do you want to start with?`)
+    :(S.lang==='es'
+      ?`${S.name}. Donna. Todo listo. ¿Qué refinamos hoy?`
+      :`${S.name}. Donna. All set. What are we sharpening today?`);
   addMsg('in',greet);
   }
 } else {
@@ -2478,7 +2553,7 @@ if(S.name){
 
 // ── TRIAL & ACCESS ─────────────────────────────────────────────────────────
 const TRIAL_DAYS = 15;
-const STRIPE_URL = 'https://buy.stripe.com/REPLACE_WITH_YOUR_STRIPE_LINK';
+const STRIPE_URL = 'https://buy.stripe.com/3cI28s4HG6Jj1i0bPN1kA00';
 
 function getTrialState(){
   try {
@@ -2585,6 +2660,137 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const inp = document.getElementById('pw-code');
   if(inp) inp.addEventListener('keydown', e=>{ if(e.key==='Enter') applyCode(); });
 });
+
+
+// ── ONBOARDING ──────────────────────────────────────────────────────────────
+function getOnboardSteps(name, mode, lang) {
+  const es = lang === 'es';
+  const beg = mode === 'beginner';
+  return [
+    {
+      target: null, // No highlight - just the welcome message
+      title: es ? `Bienvenido, ${name} 👋` : `Welcome, ${name} 👋`,
+      body: es
+        ? `Soy Donna — tu mentora de trading. Modo ${beg ? 'Principiante' : 'Avanzado'} activado. Déjame mostrarte cómo funciona todo esto en 30 segundos.`
+        : `I'm Donna — your CRT mentor. ${beg ? 'Beginner' : 'Advanced'} mode activated. Let me show you how everything works in 30 seconds.`,
+      next: es ? 'Mostrarme →' : 'Show me →'
+    },
+    {
+      target: 'tab-chat',
+      pos: 'top',
+      title: es ? '💬 Habla conmigo' : '💬 Talk to me',
+      body: es
+        ? `Hazme cualquier pregunta sobre el mercado — candelas, liquidez, zonas, setups, lo que sea. Piénsame como un amigo que sabe de trading y puedes textearte cuando quieras.`
+        : `Ask me anything about the markets — candles, liquidity, key levels, setups, anything. Think of me like a trading friend you can text anytime. No dumb questions here.`,
+      next: es ? 'Siguiente →' : 'Next →'
+    },
+    {
+      target: 'tab-academy',
+      pos: 'top',
+      title: es ? '📚 El Curso — 22 Capítulos' : '📚 The Course — 22 Chapters',
+      body: es
+        ? `De cero a cien. Anatomía de la vela, AMD, niveles clave, Turtle Soup, Model 1, gestión de riesgo y más. Si algo del curso no queda claro, pregúntame directamente.`
+        : `Zero to one hundred. Candle anatomy, AMD, key levels, Turtle Soup, Model 1, risk management and more. If anything in the course isn't clear — just ask me directly.`,
+      next: es ? 'Siguiente →' : 'Next →'
+    },
+    {
+      target: 'tab-log',
+      pos: 'top',
+      title: es ? '📓 Tu Diario de Trades' : '📓 Your Trade Journal',
+      body: es
+        ? `Registra cada operación con foto de tu gráfica, resultado y notas. El diario es donde mejoras de verdad — no en estudiar más, sino en revisar tus propios patrones.`
+        : `Log every trade with a chart screenshot, result, and notes. The journal is where real improvement happens — not from studying more, but from reviewing your own patterns.`,
+      next: es ? 'Siguiente →' : 'Next →'
+    },
+    {
+      target: 'tab-stats',
+      pos: 'top',
+      title: es ? '📊 Tus Estadísticas' : '📊 Your Stats',
+      body: es
+        ? `Tu tasa de acierto, promedio de R:R, rachas — todo aquí. Los números no mienten. Esto te dice si estás mejorando o si hay un patrón de error que tienes que corregir.`
+        : `Win rate, average R:R, streaks — all here. Numbers don't lie. This tells you if you're improving or if there's an error pattern you need to fix.`,
+      next: es ? 'Empezar →' : "Let's go →"
+    },
+    {
+      target: null,
+      title: es ? '1% mejor cada día puede cambiar tu vida. 🕯️' : '1% better every day can change your life. 🕯️',
+      body: es
+        ? `Ya tienes todo lo que necesitas. El mercado va a estar ahí mañana. Tú también. Empieza por el Capítulo 1.`
+        : `You have everything you need. The market will be there tomorrow. So will you. Start with Chapter 1.`,
+      next: es ? 'Vamos →' : "I'm ready →",
+      last: true
+    }
+  ];
+}
+
+let obSteps = [];
+let obIdx = 0;
+
+function startOnboarding(name, mode, lang) {
+  if(localStorage.getItem('donna_onboard_v8')) return;
+  obSteps = getOnboardSteps(name, mode, lang);
+  obIdx = 0;
+  showOnboardStep();
+}
+
+function showOnboardStep() {
+  const step = obSteps[obIdx];
+  if(!step) { finishOnboard(); return; }
+
+  const overlay = document.getElementById('onboard-overlay');
+  const tooltip = document.getElementById('ob-tooltip');
+  const highlight = document.getElementById('ob-highlight');
+  const title = document.getElementById('ob-title');
+  const body = document.getElementById('ob-body');
+  const nextBtn = document.getElementById('ob-next');
+  const stepLbl = document.getElementById('ob-step');
+  const skipBtn = document.getElementById('ob-skip');
+
+  overlay.classList.add('show');
+  title.textContent = step.title;
+  body.textContent = step.body;
+  nextBtn.textContent = step.next || 'Next →';
+  stepLbl.textContent = `${obIdx + 1} / ${obSteps.length}`;
+  skipBtn.style.display = step.last ? 'none' : 'inline';
+  tooltip.style.display = 'block';
+
+  // Position highlight + tooltip
+  if(step.target) {
+    const el = document.getElementById(step.target);
+    if(el) {
+      const r = el.getBoundingClientRect();
+      highlight.style.cssText = `display:block;top:${r.top-4}px;left:${r.left-4}px;width:${r.width+8}px;height:${r.height+8}px`;
+      // Position tooltip above the element
+      const ttW = 248;
+      let ttLeft = r.left + r.width/2 - ttW/2;
+      ttLeft = Math.max(8, Math.min(ttLeft, window.innerWidth - ttW - 8));
+      const ttTop = r.top - 8;
+      tooltip.className = 'ob-tooltip arrow-bottom';
+      tooltip.style.cssText = `display:block;left:${ttLeft}px;top:${ttTop - 140}px;width:${ttW}px`;
+    }
+  } else {
+    highlight.style.display = 'none';
+    // Center tooltip
+    const ttW = 260;
+    tooltip.className = 'ob-tooltip';
+    tooltip.style.cssText = `display:block;left:${window.innerWidth/2 - ttW/2}px;top:${window.innerHeight/2 - 100}px;width:${ttW}px`;
+  }
+}
+
+function nextOnboardStep() {
+  obIdx++;
+  if(obIdx >= obSteps.length) { finishOnboard(); return; }
+  showOnboardStep();
+}
+
+function skipOnboard() { finishOnboard(); }
+
+function finishOnboard() {
+  document.getElementById('onboard-overlay').classList.remove('show');
+  document.getElementById('ob-tooltip').style.display = 'none';
+  document.getElementById('ob-highlight').style.display = 'none';
+  localStorage.setItem('donna_onboard_v8', '1');
+}
 
 </script>
 </body>
