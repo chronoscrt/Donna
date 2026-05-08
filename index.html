@@ -6,44 +6,28 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
-  <meta name="description" content="Donna — Your CRT Trading Mentor">
   <title>Donna — CRT Trading Mentor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; height: -webkit-fill-available; }
-    body {
-      height: 100%;
-      min-height: -webkit-fill-available;
-      background: #000;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-      overscroll-behavior: none;
-    }
-    #root {
-      height: 100%;
-      height: -webkit-fill-available;
-      display: flex;
-      flex-direction: column;
-      overscroll-behavior: none;
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{height:100%;height:-webkit-fill-available;}
+    body{height:100%;min-height:-webkit-fill-available;background:#000;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none;}
+    #root{height:100%;height:-webkit-fill-available;display:flex;flex-direction:column;overscroll-behavior:none;}
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script>
     // ============================================================
-    //  YOUR ANTHROPIC API KEY — paste it between the quotes below
+    //  PASTE YOUR ANTHROPIC API KEY BETWEEN THE QUOTES BELOW
     // ============================================================
     var ANTHROPIC_API_KEY = 'YOUR_KEY_HERE';
     // ============================================================
 
-    // Intercepts every API call and adds your key + required headers
+    // Adds your key to every Anthropic API request automatically
     var _fetch = window.fetch.bind(window);
     window.fetch = function(url, opts) {
       if (typeof url === 'string' && url.includes('api.anthropic.com')) {
@@ -57,10 +41,9 @@
       return _fetch(url, opts);
     };
 
-    // Direct Anthropic endpoint
     var API_ENDPOINT = 'https://api.anthropic.com/v1/messages';
 
-    // ── Storage (localStorage wrapper — data stays on device) ────
+    // localStorage wrapper — mirrors Claude artifact storage API
     window.storage = {
       get: async function(key) {
         var v = localStorage.getItem(key);
@@ -72,8 +55,7 @@
         return { key: key, value: value };
       },
       delete: async function(key) {
-        localStorage.removeItem(key);
-        return { key: key, deleted: true };
+        localStorage.removeItem(key); return { key: key, deleted: true };
       },
       list: async function(prefix) {
         var keys = [];
@@ -85,7 +67,6 @@
       }
     };
   </script>
-
   <script>
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
@@ -2006,20 +1987,19 @@ function App() {
     };
     setProfile(p);
     setPhase("main");
-    addMsg("donna", DONNA.greet(p.name, p.lang, h));
     if (selMode === "advanced") {
+      addMsg("donna", p.lang === "es" ? "La mayor\xEDa de los traders pierden porque siguen reglas que alguien m\xE1s les vendi\xF3. T\xFA ya sabes que hay algo m\xE1s detr\xE1s de c\xF3mo se mueve el precio.\n\nSoy Donna. No te digo qu\xE9 operar. Te hago las preguntas que preferir\xEDas saltarte." : "Most traders lose because they follow rules someone else sold them. You already know there's something more behind how price moves.\n\nI'm Donna. I don't tell you what to trade. I ask the questions you'd rather skip.");
+      setPqStep(1);
       setTimeout(function () {
-        return addMsg("donna", p.lang === "es" ? "Aqu\xED est\xE1 lo que soy y lo que no soy.\n\nNo estoy aqu\xED para ense\xF1arte lo que ya sabes. No voy a explicar qu\xE9 es un Turtle Soup a menos que me lo pidas. Lo que soy es el compa\xF1ero de responsabilidad que hace las preguntas que te gustar\xEDa saltarte.\n\nCRT es el marco. T\xFA lo conoces. La brecha entre conocerlo y ejecutarlo con consistencia \u2014 eso es lo que vamos a cerrar.\n\n\uD83D\uDCCB \"\xBFListo para operar?\" \u2014 P\xE1salo antes de cada entrada. Punt\xFAo tu setup de A+ a F. Cualquier cosa por debajo de B-, hablamos antes de que toques el bot\xF3n.\n\uD83D\uDCAC CHAT \u2014 M\xE1ndame tus setups. Adjunta screenshots. Te doy una lectura CRT directa. Pregunto primero, valido despu\xE9s \u2014 nunca al rev\xE9s.\n\uD83D\uDCDD \"+\" \u2014 Registra cada operaci\xF3n: antes, durante y despu\xE9s. Seguimiento de win rate, sesiones, patrones emocionales.\n\uD83D\uDCDA ACADEMIA \u2014 22 cap\xEDtulos si necesitas reforzar algo. Sin juicios.\n\nUna regla: no vengas buscando confirmaci\xF3n. Ven cuando quieras ser desafiado.\n\n\xBFEn qu\xE9 estamos trabajando?" : "Here's what this is, and what it isn't.\n\nI'm not here to teach you what you already know. I won't explain what a Turtle Soup is unless you ask. What I am is the accountability partner who asks the questions you'd rather skip.\n\nCRT is the framework. You know it. The gap between knowing it and executing it consistently \u2014 that's what we're closing.\n\n\uD83D\uDCCB \"Ready to trade?\" \u2014 Run this before every entry. I score your setup A+ to F. Anything under B-, we talk before you touch the button.\n\uD83D\uDCAC CHAT \u2014 Send me your setups. Attach chart screenshots. I give you a straight CRT read. I ask questions first, validate second \u2014 never the other way.\n\uD83D\uDCDD \"+\" \u2014 Log every trade: before, during, after. Win rate, sessions, emotional patterns \u2014 I track it all and bring it up when it matters.\n\uD83D\uDCDA ACADEMY \u2014 22 chapters if you need to fill a gap. No judgment.\n\nOne rule: don't come looking for confirmation. Come when you want to be challenged.\n\nWhat are we working on?");
-      }, 600);
+        return addMsg("donna", p.lang === "es" ? "¿Cuál es tu vela principal?" : "What's your main candle?");
+      }, 900);
     } else {
+      addMsg("donna", p.lang === "es" ? "La mayor\xEDa cree que el mercado es impredecible. No lo es.\n\nTiene una l\xF3gica \u2014 y yo te la ense\xF1o desde cero. Soy Donna." : "Most people think the market is unpredictable. It isn't.\n\nIt has a logic \u2014 and I'll teach you to see it from scratch. I'm Donna.");
+      setPqStep(1);
       setTimeout(function () {
-        return addMsg("donna", p.lang === "es" ? "Aqu\xED est\xE1 lo que soy, y lo que no soy.\n\nNo soy un bot de se\xF1ales. No te voy a decir qu\xE9 comprar ni qu\xE9 vender. Lo que soy es la mentora que te ense\xF1a a leer el mercado t\xFA mismo \u2014 para que alg\xFAn d\xEDa no necesites que nadie te diga qu\xE9 hacer.\n\nEstoy construida sobre CRT \u2014 Candle Range Theory. Un sistema que ense\xF1a a ver el mercado como lo opera Smart Money: a trav\xE9s de velas, liquidez y la l\xF3gica de hacia d\xF3nde tiene que ir el precio.\n\n\uD83D\uDCDA ACADEMIA \u2014 Empieza en el Cap\xEDtulo 1 y no te saltes nada. Cada cap\xEDtulo construye sobre el anterior. Aqu\xED se sienta la base.\n\uD83D\uDCAC CHAT \u2014 Preg\xFAntame lo que sea, cuando sea. No hay preguntas demasiado b\xE1sicas. La \xFAnica mala pregunta es la que se queda en tu cabeza.\n\uD83D\uDCCB \"\xBFListo para operar?\" \u2014 Antes de tocar el bot\xF3n alguna vez, pasamos 8 puntos juntos. As\xED es como mantenemos tu cuenta mientras aprendes.\n\uD83D\uDCDD \"+\" \u2014 Tu diario de trading. Ganar o perder, lo registramos juntos. Porque ah\xED es donde sucede la mayor parte del aprendizaje real.\n\nUna cosa m\xE1s: s\xE9 honesto conmigo. Sobre lo que ves. Sobre c\xF3mo te sientes. Los traders que m\xE1s sacan de m\xED son los que se presentan con consistencia y lo comparten todo.\n\n\xBFListo para empezar? Primero \u2014 d\xE9jame conocerte un poco." : "Here's what I am, and what I'm not.\n\nI'm not a signals bot. I'm not going to tell you what to buy or sell. What I am is the mentor who teaches you to read the market yourself \u2014 so that one day you won't need anyone telling you what to do.\n\nI'm built on CRT \u2014 Candle Range Theory. A framework that teaches you to see the market the way Smart Money operates it: through candles, liquidity, and the logic of where price has to go next.\n\n\uD83D\uDCDA ACADEMY \u2014 Start at Chapter 1 and don't skip. Each chapter builds on the last. This is where the foundation goes in.\n\uD83D\uDCAC CHAT \u2014 Ask me anything, anytime. No question is too basic. The only bad question is the one that stays in your head.\n\uD83D\uDCCB \"Ready to trade?\" \u2014 Before you ever touch the button, we go through 8 points together. This is how we keep your account alive while you're learning.\n\uD83D\uDCDD \"+\" \u2014 Your trade journal. Win or lose, we log it together. Because that's where most of the real learning happens.\n\nOne more thing: be honest with me. About what you see. About how you feel. The traders who get the most from me are the ones who show up consistently and share everything.\n\nReady to start? First \u2014 let me get to know you a little.");
-      }, 600);
+        return addMsg("donna", p.lang === "es" ? "¿Qué te trajo hasta aquí?" : "What brought you here?");
+      }, 900);
     }
-    setPqStep(1);
-    setTimeout(function () {
-      return addMsg("donna", selMode === "advanced" ? selLang === "es" ? "Una pregunta antes de empezar. ¿Cuál es tu vela principal?" : "One quick thing before we start. What's your main candle?" : selLang === "es" ? "Cuéntame — ¿qué fue lo que te inspiró a querer aprender a operar en los mercados?" : "Tell me — what was it that inspired you to want to learn trading?");
-    }, 1400);
   };
   var getPQPills = function getPQPills(step, mode, lang) {
     var es = lang === "es",
@@ -2047,27 +2027,15 @@ function App() {
         return addMsg("donna", adv ? p.lang === "es" ? "¿Y cuál es tu proceso antes de entrar?" : "And what's your process before entering?" : p.lang === "es" ? "Me alegra que estés aquí. ¿Alguna vez has abierto un gráfico de trading?" : "I'm glad you're here. Have you ever actually looked at a trading chart before?");
       }, 400);
     } else if (step === 2) {
-      setProfile(function (pr) {
-        return adv ? _objectSpread(_objectSpread({}, pr), {}, {
-          process: pill
-        }) : _objectSpread(_objectSpread({}, pr), {}, {
-          chartExp: pill
-        });
-      });
-      setPqStep(3);
-      setTimeout(function () {
-        return addMsg("donna", adv ? p.lang === "es" ? "Última. ¿Qué es lo que realmente te tiene aquí?" : "Last one. What's the real thing holding you back right now?" : p.lang === "es" ? "¿Y cuándo sueles tener tiempo durante el día?" : "When are you usually free during the day?");
-      }, 400);
-    } else if (step === 3) {
       var up = adv ? _objectSpread(_objectSpread({}, profile), {}, {
-        challenge: pill
+        process: pill
       }) : _objectSpread(_objectSpread({}, profile), {}, {
-        availability: pill
+        chartExp: pill
       });
       setProfile(up);
       setPqStep(0);
       setTimeout(function () {
-        return addMsg("donna", adv ? p.lang === "es" ? "Anotado. \"".concat(pill, "\" \u2014 en eso trabajamos. M\xE1ndame setups, adjunta screenshots, pasa el checklist antes de cada entrada. \xBFQu\xE9 tienes en el radar?") : "Noted. \"".concat(pill, "\" \u2014 that's what we're working on. Send me setups, attach charts, run the checklist before any entry. What's on the radar?") : p.lang === "es" ? "Perfecto. Con esa disponibilidad, las velas diarias y de 4 horas encajan mejor con tu vida \u2014 no necesitas estar pegado a la pantalla. Empecemos desde el principio. \xBFSabes qu\xE9 es una vela japonesa?" : "Perfect. With that schedule, daily and 4H candles fit your life best \u2014 no need to be glued to a screen. Let's start at the beginning. Do you know what a Japanese candlestick is?");
+        return addMsg("donna", adv ? p.lang === "es" ? "Anotado. M\xE1ndame setups, adjunta gr\xE1ficos, pasa el checklist antes de cada entrada. \xBFQu\xE9 tienes en el radar?" : "Noted. Send me setups, attach charts, run the checklist before every entry. What's on the radar?" : p.lang === "es" ? "Perfecto. Empieza por la Academia \u2014 Cap\xEDtulo 1. No te saltes nada. Cada pieza construye sobre la anterior. Y preg\xFAntame lo que sea en el camino." : "Perfect. Start in the Academy \u2014 Chapter 1. Don't skip anything. Each piece builds on the last. And ask me anything along the way.");
       }, 500);
     }
   };
@@ -2857,7 +2825,7 @@ function App() {
       style: {
         padding: "10px 13px",
         borderRadius: m.role === "donna" ? "18px 18px 18px 4px" : "18px 18px 4px 18px",
-        background: m.role === "donna" ? DARK : RED,
+        background: m.role === "donna" ? DARK : "#0A84FF",
         color: "#fff",
         fontSize: 15,
         lineHeight: 1.58,
@@ -2918,7 +2886,7 @@ function App() {
       color: "#FF6B6B",
       border: "1px solid ".concat(RED, "44")
     }
-  }, "API: ", apiError), /*#__PURE__*/React.createElement("div", {
+  }, apiError !== null && apiError !== void 0 && apiError.includes("invalid x-api-key") ? "⚠️ API key not set — open index.html and replace YOUR_KEY_HERE with your Anthropic key." : "⚠️ " + apiError), /*#__PURE__*/React.createElement("div", {
     ref: bottomRef
   })), displayPills && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -3135,11 +3103,7 @@ function App() {
     }));
   }))));
 }
-
-    // Mount the app
-    ReactDOM.createRoot(document.getElementById('root')).render(
-      React.createElement(App)
-    );
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </body>
 </html>
