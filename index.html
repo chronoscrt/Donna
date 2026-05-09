@@ -254,7 +254,7 @@ async function generateLesson(chapter,lang){
   const sys=`You generate lesson content for a CRT trading education app. Return ONLY valid JSON.
 FORMAT: {"slides":[{"icon":"emoji","title":"max 5 words","body":"2-4 sentences with REAL market examples and specific numbers","donna":"1-2 sentences Donna voice — warm, direct, slightly funny"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"explanation"}]}
 RULES: Every slide needs a real price example. Quiz tests understanding not definitions. Mix mc and tf types. ${chapter.id<=2?"Avoid jargon — use plain English":"Use CRT terminology"}. ${isES?"ALL content in Spanish":"ALL content in English"}. EXACTLY ${cfg.slides} slides and ${cfg.minQ} questions. Return ONLY JSON.`;
-  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
+  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
   if(!res.ok)throw new Error(`API ${res.status}`);
   const data=await res.json();
   const text=data.content?.[0]?.text||"";
@@ -329,26 +329,19 @@ input,button,textarea,select{font-family:'DM Sans',sans-serif;}
 /* ═══════════════════════════════════
    SVG FLAGS
 ═══════════════════════════════════ */
-function FlagUS({w=36,h=24}){
-  const s=h/13;
+function FlagUS({size=44}){
   return(
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{borderRadius:3,display:"block",overflow:"hidden"}}>
-      <rect width={w} height={h} fill="#B22234"/>
-      {[1,3,5,7,9,11].map(i=><rect key={i} y={i*s} width={w} height={s} fill="#fff"/>)}
-      <rect width={w*.4} height={h*7/13} fill="#3C3B6E"/>
-      <text x={w*.2} y={h*.38} fontSize={h*.22} fill="#fff" textAnchor="middle" dominantBaseline="middle">★★★</text>
-      <text x={w*.2} y={h*.64} fontSize={h*.22} fill="#fff" textAnchor="middle" dominantBaseline="middle">★★</text>
-    </svg>
+    <img src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/svg/1f1fa-1f1f8.svg"
+      width={size} height={size} alt="🇺🇸"
+      style={{display:"block",borderRadius:6}}/>
   );
 }
 
-function FlagES({w=36,h=24}){
+function FlagES({size=44}){
   return(
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{borderRadius:3,display:"block",overflow:"hidden"}}>
-      <rect width={w} height={h} fill="#AA151B"/>
-      <rect y={h/4} width={w} height={h/2} fill="#F1BF00"/>
-      <rect x={w*.25} y={h*.32} width={w*.08} height={h*.36} rx="1" fill="#AA151B" opacity=".7"/>
-    </svg>
+    <img src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/svg/1f1ea-1f1f8.svg"
+      width={size} height={size} alt="🇪🇸"
+      style={{display:"block",borderRadius:6}}/>
   );
 }
 
@@ -1181,7 +1174,7 @@ Want to log this trade now?`);
                 {[{code:"en",Flag:FlagUS,label:"English"},{code:"es",Flag:FlagES,label:"Español"}].map(l=>(
                   <button key={l.code} onClick={()=>setSelLang(l.code)}
                     style={{padding:"16px 12px",borderRadius:12,background:selLang===l.code?"rgba(232,37,60,.12)":DARK,border:`1.5px solid ${selLang===l.code?RED:"transparent"}`,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,transition:"all .2s"}}>
-                    <l.Flag w={48} h={32}/>
+                    <l.Flag size={44}/>
                     <span style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>{l.label}</span>
                   </button>
                 ))}
