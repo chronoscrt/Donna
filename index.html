@@ -34,16 +34,28 @@ const {useState,useRef,useEffect,useCallback,useMemo}=React;
 
 /* ── CONSTANTS ─────────────────────────────────── */
 const RED="#E8253C",DARK="#1C1C1E",DARK2="#2C2C2E",MUTED="#8E8E93",
-      GREEN="#30D158",BLUE="#007AFF",GOLD="#FF9F0A",FREE=10;
+      GREEN="#30D158",BLUE="#007AFF",GOLD="#FF9F0A",FREE=20;
 
 const COMPLEXITY={
-  1:{slides:3,minQ:6,label:"Foundation",color:"#4ECDC4",emoji:"🌱"},
-  2:{slides:5,minQ:8,label:"Intermediate",color:GOLD,emoji:"📈"},
-  3:{slides:6,minQ:10,label:"Advanced",color:RED,emoji:"🔥"},
+  1:{slides:2,minQ:3,label:"Foundation",color:"#4ECDC4",emoji:"🌱"},
+  2:{slides:3,minQ:4,label:"Intermediate",color:GOLD,emoji:"📈"},
+  3:{slides:4,minQ:5,label:"Advanced",color:RED,emoji:"🔥"},
 };
 
 /* ── CHAPTERS ──────────────────────────────────── */
 const CHAPTERS=[
+  {id:0,icon:"🎯",title:"Start Here",sub:"What is Donna and how CRT works.",level:1,static:true,
+   slides:[
+     {icon:"📖",title:"What is CRT?",body:"Candle Range Theory reads price through Smart Money logic. Every candle has exactly two possible outcomes: a Turtle Soup (wick beyond a level, closes inside = fake move) or a True Break (close beyond = real move). Gold at 2000, for example — if it wicks to 2015 but closes at 1998, that is a Turtle Soup. Price is going down.",donna:"Think of every candle as a vote. The wick is where they tried. The close is where they committed. Never confuse the two."},
+     {icon:"🤝",title:"What Donna Does",body:"Donna analyzes your charts with CRT, walks you through an 8-point pre-trade checklist, helps you log every trade, and teaches you through 22 structured chapters from basic candles to the complete trading system. She is not a signal service. She is your coach.",donna:"I will remember your trades, track your patterns, and call out your mistakes by name. That is the deal."},
+     {icon:"⚖️",title:"The Three Rules",body:"Rule 1: Risk 1 to 2 percent maximum per trade, no exceptions. Rule 2: The stop never moves once placed above or below the Model 1 wick. Rule 3: First take is always at 50 percent of the range. These three rules, followed consistently, separate traders who last from those who blow up.",donna:"You will want to break all three. That is normal. Do not."}
+   ],
+   quiz:[
+     {q:"A candle wicks above an old high but closes back inside the range. What does CRT call this?",type:"mc",opts:["True Break — go long","Turtle Soup — fake move","Neutral candle","Change of character"],a:1,exp:"A wick above that closes inside is a Turtle Soup — a fake breakout. The close reveals intention. The wick revealed deception."},
+     {q:"Your stop is correctly placed. Price moves against you slightly. What do you do?",type:"mc",opts:["Move stop wider","Close early","Do nothing — stop stays","Add to position"],a:2,exp:"The stop never moves. Moving it is how good setups become account-destroying losses. Set it and let the market decide."},
+     {q:"You must always take partial profit at 50% of the range before the full target.",type:"tf",a:true,exp:"Always. The 50% partial is mandatory. It locks in profit and lets the rest of the trade run free."}
+   ]
+  },
   {id:1,icon:"🕯️",title:"Reading Candles",sub:"What every candle is actually telling you.",level:1,desc:"The four parts of a candlestick (OHLC), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples with real numbers."},
   {id:2,icon:"📊",title:"Market States",sub:"First question every time you open a chart.",level:1,desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), choppy (no trade). How to identify each. The devastating mistake of applying trending strategy in a ranging market. The no-man\'s-land concept — never trade the middle of a range."},
   {id:3,icon:"🔭",title:"The Three Timeframes",sub:"HTF · ITF · LTF — one purpose each.",level:2,desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."},
@@ -80,8 +92,8 @@ const T={
     privacy:"All data stays on your device only.",
     tabChat:"CHAT",tabJournal:"JOURNAL",tabAcademy:"ACADEMY",
     msgPH:"Message Donna...",
-    trialLeft:(n)=>`${n} free messages left`,
-    paywallTitle:"You\'ve used your 10 free messages.",
+    trialLeft:(n)=>`${n} of 20 free messages left`,
+    paywallTitle:"You\'ve used your 20 free messages.",
     paywallSub:"Upgrade for unlimited chat, live chart reads, and full academy.",
     upgrade:"Upgrade to Pro →",later:"Maybe later",
     advMode:"Advanced Mode",begMode:"Beginner Mode",
@@ -121,7 +133,7 @@ const T={
     privacy:"Todos los datos se quedan en tu dispositivo.",
     tabChat:"CHAT",tabJournal:"DIARIO",tabAcademy:"ACADEMIA",
     msgPH:"Mensaje a Donna...",
-    trialLeft:(n)=>`${n} mensajes restantes`,
+    trialLeft:(n)=>`${n} de 20 mensajes gratis`,
     paywallTitle:"Has usado tus 10 mensajes gratuitos.",
     paywallSub:"Actualiza para chat ilimitado, análisis de gráficos y academia completa.",
     upgrade:"Actualizar a Pro →",later:"Quizás después",
@@ -251,10 +263,8 @@ async function generateLesson(chapter,lang){
   try{const cached=await window.storage.get(cacheKey);if(cached?.value){const d=JSON.parse(cached.value);if(d?.slides?.length>0)return d;}}catch(e){}
   const cfg=COMPLEXITY[chapter.level]||COMPLEXITY[1];
   const isES=lang==="es";
-  const sys=`You generate lesson content for a CRT trading education app. Return ONLY valid JSON.
-FORMAT: {"slides":[{"icon":"emoji","title":"max 5 words","body":"2-4 sentences with REAL market examples and specific numbers","donna":"1-2 sentences Donna voice — warm, direct, slightly funny"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"explanation"}]}
-RULES: Every slide needs a real price example. Quiz tests understanding not definitions. Mix mc and tf types. ${chapter.id<=2?"Avoid jargon — use plain English":"Use CRT terminology"}. ${isES?"ALL content in Spanish":"ALL content in English"}. EXACTLY ${cfg.slides} slides and ${cfg.minQ} questions. Return ONLY JSON.`;
-  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:800,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
+  const sys=`Return ONLY a JSON object. No markdown. No explanation.\nFormat: {"slides":[{"icon":"emoji","title":"5 words","body":"2 sentences with real price number example","donna":"1 short sentence Donna voice"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"1 sentence"}]}\nRules: ${isES?"Spanish only":"English only"}. ${chapter.id<=2?"No jargon":"Use CRT terms"}. Exactly ${cfg.slides} slides and ${cfg.minQ} quiz items. Return JSON only.`;
+  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5-20250929",max_tokens:500,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
   if(!res.ok)throw new Error(`API ${res.status}`);
   const data=await res.json();
   const text=data.content?.[0]?.text||"";
@@ -662,6 +672,10 @@ function LessonModal({chapter,lang,onClose,onComplete}){
   const cfg=COMPLEXITY[chapter.level]||COMPLEXITY[1];
 
   const load=useCallback(async()=>{
+    if(chapter.static){
+      setData({slides:chapter.slides,quiz:chapter.quiz});
+      setLoading(false);return;
+    }
     setLoading(true);setError(false);
     try{const d=await generateLesson(chapter,lang);setData(d);}
     catch(e){setError(true);}
@@ -849,8 +863,8 @@ function AcademyScreen({profile,completed,onOpen}){
         <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:2,textAlign:"center",marginBottom:20}}>{lang==="es"?"RUTA DE APRENDIZAJE":"LEARNING PATH"}</div>
         {CHAPTERS.map((ch,i)=>{
           const done=completed.has(ch.id);
-          const current=!done&&(i===0||completed.has(CHAPTERS[i-1]?.id));
-          const locked=!done&&!current;
+          const current=ch.id===0?!done:!done&&(i===0||completed.has(CHAPTERS[i-1]?.id));
+          const locked=ch.id===0?false:!done&&!current;
           const isLeft=i%2===0;
           const bc=done?RED:current?RED:DARK2;
           const cfg=COMPLEXITY[ch.level]||COMPLEXITY[1];
@@ -863,7 +877,7 @@ function AcademyScreen({profile,completed,onOpen}){
                   {locked?"🔒":done?"✅":ch.icon}
                 </div>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:10,fontWeight:700,color:current||done?RED:MUTED,letterSpacing:1.5}}>CH {String(ch.id).padStart(2,"0")}</div>
+                  <div style={{fontSize:10,fontWeight:700,color:current||done?RED:MUTED,letterSpacing:1.5}}>{ch.id===0?"★ START HERE":"CH "+String(ch.id).padStart(2,"0")}</div>
                   <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13,color:locked?MUTED:"#fff",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:1}}>{ch.title}</div>
                   <div style={{fontSize:12,color:MUTED,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{ch.sub}</div>
                 </div>
@@ -885,16 +899,106 @@ function AcademyScreen({profile,completed,onOpen}){
    PAYWALL
 ═══════════════════════════════════ */
 function Paywall({lang,onClose}){
-  const t=T[lang];
+  const es=lang==="es";
+  const [loading,setLoading]=useState(null);
+  const checkout=async(plan)=>{
+    setLoading(plan);
+    try{
+      const res=await fetch("/api/create-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({plan,lang})});
+      const d=await res.json();
+      if(d.url)window.location.href=d.url;
+      else alert(es?"Error al procesar el pago. Intenta de nuevo.":"Payment error. Please try again.");
+    }catch(e){alert(es?"Error de conexión.":"Connection error.");}
+    setLoading(null);
+  };
   return(
-    <div style={{position:"absolute",inset:0,zIndex:980,background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px",gap:20}}>
+    <div style={{position:"absolute",inset:0,zIndex:980,background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px",gap:16,overflowY:"auto"}}>
       <CandleIcon/>
-      <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:24,textAlign:"center",lineHeight:1.3}}>{t.paywallTitle}</div>
-      <div style={{fontSize:14,color:MUTED,textAlign:"center",lineHeight:1.7,maxWidth:300}}>{t.paywallSub}</div>
-      <button style={{width:"100%",maxWidth:340,padding:17,borderRadius:14,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:17,color:"#fff"}}>{t.upgrade}</button>
-      <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:14,color:MUTED,padding:"8px 0"}}>{t.later}</button>
+      <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:22,textAlign:"center",lineHeight:1.3}}>
+        {es?"Has usado tus 20 mensajes gratuitos.":"You've used your 20 free messages."}
+      </div>
+      <div style={{fontSize:13,color:MUTED,textAlign:"center",lineHeight:1.6,maxWidth:300}}>
+        {es?"La academia siempre es gratis. El chat con Donna es donde está la magia.":"The academy is always free. The chat with Donna is where the magic happens."}
+      </div>
+      <div style={{width:"100%",maxWidth:340,display:"flex",flexDirection:"column",gap:12}}>
+        {/* BASIC PLAN */}
+        <div style={{background:"#111",border:`2px solid ${BLUE}`,borderRadius:18,padding:"18px 20px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+            <div>
+              <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16}}>💬 {es?"Chat Ilimitado":"Unlimited Chat"}</div>
+              <div style={{fontSize:12,color:MUTED,marginTop:3}}>{es?"Donna responde todo lo que necesites":"Donna answers everything you need"}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:22,color:BLUE}}>$10</div>
+              <div style={{fontSize:11,color:MUTED}}>{es?"/mes":"/month"}</div>
+            </div>
+          </div>
+          <div style={{fontSize:12,color:MUTED,marginBottom:12}}>
+            ✅ {es?"Chat ilimitado con Donna":"Unlimited Donna chat"}<br/>
+            ✅ {es?"Checklist pre-operación":"Pre-trade checklist"}<br/>
+            ✅ {es?"Diario de operaciones":"Trade journal"}<br/>
+            ✅ {es?"Academia completa (22 capítulos)":"Full academy (22 chapters)"}
+          </div>
+          <button onClick={()=>checkout("basic")} disabled={loading==="basic"}
+            style={{width:"100%",padding:"13px",borderRadius:12,background:BLUE,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:15,color:"#fff",opacity:loading==="basic"?.7:1}}>
+            {loading==="basic"?(es?"Procesando...":"Processing..."):(es?"Empezar por $10/mes":"Start for $10/month")}
+          </button>
+        </div>
+        {/* PRO PLAN */}
+        <div style={{background:"#111",border:`2px solid ${RED}`,borderRadius:18,padding:"18px 20px",position:"relative"}}>
+          <div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",background:RED,borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700,color:"#fff",whiteSpace:"nowrap"}}>
+            {es?"⭐ MÁS POPULAR":"⭐ MOST POPULAR"}
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+            <div>
+              <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16}}>📊 {es?"Chat + Análisis":"Chat + Charts"}</div>
+              <div style={{fontSize:12,color:MUTED,marginTop:3}}>{es?"Donna lee tus gráficos en vivo":"Donna reads your live charts"}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:22,color:RED}}>$15</div>
+              <div style={{fontSize:11,color:MUTED}}>{es?"/mes":"/month"}</div>
+            </div>
+          </div>
+          <div style={{fontSize:12,color:MUTED,marginBottom:12}}>
+            ✅ {es?"Todo el plan básico":"Everything in Basic"}<br/>
+            ✅ {es?"Análisis de gráficos con CRT":"CRT chart analysis"}<br/>
+            ✅ {es?"Donna guía cada setup":"Donna guides every setup"}<br/>
+            ✅ {es?"Guardado de imágenes de trades":"Trade image storage"}
+          </div>
+          <button onClick={()=>checkout("pro")} disabled={loading==="pro"}
+            style={{width:"100%",padding:"13px",borderRadius:12,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:15,color:"#fff",opacity:loading==="pro"?.7:1}}>
+            {loading==="pro"?(es?"Procesando...":"Processing..."):(es?"Empezar por $15/mes":"Start for $15/month")}
+          </button>
+        </div>
+      </div>
+      <div style={{fontSize:11,color:MUTED,textAlign:"center"}}>{es?"La academia siempre gratis · Cancela cuando quieras":"Academy always free · Cancel anytime"}</div>
+      <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:MUTED,padding:"4px 0"}}>{es?"Quizás después":"Maybe later"}</button>
     </div>
   );
+}
+
+
+/* ── SMART PILLS based on Donna response ── */
+function getPillsForResponse(text, lang){
+  if(!text)return null;
+  const es=lang==="es", lo=text.toLowerCase();
+  if(lo.includes("timeframe")||lo.includes("temporalidad")||lo.includes("candle")||lo.includes("vela de"))
+    return es?["📅 Diaria","🕓 4H","⏰ 1H","🌊 Las combino"]:["📅 Daily","🕓 4H","⏰ 1H","🌊 I combine them"];
+  if(lo.includes("bias")||lo.includes("sesgo")||lo.includes("direction")||lo.includes("alcista")||lo.includes("bajista"))
+    return es?["📈 Alcista","📉 Bajista","😐 No lo tengo claro"]:["📈 Bullish","📉 Bearish","😐 Not sure yet"];
+  if(lo.includes("kill zone")||lo.includes("session")||lo.includes("sesión")||lo.includes("london")||lo.includes("nueva york"))
+    return es?["🌅 Londres","🗽 NY Open","🌆 NY PM","⏰ Sin KZ"]:["🌅 London","🗽 NY Open","🌆 NY PM","⏰ No KZ"];
+  if(lo.includes("stop")||lo.includes("target")||lo.includes("50%")||lo.includes("partial"))
+    return es?["✅ Stop fijo","🎯 Toqué el 50%","❌ Me sacó"]:["✅ Stop is fixed","🎯 Hit 50%","❌ Got stopped out"];
+  if(lo.includes("checklist")||lo.includes("ready")||lo.includes("listo"))
+    return es?["✅ Abrir checklist","📝 Registrar operación"]:["✅ Open checklist","📝 Log a trade"];
+  if((lo.match(/\?/)&&(lo.includes("did you")||lo.includes("have you")||lo.includes("¿lo")||lo.includes("¿pasaste")||lo.includes("¿tienes")||lo.includes("¿estás"))))
+    return es?["✅ Sí","❌ No","🤔 Más o menos"]:["✅ Yes","❌ No","🤔 Kind of"];
+  if(lo.includes("chart")||lo.includes("setup")||lo.includes("gráfico")||lo.includes("setup"))
+    return es?["📊 Te mando el gráfico","✅ Listo para operar","📝 Registrar"]:["📊 Send chart","✅ Ready to trade","📝 Log trade"];
+  if(lo.includes("academy")||lo.includes("academia")||lo.includes("chapter")||lo.includes("capítulo"))
+    return es?["🎓 Ir a academia","📚 Capítulo 1","💬 Tengo preguntas"]:["🎓 Go to academy","📚 Chapter 1","💬 I have questions"];
+  return null;
 }
 
 /* ═══════════════════════════════════
@@ -925,6 +1029,9 @@ function App(){
   const[apiError,setApiError]=useState(null);
   const[msgCount,setMsgCount]=useState(0);
   const[showPaywall,setShowPaywall]=useState(false);
+  const[userPlan,setUserPlan]=useState(()=>{
+    try{return localStorage.getItem("donna_plan")||"free";}catch{return"free";}
+  });
   const[notif,setNotif]=useState(null);
 
   const fileRef=useRef(null);
@@ -936,6 +1043,22 @@ function App(){
   const lang=profile.lang||selLang;
 
   useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,loading]);
+  useEffect(()=>{
+    const params=new URLSearchParams(window.location.search);
+    const sid=params.get("session_id");
+    if(sid){
+      fetch("/api/verify-payment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:sid})})
+        .then(r=>r.json()).then(d=>{
+          if(d.success){
+            const plan=d.plan||"basic";
+            setUserPlan(plan);
+            try{localStorage.setItem("donna_plan",plan);}catch{}
+            window.history.replaceState({},"","/");
+            showNotif(lang==="es"?`✅ ¡Bienvenido a Donna ${plan==="pro"?"Pro":"Basic"}!`:`✅ Welcome to Donna ${plan==="pro"?"Pro":"Basic"}!`);
+          }
+        }).catch(()=>{});
+    }
+  },[]);
   useEffect(()=>{try{localStorage.setItem("donna_trades",JSON.stringify(trades));}catch(e){}},[trades]);
   useEffect(()=>{try{if(activeTrade)localStorage.setItem("donna_active_trade",JSON.stringify(activeTrade));else localStorage.removeItem("donna_active_trade");}catch(e){}},[activeTrade]);
 
@@ -1102,7 +1225,7 @@ Let's start with the most important thing:`;
   /* ── SEND MESSAGE ── */
   const sendMessage=async(text,img=null)=>{
     if(!text?.trim()&&!img||loading)return;
-    if(msgCount>=FREE){setShowPaywall(true);return;}
+    if(msgCount>=FREE&&userPlan==="free"){setShowPaywall(true);return;}
     const userText=text?.trim()||(lang==="es"?"[Gráfico adjunto]":"[Chart attached]");
     addMsg("user",userText,img?{img}:{});
     setInput("");setImgData(null);setImgPrev(null);
@@ -1117,13 +1240,13 @@ Let's start with the most important thing:`;
       });
       const cur=img?[{type:"image",source:{type:"base64",media_type:img.split(";")[0].split(":")[1],data:img.split(",")[1]}},{type:"text",text:userText}]:userText;
       history.push({role:"user",content:cur});
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5-20250929",max_tokens:800,system:sys,messages:history})});
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-5-20250929",max_tokens:500,system:sys,messages:history})});
       if(!res.ok){const ed=await res.json().catch(()=>({}));throw new Error(ed.error?.message||`API ${res.status}`);}
       const data=await res.json();
       const reply=data.content?.[0]?.text;
       if(!reply)throw new Error("Empty response");
       addMsg("donna",reply);
-      setContextPills(DEFAULT_PILLS);
+      setContextPills(getPillsForResponse(reply,lang)||DEFAULT_PILLS);
     }catch(e){
       setApiError(e.message);
       addMsg("donna",DONNA.fallback(lang,profile.mode));
@@ -1132,7 +1255,12 @@ Let's start with the most important thing:`;
     setLoading(false);
   };
 
-  const handleSend=()=>{imgData?sendMessage(input,imgData):sendMessage(input);};
+  const handleSend=()=>{
+    if(imgData&&userPlan!=="pro"&&userPlan!=="free_trial"){
+      setShowPaywall(true);return;
+    }
+    imgData?sendMessage(input,imgData):sendMessage(input);
+  };
 
   const handlePillTap=(pill)=>{
     if(pqStep>0){handlePQ(pill);return;}
@@ -1168,7 +1296,7 @@ Want to log this trade now?`);
           <div className="fade-up" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,marginBottom:28}}>
             <CandleIcon/>
             <h1 style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:32,letterSpacing:-.5}}>Meet Donna.</h1>
-            <p style={{fontSize:14,color:MUTED,textAlign:"center"}}>{tO.tagline||"Your CRT trading mentor. 10 free messages."}</p>
+            <p style={{fontSize:14,color:MUTED,textAlign:"center"}}>{tO.tagline||"Your CRT trading mentor. 20 free messages."}</p>
           </div>
           <div className="fade-up" style={{width:"100%",display:"flex",flexDirection:"column",gap:18}}>
             <div>
