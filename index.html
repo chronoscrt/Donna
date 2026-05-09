@@ -29,236 +29,8 @@ window.storage={
   list:async(p)=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!p||k.startsWith(p))ks.push(k);}return{keys:ks};}
 };
 </script>
-<script type="text/babel">
-const {useState,useRef,useEffect,useCallback,useMemo}=React;
 
-/* ── CONSTANTS ─────────────────────────────────── */
-const RED="#E8253C",DARK="#1C1C1E",DARK2="#2C2C2E",MUTED="#8E8E93",
-      GREEN="#30D158",BLUE="#007AFF",GOLD="#FF9F0A",FREE=30;
-
-const COMPLEXITY={
-  1:{slides:2,minQ:3,label:"Foundation",color:"#4ECDC4",emoji:"🌱"},
-  2:{slides:3,minQ:4,label:"Intermediate",color:GOLD,emoji:"📈"},
-  3:{slides:4,minQ:5,label:"Advanced",color:RED,emoji:"🔥"},
-};
-
-/* ── CHAPTERS ──────────────────────────────────── */
-const CHAPTERS=[
-  {id:0,icon:"🎯",title:"Start Here",sub:"What is Donna and how CRT works.",level:1,static:true,
-   slides:[
-     {icon:"📖",title:"What is CRT?",body:"Candle Range Theory reads price through Smart Money logic. Every candle has exactly two possible outcomes: a Turtle Soup (wick beyond a level, closes inside = fake move) or a True Break (close beyond = real move). Gold at 2000, for example — if it wicks to 2015 but closes at 1998, that is a Turtle Soup. Price is going down.",donna:"Think of every candle as a vote. The wick is where they tried. The close is where they committed. Never confuse the two."},
-     {icon:"🤝",title:"What Donna Does",body:"Donna analyzes your charts with CRT, walks you through an 8-point pre-trade checklist, helps you log every trade, and teaches you through 22 structured chapters from basic candles to the complete trading system. She is not a signal service. She is your coach.",donna:"I will remember your trades, track your patterns, and call out your mistakes by name. That is the deal."},
-     {icon:"⚖️",title:"The Three Rules",body:"Rule 1: Risk 1 to 2 percent maximum per trade, no exceptions. Rule 2: The stop never moves once placed above or below the Model 1 wick. Rule 3: First take is always at 50 percent of the range. These three rules, followed consistently, separate traders who last from those who blow up.",donna:"You will want to break all three. That is normal. Do not."}
-   ],
-   quiz:[
-     {q:"A candle wicks above an old high but closes back inside the range. What does CRT call this?",type:"mc",opts:["True Break — go long","Turtle Soup — fake move","Neutral candle","Change of character"],a:1,exp:"A wick above that closes inside is a Turtle Soup — a fake breakout. The close reveals intention. The wick revealed deception."},
-     {q:"Your stop is correctly placed. Price moves against you slightly. What do you do?",type:"mc",opts:["Move stop wider","Close early","Do nothing — stop stays","Add to position"],a:2,exp:"The stop never moves. Moving it is how good setups become account-destroying losses. Set it and let the market decide."},
-     {q:"You must always take partial profit at 50% of the range before the full target.",type:"tf",a:true,exp:"Always. The 50% partial is mandatory. It locks in profit and lets the rest of the trade run free."}
-   ]
-  },
-  {id:1,icon:"🕯️",title:"Reading Candles",sub:"What every candle is actually telling you.",level:1,desc:"The four parts of a candlestick (OHLC), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples with real numbers."},
-  {id:2,icon:"📊",title:"Market States",sub:"First question every time you open a chart.",level:1,desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), no structure (no trade). How to identify each. The devastating mistake of applying trending strategy in a ranging market. The no-man\'s-land concept — never trade the middle of a range."},
-  {id:3,icon:"🔭",title:"The Three Timeframes",sub:"HTF · ITF · LTF — one purpose each.",level:2,desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."},
-  {id:4,icon:"🌊",title:"Who Moves Price",sub:"Smart Money vs Retail — the invisible hand.",level:2,desc:"Large participants use predictable retail behavior as fuel. Retail was taught to buy breakouts above highs — large players know exactly where those orders are. Dumb Money buys above highs; Smart Money sells to them. Include the buy stop / sell stop accumulation concept."},
-  {id:5,icon:"💧",title:"Why Price Moves",sub:"Two reasons. Only two. Every move in history.",level:2,desc:"Price moves to reach liquidity (stacked orders at old highs and lows) or to fill an imbalance. The ERL/IRL cycle. Buy stops above highs, sell stops below lows. Old highs that formed after sweeping a low matter most."},
-  {id:6,icon:"🗺️",title:"Knowing Your Target",sub:"Always know where before you look for how.",level:2,desc:"Why you must identify the target BEFORE looking for an entry. External liquidity (old highs/lows) vs Internal liquidity (imbalances along the way). Without a target, there is no trade."},
-  {id:7,icon:"🐢",title:"The Fake Breakout",sub:"The engine behind every big move.",level:3,desc:"The fake breakout precedes every major move. Price pushes above an old high, triggers buy stops, collects liquidity, then reverses. Three types: continuation, range, reversal. Rule 1: never buy above old high, never sell below old low. Reversal type at HTF key level = highest quality."},
-  {id:8,icon:"📅",title:"The 3-Candle Sequence",sub:"Accumulation · Manipulation · Distribution.",level:3,desc:"Every price move follows AMD: C1 accumulates the range, C2 performs the fake breakout (never trade this candle), C3 is the real move. Weekly: Monday=accumulation, Tuesday=manipulation and real high/low, Wednesday-Thursday=distribution."},
-  {id:9,icon:"👁️",title:"Reading Bias",sub:"Closes reveal. Wicks deceive.",level:1,desc:"How to read daily bias from candle closes. Bullish trades only below the daily open. Bearish trades only above the daily open. Prior daily closed above old high = bullish bias. Wicked above but closed inside = bearish bias. This one filter eliminates most bad trades."},
-  {id:10,icon:"⏰",title:"Trading Sessions",sub:"When matters more than where.",level:2,desc:"Three Kill Zones: Asia 8PM-12AM NY (Gold, JPY), London 2-5AM NY (EUR/USD, GBP), NY Open 7-11AM (Indices, Crypto, USD). NYSE opens 9:30AM = biggest liquidity injection. A perfect level at 3AM Saturday has different probability than the same level during Tuesday London Kill Zone."},
-  {id:11,icon:"🎯",title:"The Entry Candle",sub:"One candle. One rule. One trigger.",level:3,desc:"The Model 1 entry: one thick decisive candle that nails a structural level and closes back inside. Three requirements: thick, real structural level, Kill Zone timing. The close is the trigger — never the wick. Stop above/below the wick (fixed, never moved). T1=50% mandatory first, T2=opposite end."},
-  {id:12,icon:"💀",title:"The Final Trap",sub:"It happens before every target. Every time.",level:3,desc:"The Kiss of Death: the last fake move right before price reaches its target. Always happens — guaranteed. Designed to shake out traders who entered correctly. Why it\'s Entry 5 and the most violent move. If you\'re stopped out by the KoD, you didn\'t lose — you just didn\'t size it right."},
-  {id:13,icon:"🗝️",title:"Price Imbalances",sub:"The gap price always comes back to fill.",level:2,desc:"Fair Value Gaps: 3-candle imbalances where price moved too fast and left a gap. Acts as a magnet. The 50% rule. High-probability FVGs are backed by structural events. OB+FVG at same level = maximum confluence."},
-  {id:14,icon:"📦",title:"Order Blocks",sub:"Where big money left its footprint.",level:2,desc:"The last candle of the opposite color before a major move = Order Block. In a bullish market, the last bearish candle before the impulse up = support. The 50% rule. Higher TF Order Blocks carry more weight."},
-  {id:15,icon:"🔄",title:"Flipped Levels",sub:"Old support becomes resistance — and vice versa.",level:2,desc:"Breaker Blocks: Order Blocks that were broken and flipped. Three price passes through same area = most balanced location on chart. Least drawdown of all entries. Same event as the true Change of Character."},
-  {id:16,icon:"🔢",title:"Five Entry Points",sub:"The full sequence. Never go backward.",level:3,desc:"E1: Turtle Soup wick (live, hardest, highest reward). E2: Model 1 close (standard entry). E3: Breaker Block (least drawdown). E4: OTE 60-75% retrace (KoD often traps here). E5: Kiss of Death (most violent, most certain). Never go backward — if E3 formed, only E5 remains."},
-  {id:17,icon:"🔗",title:"Correlated Markets",sub:"When one market tells on another.",level:2,desc:"SMT divergence: correlated assets not confirming each other. EUR/USD vs DXY (inverse). BTC vs ETH (direct). S&P vs NASDAQ (direct). One takes a high the other doesn\'t = fake move in the one that took it. Never trade SMT alone — combine with Model 1 at structural level."},
-  {id:18,icon:"⚠️",title:"Real vs Fake Breakouts",sub:"The trap that destroys the most accounts.",level:3,desc:"False Change of Character looks perfect — that\'s the point. Real CoC: violent purge of stops + decisive close through the level. False CoC: textbook-perfect setup designed to trap informed traders. Verification: key HTF level + Kill Zone + correlated market confirmation."},
-  {id:19,icon:"📈",title:"Trading Ranges",sub:"Rules, targets, and the fake breakout rule.",level:2,desc:"Buy at range low, sell at range high, never the middle. The first breakout is almost always fake — wait for the fake to confirm direction. Range = accumulation for the next big move. What defines a valid range vs no structure noise."},
-  {id:20,icon:"🏗️",title:"Building a Trade",sub:"Top-down always. Entry is the last step.",level:3,desc:"The complete top-down process: week of month → HTF narrative → daily open position → liquidity target → Kill Zone → structural level → entry candle. Entry is ALWAYS last. Four things to know before pressing the button: stop level, 50% target, full target, risk percentage."},
-  {id:21,icon:"⚡",title:"Managing the Trade",sub:"From button to exit — behavior is everything.",level:3,desc:"Two valid entry types only (Model 1 close and true CoC). Why the stop never moves. Managing through the failure swing and the Kiss of Death. The mandatory 50% partial and why it\'s sacred. The behavioral patterns that cause losses: early exits, moving stops, FOMO entries."},
-  {id:22,icon:"🏆",title:"The Complete System",sub:"Put it all together. This is your process.",level:3,desc:"The universal pattern: Open. Key Level. Fake breakout. Real move. The fractal nature — same logic at every timeframe. The 1-2% risk rule. The 8-loss streak that comes for everyone. Why documentation separates profitable traders."},
-];
-
-/* ── TRANSLATIONS ───────────────────────────────── */
-const T={
-  en:{
-    nameLabel:"YOUR NAME",namePH:"Your name...",
-    langLabel:"LANGUAGE / IDIOMA",modeLabel:"MODE",
-    beg:"Beginner",begSub:"Step by step",
-    adv:"Advanced",advSub:"No hand-holding",
-    start:"Start with Donna",
-    disclaimer:"Not financial advice. Just candle theory.",
-    privacy:"All data stays on your device only.",
-    tabChat:"CHAT",tabJournal:"JOURNAL",tabAcademy:"ACADEMY",
-    msgPH:"Message Donna...",
-    trialLeft:(n)=>`${n} of 20 free messages left`,
-    paywallTitle:"You\'ve used your 30 free messages.",
-    paywallSub:"Upgrade for unlimited chat, live chart reads, and full academy.",
-    upgrade:"Upgrade to Pro →",later:"Maybe later",
-    advMode:"Advanced Mode",begMode:"Beginner Mode",
-    clTitle:"Pre-Trade Checklist",clSub:"Tap to confirm each point",
-    clCTA:(g)=>`${g} — Log this trade`,
-    clDontTrade:"Don\'t trade this — wait for better",
-    clClose:"Not ready yet",
-    lessonContinue:"Continue →",lessonStart:"Start Quiz ⚡",
-    quizTitle:"QUIZ",nextQ:"Next →",
-    finishCh:"Complete Chapter 🏆",
-    chDone:"Chapter Complete!",
-    chScore:(s,t)=>`${s}/${t} correct`,
-    journalEmpty:"No trades logged yet.",
-    journalLog:"Log a Trade",
-    tradeAsset:"What asset?",
-    tradeDirection:"Direction?",
-    tradeKZ:"Kill Zone?",
-    tradeEmotion:"How are you feeling?",
-    tradeReason:"Why this trade? (one sentence)",
-    tradeRisk:"Risk %?",
-    tradeClose:"Close this trade",
-    tradeResult:"Result?",
-    tradeR:"R multiple?",
-    tradeDoneRight:"One thing you did right",
-    tradeWouldChange:"One thing you\'d change",
-    tradeSave:"Save Trade",
-    activeTrade:"Active Trade",
-    checkIn:"Check In",
-  },
-  es:{
-    nameLabel:"TU NOMBRE",namePH:"Tu nombre...",
-    langLabel:"IDIOMA / LANGUAGE",modeLabel:"MODO",
-    beg:"Principiante",begSub:"Paso a paso",
-    adv:"Avanzado",advSub:"Sin mano extra",
-    start:"Empezar con Donna",
-    disclaimer:"No es asesoramiento financiero. Solo teoría de velas.",
-    privacy:"Todos los datos se quedan en tu dispositivo.",
-    tabChat:"CHAT",tabJournal:"DIARIO",tabAcademy:"ACADEMIA",
-    msgPH:"Mensaje a Donna...",
-    trialLeft:(n)=>`${n} de 20 mensajes gratis`,
-    paywallTitle:"Has usado tus 10 mensajes gratuitos.",
-    paywallSub:"Actualiza para chat ilimitado, análisis de gráficos y academia completa.",
-    upgrade:"Actualizar a Pro →",later:"Quizás después",
-    advMode:"Modo Avanzado",begMode:"Modo Principiante",
-    clTitle:"Checklist Pre-Operación",clSub:"Toca para confirmar cada punto",
-    clCTA:(g)=>`${g} — Registrar operación`,
-    clDontTrade:"No operes esto — espera un mejor setup",
-    clClose:"Aún no estoy listo",
-    lessonContinue:"Continuar →",lessonStart:"Empezar Quiz ⚡",
-    quizTitle:"QUIZ",nextQ:"Siguiente →",
-    finishCh:"Completar Capítulo 🏆",
-    chDone:"¡Capítulo Completado!",
-    chScore:(s,tt)=>`${s}/${tt} correctas`,
-    journalEmpty:"Aún no hay operaciones registradas.",
-    journalLog:"Registrar Operación",
-    tradeAsset:"¿Qué activo?",
-    tradeDirection:"¿Dirección?",
-    tradeKZ:"¿Kill Zone?",
-    tradeEmotion:"¿Cómo te sientes?",
-    tradeReason:"¿Por qué esta entrada? (una frase)",
-    tradeRisk:"¿Riesgo %?",
-    tradeClose:"Cerrar operación",
-    tradeResult:"¿Resultado?",
-    tradeR:"¿Ratio R?",
-    tradeDoneRight:"Una cosa que hiciste bien",
-    tradeWouldChange:"Una cosa que cambiarías",
-    tradeSave:"Guardar Operación",
-    activeTrade:"Operación Activa",
-    checkIn:"Check In",
-  }
-};
-
-/* ── CHECKLIST DATA ─────────────────────────────── */
-const CL={
-  en:[
-    {id:1,icon:"🧭",label:"HTF bias is clear",sub:"I know which direction the higher candle is pointing."},
-    {id:2,icon:"🎯",label:"Liquidity target identified",sub:"I know WHERE price is going before I look for entry."},
-    {id:3,icon:"⏰",label:"Inside a Kill Zone",sub:"London 1-5 AM · New York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
-    {id:4,icon:"📍",label:"Valid old high or low",sub:"There\'s a structural level for the Turtle Soup."},
-    {id:5,icon:"🕯️",label:"Clear Model 1 candle",sub:"Thick, decisive, closing back inside the range."},
-    {id:6,icon:"🛑",label:"Stop loss placed",sub:"Above/below the Model 1 wick. Fixed. Not moving."},
-    {id:7,icon:"✂️",label:"Targets are marked",sub:"50% partial AND full target are on the chart."},
-    {id:8,icon:"🛡️",label:"Risk is 1-2% max",sub:"No exceptions. No matter how good the setup looks."},
-  ],
-  es:[
-    {id:1,icon:"🧭",label:"Sesgo HTF claro",sub:"Sé hacia dónde apunta la vela de mayor temporalidad."},
-    {id:2,icon:"🎯",label:"Objetivo de liquidez identificado",sub:"Sé ADÓNDE va el precio antes de buscar entrada."},
-    {id:3,icon:"⏰",label:"Dentro de una Kill Zone",sub:"Londres 1-5 AM · Nueva York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
-    {id:4,icon:"📍",label:"Máximo o mínimo anterior válido",sub:"Hay un nivel estructural para el Turtle Soup."},
-    {id:5,icon:"🕯️",label:"Vela Model 1 clara",sub:"Gruesa, decisiva, cerrando dentro del rango."},
-    {id:6,icon:"🛑",label:"Stop loss colocado",sub:"Por encima/debajo del wick del Model 1. Fijo."},
-    {id:7,icon:"✂️",label:"Objetivos marcados",sub:"50% parcial Y objetivo completo en el gráfico."},
-    {id:8,icon:"🛡️",label:"Riesgo máximo 1-2%",sub:"Sin excepciones. Por muy buena que sea la entrada."},
-  ]
-};
-
-/* ── DONNA PERSONALITY ──────────────────────────── */
-const DONNA={
-  gradeComment:(g,l)=>{
-    const en={"A+":"All 8. Perfect setup. Execute with discipline.","A":"Strong. One condition open — know what it is.","A-":"Solid but two gaps. Size down slightly.","B+":"Decent. Proceed with half size.","B-":"More missing than confirmed. Are you sure?","F":"Don\'t trade this. Wait for a clean setup."};
-    const es={"A+":"Los 8 puntos. Setup perfecto. Ejecuta con disciplina.","A":"Sólido. Un punto abierto — sé cuál es.","A-":"Sólido pero dos huecos. Reduce el tamaño.","B+":"Decente. Procede con la mitad del tamaño.","B-":"Más puntos sin confirmar. ¿Estás seguro?","F":"No operes esto. Espera un setup limpio."};
-    return(l==="es"?es:en)[g]||"";
-  },
-  fallback:(l,m)=>{
-    const a=l==="es"
-      ?m==="advanced"?["¿Cuál es tu sesgo HTF?","¿Dónde está tu objetivo de liquidez?","¿Estás en una Kill Zone?","¿Pasaste el checklist?","¿Qué te dice la vela mayor?"]
-                     :["Buena pregunta. Una idea a la vez.","El cierre siempre revela la verdad.","Estás haciendo las preguntas correctas.","Déjame explicarlo simple.","Piensa en el mercado como un río."]
-      :m==="advanced"?["What\'s your HTF bias?","Where\'s your liquidity target?","Are you in a Kill Zone?","Did you run the checklist?","What does the higher candle tell you?"]
-                     :["Good question. One idea at a time.","The close always tells the truth.","You\'re asking the right things.","Let me break that down simply.","Think of price like a river."];
-    return a[Math.floor(Math.random()*a.length)];
-  },
-  tradeReview:(trade,trades,l)=>{
-    const closed=trades.filter(t=>t.status==="closed"&&t.id!==trade.id);
-    const noKZ=closed.filter(t=>t.killZone==="No KZ"&&t.result==="loss").length;
-    const fomo=closed.filter(t=>(t.emotion==="FOMO"||t.emotion==="Anxious"||t.emotion==="😤 FOMO"||t.emotion==="😰 Ansioso")&&t.result==="loss").length;
-    if(l==="es"){
-      let msg=`${trade.asset} ${trade.direction} registrado. `;
-      if(noKZ>=2)msg+=`Nota: tienes ${noKZ} pérdidas fuera de Kill Zone. Ese patrón te está costando. `;
-      if(fomo>=2)msg+=`Y ${fomo} pérdidas con FOMO o ansiedad. Las emociones están operando por ti. `;
-      msg+=`¿Checklist completo antes de entrar?`;
-      return msg;
-    }
-    let msg=`${trade.asset} ${trade.direction} logged. `;
-    if(noKZ>=2)msg+=`Note: you have ${noKZ} losses outside Kill Zone. That pattern is costing you. `;
-    if(fomo>=2)msg+=`And ${fomo} losses with FOMO or anxiety. Your emotions are trading for you. `;
-    msg+=`Full checklist before entry?`;
-    return msg;
-  }
-};
-
-/* ── HELPERS ────────────────────────────────────── */
-const getGrade=(n)=>{
-  if(n===8)return{grade:"A+",color:GREEN};
-  if(n===7)return{grade:"A",color:GREEN};
-  if(n===6)return{grade:"A-",color:"#34C759"};
-  if(n===5)return{grade:"B+",color:GOLD};
-  if(n===4)return{grade:"B-",color:"#FF6B35"};
-  return{grade:"F",color:RED};
-};
-
-const timeAgo=(ts)=>{
-  const m=Math.floor((Date.now()-ts)/60000);
-  if(m<60)return`${m}m`;
-  const h=Math.floor(m/60);
-  if(h<24)return`${h}h`;
-  return`${Math.floor(h/24)}d`;
-};
-
-const getStats=(trades)=>{
-  const closed=trades.filter(t=>t.status==="closed");
-  const wins=closed.filter(t=>t.result==="win").length;
-  const losses=closed.filter(t=>t.result==="loss").length;
-  return{total:closed.length,wins,losses,winRate:closed.length>0?Math.round(wins/closed.length*100):0};
-};
-
-/* ── SOUNDS ─────────────────────────────────────── */
-const Sounds={
-  correct:()=>[[523.25,0],[659.25,.1],[783.99,.2]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.22,c.currentTime+t+.05);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.35);o.start(c.currentTime+t);o.stop(c.currentTime+t+.35);}catch(e){}}),
-  wrong:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sawtooth";o.frequency.setValueAtTime(260,c.currentTime);o.frequency.linearRampToValueAtTime(160,c.currentTime+.35);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.45);o.start(c.currentTime);o.stop(c.currentTime+.45);}catch(e){}},
-  complete:()=>[[523.25,0],[659.25,.12],[783.99,.24],[1046.5,.38],[1318.5,.54]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.28,c.currentTime+t+.06);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.55);o.start(c.currentTime+t);o.stop(c.currentTime+t+.55);}catch(e){}}),
-  tap:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=800;g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.08);o.start(c.currentTime);o.stop(c.currentTime+.08);}catch(e){}},
-};
-
-/* ── LESSON GENERATION ──────────────────────────── */
-
+<script>
 /* ═══════════════════════════════════════════════════════════
    STATIC LESSONS — instant load, no API, bilingual
    Donna chat still uses AI. Lessons never do.
@@ -750,11 +522,243 @@ es:{
 {q:"El atajo para volverse rentable en el trading es:",type:"mc",opts:["Encontrar los indicadores correctos","Mejorar las entradas","Las pérdidas — son el costo inevitable del aprendizaje real","Operar marcos temporales superiores únicamente"],a:2,exp:"El atajo en el trading tiene un nombre: pérdidas. Aprendes más de tus operaciones perdedoras — si las documentas. Los traders rentables no encontraron un atajo. Pagaron la matrícula en pérdidas y documentaron lo que las pérdidas les enseñaron."},
 {q:"Has completado los 22 capítulos de la Academia CRT CHRONOS. Ahora estás listo para:",type:"mc",opts:["Operar con tamaño completo inmediatamente","Empezar con trading demo, registrar cada operación, revisar con Donna semanalmente","No perder nunca más — conoces el sistema completo","Dejar de aprender — el sistema está completo"],a:1,exp:"Completar la academia significa que entiendes el marco. Ahora el trabajo real comienza: trading demo, registrando cada operación, revisando con Donna, identificando tus patrones personales. El conocimiento sin práctica no es una ventaja."}
 ]}
-}};
+};
 
 /* ═══════════════════════════════════════════════════
    UPDATED generateLesson — static first, API never
 ═══════════════════════════════════════════════════ */
+</script>
+<script type="text/babel">
+const {useState,useRef,useEffect,useCallback,useMemo}=React;
+
+/* ── CONSTANTS ─────────────────────────────────── */
+const RED="#E8253C",DARK="#1C1C1E",DARK2="#2C2C2E",MUTED="#8E8E93",
+      GREEN="#30D158",BLUE="#007AFF",GOLD="#FF9F0A",FREE=30;
+
+const COMPLEXITY={
+  1:{slides:2,minQ:3,label:"Foundation",color:"#4ECDC4",emoji:"🌱"},
+  2:{slides:3,minQ:4,label:"Intermediate",color:GOLD,emoji:"📈"},
+  3:{slides:4,minQ:5,label:"Advanced",color:RED,emoji:"🔥"},
+};
+
+/* ── CHAPTERS ──────────────────────────────────── */
+const CHAPTERS=[
+  {id:0,icon:"🎯",title:"Start Here",sub:"What is Donna and how CRT works.",level:1,static:true,
+   slides:[
+     {icon:"📖",title:"What is CRT?",body:"Candle Range Theory reads price through Smart Money logic. Every candle has exactly two possible outcomes: a Turtle Soup (wick beyond a level, closes inside = fake move) or a True Break (close beyond = real move). Gold at 2000, for example — if it wicks to 2015 but closes at 1998, that is a Turtle Soup. Price is going down.",donna:"Think of every candle as a vote. The wick is where they tried. The close is where they committed. Never confuse the two."},
+     {icon:"🤝",title:"What Donna Does",body:"Donna analyzes your charts with CRT, walks you through an 8-point pre-trade checklist, helps you log every trade, and teaches you through 22 structured chapters from basic candles to the complete trading system. She is not a signal service. She is your coach.",donna:"I will remember your trades, track your patterns, and call out your mistakes by name. That is the deal."},
+     {icon:"⚖️",title:"The Three Rules",body:"Rule 1: Risk 1 to 2 percent maximum per trade, no exceptions. Rule 2: The stop never moves once placed above or below the Model 1 wick. Rule 3: First take is always at 50 percent of the range. These three rules, followed consistently, separate traders who last from those who blow up.",donna:"You will want to break all three. That is normal. Do not."}
+   ],
+   quiz:[
+     {q:"A candle wicks above an old high but closes back inside the range. What does CRT call this?",type:"mc",opts:["True Break — go long","Turtle Soup — fake move","Neutral candle","Change of character"],a:1,exp:"A wick above that closes inside is a Turtle Soup — a fake breakout. The close reveals intention. The wick revealed deception."},
+     {q:"Your stop is correctly placed. Price moves against you slightly. What do you do?",type:"mc",opts:["Move stop wider","Close early","Do nothing — stop stays","Add to position"],a:2,exp:"The stop never moves. Moving it is how good setups become account-destroying losses. Set it and let the market decide."},
+     {q:"You must always take partial profit at 50% of the range before the full target.",type:"tf",a:true,exp:"Always. The 50% partial is mandatory. It locks in profit and lets the rest of the trade run free."}
+   ]
+  },
+  {id:1,icon:"🕯️",title:"Reading Candles",sub:"What every candle is actually telling you.",level:1,desc:"The four parts of a candlestick (OHLC), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples with real numbers."},
+  {id:2,icon:"📊",title:"Market States",sub:"First question every time you open a chart.",level:1,desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), no structure (no trade). How to identify each. The devastating mistake of applying trending strategy in a ranging market. The no-man\'s-land concept — never trade the middle of a range."},
+  {id:3,icon:"🔭",title:"The Three Timeframes",sub:"HTF · ITF · LTF — one purpose each.",level:2,desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."},
+  {id:4,icon:"🌊",title:"Who Moves Price",sub:"Smart Money vs Retail — the invisible hand.",level:2,desc:"Large participants use predictable retail behavior as fuel. Retail was taught to buy breakouts above highs — large players know exactly where those orders are. Dumb Money buys above highs; Smart Money sells to them. Include the buy stop / sell stop accumulation concept."},
+  {id:5,icon:"💧",title:"Why Price Moves",sub:"Two reasons. Only two. Every move in history.",level:2,desc:"Price moves to reach liquidity (stacked orders at old highs and lows) or to fill an imbalance. The ERL/IRL cycle. Buy stops above highs, sell stops below lows. Old highs that formed after sweeping a low matter most."},
+  {id:6,icon:"🗺️",title:"Knowing Your Target",sub:"Always know where before you look for how.",level:2,desc:"Why you must identify the target BEFORE looking for an entry. External liquidity (old highs/lows) vs Internal liquidity (imbalances along the way). Without a target, there is no trade."},
+  {id:7,icon:"🐢",title:"The Fake Breakout",sub:"The engine behind every big move.",level:3,desc:"The fake breakout precedes every major move. Price pushes above an old high, triggers buy stops, collects liquidity, then reverses. Three types: continuation, range, reversal. Rule 1: never buy above old high, never sell below old low. Reversal type at HTF key level = highest quality."},
+  {id:8,icon:"📅",title:"The 3-Candle Sequence",sub:"Accumulation · Manipulation · Distribution.",level:3,desc:"Every price move follows AMD: C1 accumulates the range, C2 performs the fake breakout (never trade this candle), C3 is the real move. Weekly: Monday=accumulation, Tuesday=manipulation and real high/low, Wednesday-Thursday=distribution."},
+  {id:9,icon:"👁️",title:"Reading Bias",sub:"Closes reveal. Wicks deceive.",level:1,desc:"How to read daily bias from candle closes. Bullish trades only below the daily open. Bearish trades only above the daily open. Prior daily closed above old high = bullish bias. Wicked above but closed inside = bearish bias. This one filter eliminates most bad trades."},
+  {id:10,icon:"⏰",title:"Trading Sessions",sub:"When matters more than where.",level:2,desc:"Three Kill Zones: Asia 8PM-12AM NY (Gold, JPY), London 2-5AM NY (EUR/USD, GBP), NY Open 7-11AM (Indices, Crypto, USD). NYSE opens 9:30AM = biggest liquidity injection. A perfect level at 3AM Saturday has different probability than the same level during Tuesday London Kill Zone."},
+  {id:11,icon:"🎯",title:"The Entry Candle",sub:"One candle. One rule. One trigger.",level:3,desc:"The Model 1 entry: one thick decisive candle that nails a structural level and closes back inside. Three requirements: thick, real structural level, Kill Zone timing. The close is the trigger — never the wick. Stop above/below the wick (fixed, never moved). T1=50% mandatory first, T2=opposite end."},
+  {id:12,icon:"💀",title:"The Final Trap",sub:"It happens before every target. Every time.",level:3,desc:"The Kiss of Death: the last fake move right before price reaches its target. Always happens — guaranteed. Designed to shake out traders who entered correctly. Why it\'s Entry 5 and the most violent move. If you\'re stopped out by the KoD, you didn\'t lose — you just didn\'t size it right."},
+  {id:13,icon:"🗝️",title:"Price Imbalances",sub:"The gap price always comes back to fill.",level:2,desc:"Fair Value Gaps: 3-candle imbalances where price moved too fast and left a gap. Acts as a magnet. The 50% rule. High-probability FVGs are backed by structural events. OB+FVG at same level = maximum confluence."},
+  {id:14,icon:"📦",title:"Order Blocks",sub:"Where big money left its footprint.",level:2,desc:"The last candle of the opposite color before a major move = Order Block. In a bullish market, the last bearish candle before the impulse up = support. The 50% rule. Higher TF Order Blocks carry more weight."},
+  {id:15,icon:"🔄",title:"Flipped Levels",sub:"Old support becomes resistance — and vice versa.",level:2,desc:"Breaker Blocks: Order Blocks that were broken and flipped. Three price passes through same area = most balanced location on chart. Least drawdown of all entries. Same event as the true Change of Character."},
+  {id:16,icon:"🔢",title:"Five Entry Points",sub:"The full sequence. Never go backward.",level:3,desc:"E1: Turtle Soup wick (live, hardest, highest reward). E2: Model 1 close (standard entry). E3: Breaker Block (least drawdown). E4: OTE 60-75% retrace (KoD often traps here). E5: Kiss of Death (most violent, most certain). Never go backward — if E3 formed, only E5 remains."},
+  {id:17,icon:"🔗",title:"Correlated Markets",sub:"When one market tells on another.",level:2,desc:"SMT divergence: correlated assets not confirming each other. EUR/USD vs DXY (inverse). BTC vs ETH (direct). S&P vs NASDAQ (direct). One takes a high the other doesn\'t = fake move in the one that took it. Never trade SMT alone — combine with Model 1 at structural level."},
+  {id:18,icon:"⚠️",title:"Real vs Fake Breakouts",sub:"The trap that destroys the most accounts.",level:3,desc:"False Change of Character looks perfect — that\'s the point. Real CoC: violent purge of stops + decisive close through the level. False CoC: textbook-perfect setup designed to trap informed traders. Verification: key HTF level + Kill Zone + correlated market confirmation."},
+  {id:19,icon:"📈",title:"Trading Ranges",sub:"Rules, targets, and the fake breakout rule.",level:2,desc:"Buy at range low, sell at range high, never the middle. The first breakout is almost always fake — wait for the fake to confirm direction. Range = accumulation for the next big move. What defines a valid range vs no structure noise."},
+  {id:20,icon:"🏗️",title:"Building a Trade",sub:"Top-down always. Entry is the last step.",level:3,desc:"The complete top-down process: week of month → HTF narrative → daily open position → liquidity target → Kill Zone → structural level → entry candle. Entry is ALWAYS last. Four things to know before pressing the button: stop level, 50% target, full target, risk percentage."},
+  {id:21,icon:"⚡",title:"Managing the Trade",sub:"From button to exit — behavior is everything.",level:3,desc:"Two valid entry types only (Model 1 close and true CoC). Why the stop never moves. Managing through the failure swing and the Kiss of Death. The mandatory 50% partial and why it\'s sacred. The behavioral patterns that cause losses: early exits, moving stops, FOMO entries."},
+  {id:22,icon:"🏆",title:"The Complete System",sub:"Put it all together. This is your process.",level:3,desc:"The universal pattern: Open. Key Level. Fake breakout. Real move. The fractal nature — same logic at every timeframe. The 1-2% risk rule. The 8-loss streak that comes for everyone. Why documentation separates profitable traders."},
+];
+
+/* ── TRANSLATIONS ───────────────────────────────── */
+const T={
+  en:{
+    nameLabel:"YOUR NAME",namePH:"Your name...",
+    langLabel:"LANGUAGE / IDIOMA",modeLabel:"MODE",
+    beg:"Beginner",begSub:"Step by step",
+    adv:"Advanced",advSub:"No hand-holding",
+    start:"Start with Donna",
+    disclaimer:"Not financial advice. Just candle theory.",
+    privacy:"All data stays on your device only.",
+    tabChat:"CHAT",tabJournal:"JOURNAL",tabAcademy:"ACADEMY",
+    msgPH:"Message Donna...",
+    trialLeft:(n)=>`${n} of 20 free messages left`,
+    paywallTitle:"You\'ve used your 30 free messages.",
+    paywallSub:"Upgrade for unlimited chat, live chart reads, and full academy.",
+    upgrade:"Upgrade to Pro →",later:"Maybe later",
+    advMode:"Advanced Mode",begMode:"Beginner Mode",
+    clTitle:"Pre-Trade Checklist",clSub:"Tap to confirm each point",
+    clCTA:(g)=>`${g} — Log this trade`,
+    clDontTrade:"Don\'t trade this — wait for better",
+    clClose:"Not ready yet",
+    lessonContinue:"Continue →",lessonStart:"Start Quiz ⚡",
+    quizTitle:"QUIZ",nextQ:"Next →",
+    finishCh:"Complete Chapter 🏆",
+    chDone:"Chapter Complete!",
+    chScore:(s,t)=>`${s}/${t} correct`,
+    journalEmpty:"No trades logged yet.",
+    journalLog:"Log a Trade",
+    tradeAsset:"What asset?",
+    tradeDirection:"Direction?",
+    tradeKZ:"Kill Zone?",
+    tradeEmotion:"How are you feeling?",
+    tradeReason:"Why this trade? (one sentence)",
+    tradeRisk:"Risk %?",
+    tradeClose:"Close this trade",
+    tradeResult:"Result?",
+    tradeR:"R multiple?",
+    tradeDoneRight:"One thing you did right",
+    tradeWouldChange:"One thing you\'d change",
+    tradeSave:"Save Trade",
+    activeTrade:"Active Trade",
+    checkIn:"Check In",
+  },
+  es:{
+    nameLabel:"TU NOMBRE",namePH:"Tu nombre...",
+    langLabel:"IDIOMA / LANGUAGE",modeLabel:"MODO",
+    beg:"Principiante",begSub:"Paso a paso",
+    adv:"Avanzado",advSub:"Sin mano extra",
+    start:"Empezar con Donna",
+    disclaimer:"No es asesoramiento financiero. Solo teoría de velas.",
+    privacy:"Todos los datos se quedan en tu dispositivo.",
+    tabChat:"CHAT",tabJournal:"DIARIO",tabAcademy:"ACADEMIA",
+    msgPH:"Mensaje a Donna...",
+    trialLeft:(n)=>`${n} de 20 mensajes gratis`,
+    paywallTitle:"Has usado tus 10 mensajes gratuitos.",
+    paywallSub:"Actualiza para chat ilimitado, análisis de gráficos y academia completa.",
+    upgrade:"Actualizar a Pro →",later:"Quizás después",
+    advMode:"Modo Avanzado",begMode:"Modo Principiante",
+    clTitle:"Checklist Pre-Operación",clSub:"Toca para confirmar cada punto",
+    clCTA:(g)=>`${g} — Registrar operación`,
+    clDontTrade:"No operes esto — espera un mejor setup",
+    clClose:"Aún no estoy listo",
+    lessonContinue:"Continuar →",lessonStart:"Empezar Quiz ⚡",
+    quizTitle:"QUIZ",nextQ:"Siguiente →",
+    finishCh:"Completar Capítulo 🏆",
+    chDone:"¡Capítulo Completado!",
+    chScore:(s,tt)=>`${s}/${tt} correctas`,
+    journalEmpty:"Aún no hay operaciones registradas.",
+    journalLog:"Registrar Operación",
+    tradeAsset:"¿Qué activo?",
+    tradeDirection:"¿Dirección?",
+    tradeKZ:"¿Kill Zone?",
+    tradeEmotion:"¿Cómo te sientes?",
+    tradeReason:"¿Por qué esta entrada? (una frase)",
+    tradeRisk:"¿Riesgo %?",
+    tradeClose:"Cerrar operación",
+    tradeResult:"¿Resultado?",
+    tradeR:"¿Ratio R?",
+    tradeDoneRight:"Una cosa que hiciste bien",
+    tradeWouldChange:"Una cosa que cambiarías",
+    tradeSave:"Guardar Operación",
+    activeTrade:"Operación Activa",
+    checkIn:"Check In",
+  }
+};
+
+/* ── CHECKLIST DATA ─────────────────────────────── */
+const CL={
+  en:[
+    {id:1,icon:"🧭",label:"HTF bias is clear",sub:"I know which direction the higher candle is pointing."},
+    {id:2,icon:"🎯",label:"Liquidity target identified",sub:"I know WHERE price is going before I look for entry."},
+    {id:3,icon:"⏰",label:"Inside a Kill Zone",sub:"London 1-5 AM · New York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
+    {id:4,icon:"📍",label:"Valid old high or low",sub:"There\'s a structural level for the Turtle Soup."},
+    {id:5,icon:"🕯️",label:"Clear Model 1 candle",sub:"Thick, decisive, closing back inside the range."},
+    {id:6,icon:"🛑",label:"Stop loss placed",sub:"Above/below the Model 1 wick. Fixed. Not moving."},
+    {id:7,icon:"✂️",label:"Targets are marked",sub:"50% partial AND full target are on the chart."},
+    {id:8,icon:"🛡️",label:"Risk is 1-2% max",sub:"No exceptions. No matter how good the setup looks."},
+  ],
+  es:[
+    {id:1,icon:"🧭",label:"Sesgo HTF claro",sub:"Sé hacia dónde apunta la vela de mayor temporalidad."},
+    {id:2,icon:"🎯",label:"Objetivo de liquidez identificado",sub:"Sé ADÓNDE va el precio antes de buscar entrada."},
+    {id:3,icon:"⏰",label:"Dentro de una Kill Zone",sub:"Londres 1-5 AM · Nueva York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
+    {id:4,icon:"📍",label:"Máximo o mínimo anterior válido",sub:"Hay un nivel estructural para el Turtle Soup."},
+    {id:5,icon:"🕯️",label:"Vela Model 1 clara",sub:"Gruesa, decisiva, cerrando dentro del rango."},
+    {id:6,icon:"🛑",label:"Stop loss colocado",sub:"Por encima/debajo del wick del Model 1. Fijo."},
+    {id:7,icon:"✂️",label:"Objetivos marcados",sub:"50% parcial Y objetivo completo en el gráfico."},
+    {id:8,icon:"🛡️",label:"Riesgo máximo 1-2%",sub:"Sin excepciones. Por muy buena que sea la entrada."},
+  ]
+};
+
+/* ── DONNA PERSONALITY ──────────────────────────── */
+const DONNA={
+  gradeComment:(g,l)=>{
+    const en={"A+":"All 8. Perfect setup. Execute with discipline.","A":"Strong. One condition open — know what it is.","A-":"Solid but two gaps. Size down slightly.","B+":"Decent. Proceed with half size.","B-":"More missing than confirmed. Are you sure?","F":"Don\'t trade this. Wait for a clean setup."};
+    const es={"A+":"Los 8 puntos. Setup perfecto. Ejecuta con disciplina.","A":"Sólido. Un punto abierto — sé cuál es.","A-":"Sólido pero dos huecos. Reduce el tamaño.","B+":"Decente. Procede con la mitad del tamaño.","B-":"Más puntos sin confirmar. ¿Estás seguro?","F":"No operes esto. Espera un setup limpio."};
+    return(l==="es"?es:en)[g]||"";
+  },
+  fallback:(l,m)=>{
+    const a=l==="es"
+      ?m==="advanced"?["¿Cuál es tu sesgo HTF?","¿Dónde está tu objetivo de liquidez?","¿Estás en una Kill Zone?","¿Pasaste el checklist?","¿Qué te dice la vela mayor?"]
+                     :["Buena pregunta. Una idea a la vez.","El cierre siempre revela la verdad.","Estás haciendo las preguntas correctas.","Déjame explicarlo simple.","Piensa en el mercado como un río."]
+      :m==="advanced"?["What\'s your HTF bias?","Where\'s your liquidity target?","Are you in a Kill Zone?","Did you run the checklist?","What does the higher candle tell you?"]
+                     :["Good question. One idea at a time.","The close always tells the truth.","You\'re asking the right things.","Let me break that down simply.","Think of price like a river."];
+    return a[Math.floor(Math.random()*a.length)];
+  },
+  tradeReview:(trade,trades,l)=>{
+    const closed=trades.filter(t=>t.status==="closed"&&t.id!==trade.id);
+    const noKZ=closed.filter(t=>t.killZone==="No KZ"&&t.result==="loss").length;
+    const fomo=closed.filter(t=>(t.emotion==="FOMO"||t.emotion==="Anxious"||t.emotion==="😤 FOMO"||t.emotion==="😰 Ansioso")&&t.result==="loss").length;
+    if(l==="es"){
+      let msg=`${trade.asset} ${trade.direction} registrado. `;
+      if(noKZ>=2)msg+=`Nota: tienes ${noKZ} pérdidas fuera de Kill Zone. Ese patrón te está costando. `;
+      if(fomo>=2)msg+=`Y ${fomo} pérdidas con FOMO o ansiedad. Las emociones están operando por ti. `;
+      msg+=`¿Checklist completo antes de entrar?`;
+      return msg;
+    }
+    let msg=`${trade.asset} ${trade.direction} logged. `;
+    if(noKZ>=2)msg+=`Note: you have ${noKZ} losses outside Kill Zone. That pattern is costing you. `;
+    if(fomo>=2)msg+=`And ${fomo} losses with FOMO or anxiety. Your emotions are trading for you. `;
+    msg+=`Full checklist before entry?`;
+    return msg;
+  }
+};
+
+/* ── HELPERS ────────────────────────────────────── */
+const getGrade=(n)=>{
+  if(n===8)return{grade:"A+",color:GREEN};
+  if(n===7)return{grade:"A",color:GREEN};
+  if(n===6)return{grade:"A-",color:"#34C759"};
+  if(n===5)return{grade:"B+",color:GOLD};
+  if(n===4)return{grade:"B-",color:"#FF6B35"};
+  return{grade:"F",color:RED};
+};
+
+const timeAgo=(ts)=>{
+  const m=Math.floor((Date.now()-ts)/60000);
+  if(m<60)return`${m}m`;
+  const h=Math.floor(m/60);
+  if(h<24)return`${h}h`;
+  return`${Math.floor(h/24)}d`;
+};
+
+const getStats=(trades)=>{
+  const closed=trades.filter(t=>t.status==="closed");
+  const wins=closed.filter(t=>t.result==="win").length;
+  const losses=closed.filter(t=>t.result==="loss").length;
+  return{total:closed.length,wins,losses,winRate:closed.length>0?Math.round(wins/closed.length*100):0};
+};
+
+/* ── SOUNDS ─────────────────────────────────────── */
+const Sounds={
+  correct:()=>[[523.25,0],[659.25,.1],[783.99,.2]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.22,c.currentTime+t+.05);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.35);o.start(c.currentTime+t);o.stop(c.currentTime+t+.35);}catch(e){}}),
+  wrong:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sawtooth";o.frequency.setValueAtTime(260,c.currentTime);o.frequency.linearRampToValueAtTime(160,c.currentTime+.35);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.45);o.start(c.currentTime);o.stop(c.currentTime+.45);}catch(e){}},
+  complete:()=>[[523.25,0],[659.25,.12],[783.99,.24],[1046.5,.38],[1318.5,.54]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.28,c.currentTime+t+.06);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.55);o.start(c.currentTime+t);o.stop(c.currentTime+t+.55);}catch(e){}}),
+  tap:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=800;g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.08);o.start(c.currentTime);o.stop(c.currentTime+.08);}catch(e){}},
+};
+
+/* ── LESSON GENERATION ──────────────────────────── */
+
+
 async function generateLesson(chapter, lang){
   // Static content — instant, always works
   const langData = SL[lang] || SL['en'];
