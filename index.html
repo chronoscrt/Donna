@@ -21,11 +21,7 @@
 <body>
   <div id="root"></div>
   <script>
-    // ─────────────────────────────────────────────────────
-    // PASTE YOUR ANTHROPIC API KEY BETWEEN THE QUOTES
-    // ─────────────────────────────────────────────────────
-
-    // localStorage wrapper — mirrors Claude artifact storage
+    // localStorage wrapper
     window.storage = {
       get: async function(key) {
         var v = localStorage.getItem(key);
@@ -52,10 +48,6 @@
   </script>
   <script>
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
-function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
-function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
-function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
@@ -65,6 +57,10 @@ function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArra
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
+function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
@@ -210,7 +206,7 @@ var DONNA = {
 /* ═══ TRANSLATIONS ═══ */
 var T = {
   en: {
-    tagline: "Your trading mentor. Built on Candle Range Theory.",
+    tagline: "Your trading mentor. 10 free messages.",
     nameLabel: "YOUR NAME",
     namePH: "Your name...",
     langLabel: "LANGUAGE / IDIOMA",
@@ -254,7 +250,7 @@ var T = {
     }
   },
   es: {
-    tagline: "Tu mentora de trading. Basada en Candle Range Theory.",
+    tagline: "Tu mentora de trading. 10 mensajes gratis.",
     nameLabel: "TU NOMBRE",
     namePH: "Tu nombre...",
     langLabel: "IDIOMA / LANGUAGE",
@@ -415,1555 +411,257 @@ var getGrade = function getGrade(n) {
 var CHAPTERS = [{
   id: 1,
   icon: "🕯️",
-  title: "Anatomy of a Candle",
-  sub: "What every candle tells you."
+  title: "Reading Candles",
+  sub: "What every candle is actually telling you.",
+  level: 1,
+  desc: "The four parts of a candlestick (Open High Low Close), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples."
 }, {
   id: 2,
   icon: "📊",
-  title: "The Two Market States",
-  sub: "First question every time you open a chart."
+  title: "Market States",
+  sub: "First question every time you open a chart.",
+  level: 1,
+  desc: "Three market states: trending (clear direction), ranging (bouncing between two levels), choppy (no trade). How to identify each on a chart. The devastating mistake of applying trending strategy in a ranging market. Include the 'no-man's-land' concept — never trade the middle of a range."
 }, {
   id: 3,
   icon: "🔭",
   title: "The Three Timeframes",
-  sub: "HTF · ITF · LTF. One purpose each."
+  sub: "HTF · ITF · LTF — one purpose each.",
+  level: 2,
+  desc: "Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."
 }, {
   id: 4,
   icon: "🌊",
-  title: "Reading Order Flow",
-  sub: "Smart Money vs Retail — who moves price."
+  title: "Who Moves Price",
+  sub: "Smart Money vs Retail — the invisible hand.",
+  level: 2,
+  desc: "Large participants use predictable retail behavior as fuel. Retail was taught to buy breakouts above highs — large players know exactly where those orders are. CRT teaches you to read their footprints. Dumb Money buys above highs; Smart Money sells to them. Include the buy stop / sell stop accumulation concept."
 }, {
   id: 5,
   icon: "💧",
-  title: "Liquidity — Why Price Moves",
-  sub: "Two reasons. Only two. Every move in history."
+  title: "Why Price Moves",
+  sub: "Two reasons. Only two. Every move in history.",
+  level: 2,
+  desc: "Price moves to reach liquidity (stacked orders at old highs and lows) or to fill an imbalance. The ERL/IRL cycle. Buy stops above highs, sell stops below lows. Why every price move in history reduces to one of these two. Old highs that formed after sweeping a low matter most."
 }, {
   id: 6,
   icon: "🗺️",
-  title: "The Draw on Liquidity",
-  sub: "Always know the target before you enter."
+  title: "Knowing Your Target",
+  sub: "Always know where before you look for how.",
+  level: 2,
+  desc: "Why you must identify the target BEFORE looking for an entry. External liquidity (old highs/lows — final destination) vs Internal liquidity (imbalances along the way). Which levels carry the most weight. The liquidity cycle. Without a target, there is no trade."
 }, {
   id: 7,
   icon: "🐢",
-  title: "Turtle Soup",
-  sub: "The engine behind every big move."
+  title: "The Fake Breakout",
+  sub: "The engine behind every big move.",
+  level: 3,
+  desc: "The fake breakout precedes every major move. Price pushes above an old high, triggers buy stops, collects liquidity, then reverses. Three types: continuation, range, reversal. The failure swing. Rule 1: never buy above old high, never sell below old low. Reversal type at HTF key level = highest quality."
 }, {
   id: 8,
   icon: "📅",
-  title: "AMD — The 3-Candle Logic",
-  sub: "Accumulation · Manipulation · Distribution."
+  title: "The 3-Candle Sequence",
+  sub: "Accumulation · Manipulation · Distribution.",
+  level: 3,
+  desc: "Every price move follows AMD: C1 accumulates the range, C2 performs the fake breakout (never trade this candle), C3 is the real move (your trade). Weekly: Monday=accumulation, Tuesday=manipulation and real high/low, Wednesday-Thursday=distribution. Month: Week 2 is the manipulation week."
 }, {
   id: 9,
   icon: "👁️",
   title: "Reading Bias",
-  sub: "Closes reveal intention. Wicks reveal deception."
+  sub: "Closes reveal. Wicks deceive.",
+  level: 1,
+  desc: "How to read daily bias from candle closes. Bullish trades only below the daily open. Bearish trades only above the daily open. Prior daily closed above old high = bullish bias. Wicked above but closed inside = bearish bias. This one filter eliminates most bad trades."
 }, {
   id: 10,
   icon: "⏰",
-  title: "Time Over Price",
-  sub: "When matters more than where."
+  title: "Trading Sessions",
+  sub: "When matters more than where.",
+  level: 2,
+  desc: "Three Kill Zones: Asia 8PM-12AM NY (Gold, JPY), London 2-5AM NY (EUR/USD, GBP), NY Open 7-11AM (Indices, Crypto, USD). NYSE opens 9:30AM = biggest liquidity injection, not automatically manipulation. Session AMD profiles. A perfect level at 3AM Saturday has different probability than the same level during Tuesday London Kill Zone."
 }, {
   id: 11,
   icon: "🎯",
-  title: "Model 1 — The Entry",
-  sub: "One candle. One rule. One trigger."
+  title: "The Entry Candle",
+  sub: "One candle. One rule. One trigger.",
+  level: 3,
+  desc: "The Model 1 entry: one thick decisive candle that nails a structural level and closes back inside. Three requirements: thick, real structural level, Kill Zone timing. The close is the trigger — never the wick. Stop above/below the wick (fixed, never moved). T1=50% mandatory first, T2=opposite end. An FVG inside the Model 1 candle increases probability."
 }, {
   id: 12,
   icon: "💀",
-  title: "Kiss of Death",
-  sub: "The final trap before every target."
+  title: "The Final Trap",
+  sub: "It happens before every target. Every time.",
+  level: 3,
+  desc: "The Kiss of Death: the last fake move right before price reaches its target. Always happens — guaranteed. Designed to shake out traders who entered correctly. How to identify it. Why it's Entry 5 and the most violent move. If you're stopped out by the KoD, you didn't lose — you just didn't size it right."
 }, {
   id: 13,
   icon: "🗝️",
-  title: "Fair Value Gap",
-  sub: "The imbalance price always returns to fill."
+  title: "Price Imbalances",
+  sub: "The gap price always comes back to fill.",
+  level: 2,
+  desc: "Fair Value Gaps: 3-candle imbalances where price moved too fast and left a gap. Acts as a magnet. The 50% rule — the 50% of the FVG is the critical level. High-probability FVGs are backed by structural events. OB+FVG at same level = maximum confluence. FVGs as Internal Liquidity."
 }, {
   id: 14,
   icon: "📦",
-  title: "Order Block",
-  sub: "Where Smart Money left its footprint."
+  title: "Order Blocks",
+  sub: "Where big money left its footprint.",
+  level: 2,
+  desc: "The last candle of the opposite color before a major move = Order Block. In a bullish market, the last bearish candle before the impulse up = support. The 50% rule. Higher TF Order Blocks carry more weight. OB+FVG confluence. Why institutions leave these footprints and why price returns to them."
 }, {
   id: 15,
   icon: "🔄",
-  title: "Breaker Block",
-  sub: "The flip. The lowest-drawdown entry."
+  title: "Flipped Levels",
+  sub: "Old support becomes resistance — and vice versa.",
+  level: 2,
+  desc: "Breaker Blocks: Order Blocks that were broken and flipped. Three price passes through same area = most balanced location on chart. Least drawdown of all entries — Entry 3 in the sequence. Same event as the true Change of Character. What makes a valid flip vs a random level."
 }, {
   id: 16,
   icon: "🔢",
-  title: "Five Entries in Order",
-  sub: "The full sequence. Never go backward."
+  title: "Five Entry Points",
+  sub: "The full sequence. Never go backward.",
+  level: 3,
+  desc: "E1: Turtle Soup wick (live, hardest, highest reward). E2: Model 1 close (daily confirmed, standard entry). E3: Breaker Block (least drawdown). E4: OTE 60-75% retrace (where ICT traders enter — KoD often traps them here). E5: Kiss of Death (most violent, most certain). Never go backward — if E3 formed, only E5 remains."
 }, {
   id: 17,
   icon: "🔗",
-  title: "SMT — Correlated Pairs",
-  sub: "The divergence signal before the big move."
+  title: "Correlated Markets",
+  sub: "When one market tells on another.",
+  level: 2,
+  desc: "SMT divergence: correlated assets not confirming each other. EUR/USD vs DXY (inverse). BTC vs ETH (direct). S&P vs NASDAQ (direct). One takes a high the other doesn't = fake move in the one that took it. Never trade SMT alone — always combine with Model 1 confirmation at a structural level."
 }, {
   id: 18,
   icon: "⚠️",
-  title: "Real vs False CoC",
-  sub: "The trap that destroys more accounts than anything."
+  title: "Real vs Fake Breakouts",
+  sub: "The trap that destroys the most accounts.",
+  level: 3,
+  desc: "False Change of Character looks perfect — that's the point. Real CoC: violent purge of stops + decisive close through the level. False CoC: textbook-perfect setup designed to trap informed traders. Verification: key HTF level + Kill Zone + correlated market confirmation. A 1H CoC in an HTF premium zone is a sell signal dressed as a buy."
 }, {
   id: 19,
   icon: "📈",
   title: "Trading Ranges",
-  sub: "Rules, targets, and the fake breakout rule."
+  sub: "Rules, targets, and the fake breakout rule.",
+  level: 2,
+  desc: "Buy at range low, sell at range high, never the middle. The first breakout is almost always fake — wait for the fake to confirm direction. Range = accumulation for the next big move. Range to trend transition. Targets from range extremes. What defines a valid range vs choppy noise."
 }, {
   id: 20,
   icon: "🏗️",
   title: "Building a Trade",
-  sub: "Top-down always. Entry is the very last step."
+  sub: "Top-down always. Entry is the last step.",
+  level: 3,
+  desc: "The complete top-down process: week of month → HTF narrative → daily open position → liquidity target → Kill Zone → structural level → entry candle. Entry is ALWAYS last. Four things to know before pressing the button: stop level, 50% target, full target, risk percentage. Never work bottom-up."
 }, {
   id: 21,
   icon: "⚡",
-  title: "Execution & Management",
-  sub: "From the button to the exit — behavior first."
+  title: "Managing the Trade",
+  sub: "From button to exit — behavior is everything.",
+  level: 3,
+  desc: "Two valid entry types only (Model 1 close and true CoC). Why the stop never moves. Managing through the failure swing. Managing through the Kiss of Death. The mandatory 50% partial and why it's sacred. The behavioral patterns that cause losses: early exits, moving stops, FOMO entries. The trading journal as the real edge."
 }, {
   id: 22,
   icon: "🏆",
   title: "The Complete System",
-  sub: "Print it. Put it on your wall. Live it."
+  sub: "Put it all together. This is your process.",
+  level: 3,
+  desc: "The universal pattern: Open. Key Level. Fake breakout. Real move. The fractal nature — same logic at every speed. The 1-2% risk rule. The 8-loss streak that comes for everyone. Why documentation separates profitable traders. The shortcut in trading has one name: losses."
 }];
 
-/* ═══ ALL 22 LESSONS ═══ */
-var L = {
+/* ═══ COMPLEXITY CONFIG ═══ */
+var COMPLEXITY = {
   1: {
-    slides: [{
-      icon: "🕯️",
-      t: "Four Numbers. Everything.",
-      b: "Open. High. Low. Close. Every candle in history — on every timeframe, every asset — tells you exactly four things. Nothing else matters.",
-      d: "The Japanese invented this 400 years ago to track rice. We use it today for Bitcoin. Nothing has ever replaced it because nothing has ever been better."
-    }, {
-      icon: "👁️",
-      t: "The Rule That Changes Everything",
-      b: "A WICK beyond the prior range means price tried to go there — but couldn't commit. A CLOSE beyond the range means price committed. These two things mean completely opposite things.",
-      d: "Closes reveal intention. Wicks reveal deception. I'll say this 100 times before you're done here. Most traders never truly get this distinction and it costs them constantly."
-    }, {
-      icon: "🔍",
-      t: "Bullish, Bearish — Who Cares",
-      b: "In CRT, a candle's color matters less than WHERE it closed relative to the prior high or low. A red candle that closes above an old high is bullish. A green candle that wicks above an old high and closes inside is bearish.",
-      d: "Romeo says it directly: we are candle traders. Not color traders. Not pattern memorizers. We read where the candle closed and what that means for the next move."
-    }],
-    quiz: [{
-      q: "In CRT, a wick above an old high that closes back inside the range signals:",
-      type: "mc",
-      opts: ["Bullish continuation — price is going higher", "Bearish signal — price tried higher but failed", "Neutral — wait for more candles", "A valid entry signal to buy"],
-      a: 1,
-      exp: "Wicks reveal deception. Price attempted to break the high, got rejected, and closed inside. This is a Turtle Soup — the fake move. Expect the opposite direction."
-    }, {
-      q: "What matters more in CRT — the wick or the close?",
-      type: "mc",
-      opts: ["The wick — it shows the full range attempted", "The close — it reveals where price truly committed", "They are equally important", "Depends on which timeframe you're on"],
-      a: 1,
-      exp: "The close is everything in CRT. It's where the market committed. The wick shows what was tried. The close shows what was held. Closes reveal intention, wicks reveal deception."
-    }, {
-      q: "Every candle in CRT has exactly four components.",
-      type: "tf",
-      a: true,
-      exp: "Open, High, Low, Close. Every candle on every timeframe, every asset, in every market. These four data points are all you need to read the market with CRT."
-    }, {
-      q: "In CRT, a monthly candle uses completely different logic than a 1-minute candle.",
-      type: "tf",
-      a: false,
-      exp: "False. The fractal nature of CRT means a monthly candle has the exact same logic and structure as a 1-minute candle. The only difference is speed. This is why CRT works on every timeframe."
-    }, {
-      q: "The BODY of a candle represents:",
-      type: "mc",
-      opts: ["The full range from high to low", "The space between the open and close", "The distance from open to high", "The wick extensions"],
-      a: 1,
-      exp: "The body is the rectangle between the open and close. The wicks extend above and below the body to show the high and low extremes that were touched but not held."
-    }, {
-      q: "A bullish candle is one that:",
-      type: "mc",
-      opts: ["Is colored green or white", "Closed above its open", "Made a new high", "Had a long wick upward"],
-      a: 1,
-      exp: "A bullish candle simply closed above where it opened. The color doesn't define it — the relationship between the open and close does."
-    }, {
-      q: "Where is the HIGH of a candle?",
-      type: "mc",
-      opts: ["Always at the top of the body", "The highest price reached, including wicks", "The closing price", "The opening price"],
-      a: 1,
-      exp: "The high is the highest price reached during that time period, including any wicks above the body. This is one of the most important price levels in CRT — highs accumulate buy stops above them."
-    }, {
-      q: "Wicks reveal deception in CRT because they show:",
-      type: "mc",
-      opts: ["Where price committed for the period", "Attempts that failed to hold", "The true market direction", "Where Smart Money placed orders"],
-      a: 1,
-      exp: "Wicks show where price tried to go but couldn't hold. They represent failed attempts. A wick above an old high means bulls tried to break out but sellers overwhelmed them and closed price back inside."
-    }]
+    slides: 3,
+    minQ: 6,
+    label: "Foundation"
   },
   2: {
-    slides: [{
-      icon: "📊",
-      t: "The First Question. Always.",
-      b: "Before you look for any setup — before you even consider an entry — you need to know what state the market is in. Trend. Range. Choppy. Those are your only three options.",
-      d: "Applying a range strategy in a trending market — or a trend strategy in a range — is one of the fastest ways to lose money. This question eliminates most bad trades before you even see a candle."
-    }, {
-      icon: "📈",
-      t: "Trend: Go With It, Not Against It",
-      b: "Bullish trend: higher candles break highs, lower candles get rejected. Bearish trend: lower candles break lows, higher candles get rejected. Trade WITH the direction — every dip is a refueling stop, not a reversal.",
-      d: "In a bullish trend, every Turtle Soup on a pullback is Smart Money accumulating more long positions before the next push. They're not reversing — they're reloading. The Turtle Soup is their method."
-    }, {
-      icon: "📦",
-      t: "Range: Extremes Only. Never the Middle.",
-      b: "Both swing high and swing low are being rejected. Price is accumulating in a box. You buy at the range low, sell at the range high. The middle is no man's land — worst R:R possible.",
-      d: "The most important range rule: the first breakout is almost always the fake. Wait for the Turtle Soup of that breakout, not the breakout itself. Romeo is clear: trade the fake, not the break."
-    }],
-    quiz: [{
-      q: "How many market states exist in CRT?",
-      type: "mc",
-      opts: ["Two — trending and ranging", "Three — trend, range, choppy", "Four — bull, bear, range, chop", "Five — depending on timeframe"],
-      a: 1,
-      exp: "Trend, Range, Choppy — exactly three. You must identify which state you're in before looking for any setup. Applying the wrong strategy to the wrong state is how most traders lose."
-    }, {
-      q: "In a bullish trend, a dip below a swing low is a reversal signal.",
-      type: "tf",
-      a: false,
-      exp: "False. In a bullish trend, a dip below a swing low is a Turtle Soup — a refueling stop where Smart Money accumulates more longs before the next push higher. It's NOT a reversal. Trade with the trend."
-    }, {
-      q: "In a range, where do you look for entries?",
-      type: "mc",
-      opts: ["In the middle — highest probability", "At the highs only", "At the extremes — the range high and low", "Anywhere the candles look strong"],
-      a: 2,
-      exp: "Extremes only. Buy at the range low, sell at the range high. The middle of any range is no man's land — Romeo calls it that directly. Worst risk/reward, most noise, lowest probability."
-    }, {
-      q: "The first breakout of a range is almost always genuine.",
-      type: "tf",
-      a: false,
-      exp: "False. The first breakout of any range is almost always the fake — the Turtle Soup. Smart Money pushes price through the extreme, triggers all the stops, collects liquidity, and then reverses. Trade the fake breakout, not the breakout itself."
-    }, {
-      q: "What is the correct response to a choppy market?",
-      type: "mc",
-      opts: ["Look harder for setups", "Trade smaller size", "Do nothing — wait or drop the timeframe", "Switch assets immediately"],
-      a: 2,
-      exp: "Do nothing. A choppy market has no clear direction and no tradeable structure. The correct response is patience. If you need to act, drop to a lower timeframe — you'll likely find a range there."
-    }, {
-      q: "In a bearish trend, what is happening to higher highs?",
-      type: "mc",
-      opts: ["They are being broken — price is going up", "They are being rejected — price is being capped", "They are irrelevant", "They signal accumulation"],
-      a: 1,
-      exp: "In a bearish trend, higher candles (swings upward) get rejected — they can't break their prior highs. Meanwhile, lower lows keep forming. This is the structural definition of a bearish trend in CRT."
-    }, {
-      q: "\"No man's land\" in CRT refers to:",
-      type: "mc",
-      opts: ["A choppy market with no structure", "The middle of a trading range", "The area between Kill Zones", "Any price level without a key high or low"],
-      a: 1,
-      exp: "The middle of a range is no man's land. Romeo says it directly — you have no edge there. The extremes are where you have structure, clear stop placement, and defined targets. The middle gives you none of that."
-    }, {
-      q: "You can apply a range strategy in a trending market with the same probability.",
-      type: "tf",
-      a: false,
-      exp: "False. Context is everything in CRT. A range strategy in a trending market will get you steamrolled. A trend strategy in a range will stop you out on every entry. Identifying the state first is not optional."
-    }]
+    slides: 5,
+    minQ: 8,
+    label: "Intermediate"
   },
   3: {
-    slides: [{
-      icon: "🔭",
-      t: "Three Timeframes. One Purpose Each.",
-      b: "Higher Timeframe (HTF): tells you WHY price should move from a level. Intermediate Timeframe (ITF): confirms the CRT is happening right now at your level. Lower Timeframe (LTF): gives you the exact WHEN and WHERE to enter.",
-      d: "Think of it like navigation. HTF is the destination. ITF is the route. LTF is the specific turn. You need all three. A beautiful Model 1 without an HTF reason is just a candle."
-    }, {
-      icon: "🔗",
-      t: "The Three Questions You Must Answer",
-      b: "HTF: Is there a significant structural level here — an old high, old low, or weekly open? ITF: Is a CRT confirming at that level right now? LTF: Is there a thick Model 1 candle providing the trigger?",
-      d: "When all three say yes simultaneously, you're not guessing. You're seeing the same story told at three different speeds. That's the edge."
-    }, {
-      icon: "📐",
-      t: "Which Candle Pairs With Which",
-      b: "Daily candle → confirm on 4H → enter on 1H. 4H candle → confirm on 1H → enter on 15m. 1H candle → confirm on 15m → enter on 5m.",
-      d: "Romeo says it clearly: the higher timeframe gives you the WHY, the intermediate gives you the WHAT, the lower gives you the exact WHEN and WHERE. Without the WHY, every entry is a gamble."
-    }],
-    quiz: [{
-      q: "The Higher Timeframe's primary job in CRT is:",
-      type: "mc",
-      opts: ["To give you the exact entry price", "To tell you WHY price should move from a level", "To show you which direction to trade", "To confirm the Model 1 candle"],
-      a: 1,
-      exp: "The HTF gives you the WHY — the structural reason price should react at this level. Without a valid HTF reason, there is no trade, regardless of how good the lower timeframe looks."
-    }, {
-      q: "You see a perfect Model 1 on the 5m but there's no significant level on the 4H or above. Should you take the trade?",
-      type: "tf",
-      a: false,
-      exp: "No. Without the HTF key level, the setup has no reason to work. A Model 1 without context is just a candle. All three timeframes must align for a valid CRT trade. Missing the WHY = gambling."
-    }, {
-      q: "For a trade based on the daily candle, where do you look for CRT confirmation?",
-      type: "mc",
-      opts: ["1-minute chart", "4H chart", "Weekly chart", "Same daily chart"],
-      a: 1,
-      exp: "Daily candle → confirm on 4H → enter on 1H. The 4H is the intermediate timeframe for a daily setup. It shows you the CRT playing out at your daily level before you drop to 1H for the Model 1."
-    }, {
-      q: "The Lower Timeframe gives you:",
-      type: "mc",
-      opts: ["The reason price should move", "Confirmation the move is happening", "The exact WHEN and WHERE to enter", "The liquidity target"],
-      a: 2,
-      exp: "The Lower Timeframe is your entry precision tool. It gives you the exact Model 1 candle — the specific moment to press the button. It doesn't tell you WHY or WHAT — those come from above."
-    }, {
-      q: "A CRT trade using only one timeframe has the same probability as one using all three aligned.",
-      type: "tf",
-      a: false,
-      exp: "False. One timeframe = gambling. Three timeframes aligned = edge. Each level adds a layer of confirmation. Without the HTF providing the structural reason, without the ITF confirming the CRT, the LTF entry is random."
-    }, {
-      q: "For a 4H candle setup, where do you find the Model 1 entry?",
-      type: "mc",
-      opts: ["On the 4H chart itself", "On the 1H chart", "On the 5-minute chart", "On the daily chart"],
-      a: 2,
-      exp: "4H candle → confirm on 1H → enter on 5m. The 5-minute chart gives you the precise Model 1 for a 4H setup. This is the entry precision layer."
-    }, {
-      q: "CRT works the same way on every timeframe because:",
-      type: "mc",
-      opts: ["Markets use the same indicators everywhere", "Candles have a fractal nature — same logic at every speed", "Big players only trade certain timeframes", "News affects all timeframes equally"],
-      a: 1,
-      exp: "The fractal nature of CRT means every candle — monthly, weekly, daily, 4H, 1H, 15m, 5m, 1m — has the same logic and structure. A monthly candle is a daily candle is a 1-minute candle. Same story, different speed."
-    }, {
-      q: "The Intermediate Timeframe confirms that:",
-      type: "mc",
-      opts: ["The HTF level is significant", "The CRT and Turtle Soup are happening right now at the key level", "The Model 1 is valid", "The liquidity target has been reached"],
-      a: 1,
-      exp: "The ITF shows you the CRT unfolding in real time at the HTF key level. You see Candle 1 establishing the range, Candle 2 performing the Turtle Soup at your exact level. This bridges the WHY (HTF) to the WHEN (LTF)."
-    }]
-  },
-  4: {
-    slides: [{
-      icon: "🌊",
-      t: "Who Is Actually Moving Price?",
-      b: "Every trade has two sides. When you buy, someone is selling to you. When you sell, someone is buying. The entity on the other side of every retail trade is Smart Money — the algorithm that controls price movement.",
-      d: "This isn't a conspiracy theory. Smart Money isn't investment funds or big banks — the 2022 crypto crash wiped those out the same as retail. Smart Money is the algorithm itself. Understanding this changes how you see every chart."
-    }, {
-      icon: "🎯",
-      t: "Why Retail Always Loses — By Design",
-      b: "Retail was taught one thing: buy when price breaks a high, sell when price breaks a low. Smart Money designed, published, and promoted exactly that knowledge — so they'd know exactly where retail orders would be placed. Then they use those orders against them.",
-      d: "Every old high has buy stops above it. Every old low has sell stops below it. Smart Money knows this. They push price to those levels, trigger the orders, collect the liquidity, and reverse. That's the business model."
-    }, {
-      icon: "💡",
-      t: "What CRT Teaches You to See",
-      b: "CRT doesn't make you Smart Money. It teaches you to read the signals Smart Money leaves before every major move. Those signals are the false breakouts — the moments when price wicks beyond a level and reverses violently. In CRT that has a name: Turtle Soup.",
-      d: "You're not trading against Smart Money. You're reading their footprints and following them. Once you see those footprints, you can't unsee them."
-    }],
-    quiz: [{
-      q: "In CRT, 'Smart Money' refers to:",
-      type: "mc",
-      opts: ["Large investment funds and hedge funds", "Big retail traders with large accounts", "The algorithm that controls price movement in financial markets", "Central banks and governments"],
-      a: 2,
-      exp: "Smart Money is the algorithm itself — not specific institutions. The 2022 crypto crash destroyed major investment funds the same way it destroyed retail traders. Smart Money is the mechanism, not a specific entity."
-    }, {
-      q: "Investment funds and big banks are what CRT calls Smart Money.",
-      type: "tf",
-      a: false,
-      exp: "False. Smart Money is the algorithm that moves price. The 2022 crypto crash wiped out major investment funds — Smart Money would never let itself get wiped out. Smart Money is the mechanism, not specific financial institutions."
-    }, {
-      q: "Why did Smart Money design and promote traditional retail trading education (support/resistance, trendlines, RSI)?",
-      type: "mc",
-      opts: ["To help retail traders succeed", "To use retail predictable order placement against them", "To stabilize the markets", "Because it's the most accurate approach"],
-      a: 1,
-      exp: "Smart Money deliberately promoted this education so they could predict exactly where retail traders would place stops and entries. Knowing where predictable orders sit gives Smart Money a roadmap for where to push price to collect liquidity."
-    }, {
-      q: "Smart Money profits in only one direction — when price goes up.",
-      type: "tf",
-      a: false,
-      exp: "False. Smart Money profits in both directions simultaneously. They operate the algorithm. They can push price in any direction to collect liquidity, then reverse. Direction is irrelevant to them — liquidity collection is the goal."
-    }, {
-      q: "CRT turns you into Smart Money.",
-      type: "tf",
-      a: false,
-      exp: "False. CRT teaches you to read the signals Smart Money leaves — not to become Smart Money. You're learning to follow their footprints, not to control price. You trade with Smart Money, not against them."
-    }, {
-      q: "Retail traders typically place their stop losses:",
-      type: "mc",
-      opts: ["Randomly based on their account size", "At predictable textbook locations that Smart Money specifically targets", "At key higher timeframe levels", "Wherever their broker suggests"],
-      a: 1,
-      exp: "Retail education teaches predictable stop placement — below support, above resistance, at round numbers. Smart Money knows exactly where these stops are and deliberately pushes price to those locations to collect the liquidity before the real move."
-    }, {
-      q: "'Dumb Money' in CRT refers to:",
-      type: "mc",
-      opts: ["Amateur traders with small accounts", "Retail traders who react to price instead of anticipating it", "Traders who don't use stop losses", "People who trade without a strategy"],
-      a: 1,
-      exp: "Dumb Money is retail — traders who react to price as it happens, using tools designed to make them lose. They buy above highs, sell below lows, place stops at textbook levels, and change bias based on what already happened."
-    }, {
-      q: "Every old high in the market has buy stops accumulated above it because:",
-      type: "mc",
-      opts: ["Bulls place buy orders above highs to enter long", "Traders who sold from that high place stops above it, and breakout buyers wait there", "Smart Money placed orders there", "It's where institutional traders accumulate"],
-      a: 1,
-      exp: "Two types of orders stack above every old high: stop losses of traders who sold from that high, and entry orders of breakout traders waiting to buy the breakout. Smart Money knows this and uses both sets of orders as fuel."
-    }]
-  },
-  5: {
-    slides: [{
-      icon: "💧",
-      t: "Two Reasons. Only Two.",
-      b: "Price moves for exactly two reasons in CRT. First: to attack a liquidity point — an old high or low where orders are stacked. Second: to fill an imbalance — a Fair Value Gap where price moved too fast and left a gap.",
-      d: "Romeo says it directly: those are the only two reasons. Every move in market history reduces to one of these two. Once you understand this, you stop guessing where price is going and start reading where it has to go."
-    }, {
-      icon: "🎯",
-      t: "Liquidity: Where the Orders Are",
-      b: "Buy stops accumulate ABOVE old highs. Sell stops accumulate BELOW old lows. Liquidity is simply the collection of orders at these levels. Smart Money needs to fill their massive positions — they need those orders as counterparties.",
-      d: "When price pushes above an old high and triggers all the buy stops, Smart Money is using those orders to fill their sell positions. They sell to every buyer who just triggered their stop. Then price reverses because Smart Money is now positioned short."
-    }, {
-      icon: "🔄",
-      t: "The Liquidity Cycle",
-      b: "Price takes External Liquidity (old highs/lows) → returns to fill Internal Liquidity (FVGs, Order Blocks inside the move) → seeks the next External Liquidity level. This cycle never stops.",
-      d: "Once you see this cycle, you'll see it everywhere on every timeframe. Price is always in one of these phases: hunting external liquidity, filling internal liquidity, or transitioning between the two."
-    }],
-    quiz: [{
-      q: "According to CRT, price moves for how many reasons?",
-      type: "mc",
-      opts: ["One — to find fair value", "Two — to attack liquidity or fill imbalances", "Three — trend, range, and momentum", "Many — depending on market conditions"],
-      a: 1,
-      exp: "Exactly two. Only two. Every price movement in market history reduces to: attacking a liquidity point (old high/low) or filling an imbalance (Fair Value Gap). Romeo is unambiguous on this."
-    }, {
-      q: "Buy stops are accumulated BELOW old lows.",
-      type: "tf",
-      a: false,
-      exp: "False. Buy stops accumulate ABOVE old highs — they're the stop losses of traders who sold from that high, and entry orders of breakout buyers. Sell stops accumulate BELOW old lows. Getting this backwards is a critical error."
-    }, {
-      q: "When Smart Money pushes price above an old high to collect liquidity, they are:",
-      type: "mc",
-      opts: ["Signaling a genuine breakout — buy the breakout", "Using retail buy orders as counterparties to fill their own sell positions", "Testing market strength", "Following institutional order flow"],
-      a: 1,
-      exp: "Smart Money uses the orders triggered above the high as counterparties. When retail's buy stops trigger, Smart Money sells to them — filling their own short positions. Once positioned, they reverse price downward."
-    }, {
-      q: "The two types of liquidity in CRT are:",
-      type: "mc",
-      opts: ["Support and resistance", "External (ERL) and Internal (IRL)", "Supply and demand zones", "Institutional and retail orders"],
-      a: 1,
-      exp: "External Liquidity (ERL) = old highs and lows — the final targets of big moves. Internal Liquidity (IRL) = FVGs, Order Blocks, Breaker Blocks inside the move — the path along the way."
-    }, {
-      q: "Smart Money deliberately moves price to trigger retail stop losses.",
-      type: "tf",
-      a: true,
-      exp: "True. This is the fundamental mechanism CRT is built on. Smart Money needs the orders at old highs and lows as counterparties for their own massive positions. Triggering stops is not a side effect — it's the strategy."
-    }, {
-      q: "After Smart Money collects External Liquidity (takes an old high or low), price:",
-      type: "mc",
-      opts: ["Continues in the same direction indefinitely", "Returns to fill Internal Liquidity (FVGs/Order Blocks) on the pullback", "Immediately makes a new extreme", "Consolidates for weeks"],
-      a: 1,
-      exp: "After taking ERL, price returns to fill IRL — the Fair Value Gaps and Order Blocks left inside the prior move. Then it seeks the next ERL. This is the cycle: ERL → fill IRL → next ERL. It never stops."
-    }, {
-      q: "Old highs and lows are important in CRT because:",
-      type: "mc",
-      opts: ["They are support and resistance levels", "They accumulate orders (stops and entries) that Smart Money needs as fuel", "Price always reverses at these levels", "They mark institutional interest zones"],
-      a: 1,
-      exp: "Old highs and lows are liquidity pools — stacks of orders that Smart Money uses as counterparties for their own massive positions. Without these orders, Smart Money can't fill their trades efficiently."
-    }, {
-      q: "Which old highs and lows carry the most weight in CRT?",
-      type: "mc",
-      opts: ["The most recent ones on the chart", "The ones with the most candles nearby", "Highs that formed after taking a low, and lows that formed after taking a high", "The ones at round numbers"],
-      a: 2,
-      exp: "A high that formed AFTER price swept an old low has structural significance — it was created from a liquidity run. A low that formed after taking a high is equally significant. These are the levels that matter most."
-    }]
-  },
-  6: {
-    slides: [{
-      icon: "🗺️",
-      t: "Know Where You're Going First",
-      b: "Before you look for any entry — before you check any timeframe for a setup — you must identify your liquidity target. Where is price going? That question must be answered first. Always.",
-      d: "A trade without a target is like driving with no destination. You need to know where price is heading BEFORE you look for how to get in. The target defines everything — entries, stops, partials."
-    }, {
-      icon: "📍",
-      t: "External vs Internal Liquidity",
-      b: "External Liquidity (ERL): old highs and lows — the final destination of every big move. These are swept with a Turtle Soup. Internal Liquidity (IRL): FVGs and Order Blocks inside the move — the path along the way, filled on pullbacks.",
-      d: "The cycle never stops: price takes ERL → retraces to fill IRL → hunts the next ERL. Once you know which phase price is in, you know what it's going to do next."
-    }, {
-      icon: "🔝",
-      t: "The Highs and Lows That Matter Most",
-      b: "Not all levels are equal. The highs that took lows and the lows that took highs carry the most weight. A high that formed after a liquidity sweep has structural purpose — Smart Money created it intentionally.",
-      d: "A random high with no prior liquidity sweep behind it carries far less weight than one that formed after price swept an old low. Context is everything. Learn to read WHY a high or low was created, not just that it exists."
-    }],
-    quiz: [{
-      q: "When should you identify your liquidity target in the trade-building process?",
-      type: "mc",
-      opts: ["After you find the Model 1 entry", "Before you look for any entry — it's the first step", "During the entry candle formation", "After price starts moving"],
-      a: 1,
-      exp: "The target comes first. Always. You must know WHERE price is going before you look for HOW to get in. Without a defined target, you're entering blind — no exit plan, no R:R calculation, no context."
-    }, {
-      q: "External Liquidity (ERL) in CRT refers to:",
-      type: "mc",
-      opts: ["Fair Value Gaps inside the current move", "Order Blocks from the prior session", "Old highs and lows — the final targets of big moves", "Any price level with multiple touches"],
-      a: 2,
-      exp: "ERL = External Liquidity = old highs and lows. These are swept with a Turtle Soup and represent the final destination of big price moves. They're where Smart Money is delivering price to collect maximum liquidity."
-    }, {
-      q: "You should always identify your liquidity target BEFORE looking for an entry.",
-      type: "tf",
-      a: true,
-      exp: "True. This is one of the non-negotiable rules in CRT. The target defines everything else: your entry context, your stop placement, your risk/reward, and your exit timing. Target first, entry second."
-    }, {
-      q: "After price takes External Liquidity, what does it do next?",
-      type: "mc",
-      opts: ["Continues in the same direction to the next major level", "Consolidates indefinitely", "Returns to fill Internal Liquidity (FVGs/OBs) on the pullback", "Immediately reverses to the opposite extreme"],
-      a: 2,
-      exp: "After taking ERL, price retraces to fill IRL — the Fair Value Gaps and Order Blocks inside the prior move. These are the internal imbalances left from the fast move. Then it hunts the next ERL."
-    }, {
-      q: "A high that formed AFTER price swept an old low is more significant than a random high.",
-      type: "tf",
-      a: true,
-      exp: "True. Highs that took lows and lows that took highs carry the most structural weight in CRT. Smart Money created them intentionally — they mark where price reversed after a liquidity collection. These are the levels that will be respected and targeted again."
-    }, {
-      q: "Internal Liquidity (IRL) in CRT refers to:",
-      type: "mc",
-      opts: ["Old swing highs and lows", "FVGs, Order Blocks, and Breaker Blocks inside the move", "Stop losses placed by retail traders", "Any area with high trading volume"],
-      a: 1,
-      exp: "IRL = Internal Liquidity = the FVGs, Order Blocks, and Breaker Blocks left inside the current move. Price fills these on pullbacks on the way to the next External Liquidity target."
-    }, {
-      q: "If price is heading toward a Fair Value Gap (IRL), what is the NEXT target after that?",
-      type: "mc",
-      opts: ["Another FVG", "The 50% of the current range", "An old high or low — External Liquidity", "The daily open"],
-      a: 2,
-      exp: "IRL → ERL. After price fills the internal liquidity (FVG, OB), it seeks the next external liquidity (old high or low). The cycle is: take ERL → fill IRL → seek next ERL. Knowing which phase you're in tells you what comes next."
-    }, {
-      q: "The ERL/IRL cycle in CRT:",
-      type: "mc",
-      opts: ["Only applies on daily and higher timeframes", "Applies only during trending markets", "Never stops — it repeats on every timeframe in every market condition", "Only works for currency pairs"],
-      a: 2,
-      exp: "The ERL/IRL cycle never stops. It operates on every timeframe, in every market, in every condition. Trend, range, or choppy — price is always in one of the three phases: hunting ERL, filling IRL, or transitioning."
-    }]
-  },
-  7: {
-    slides: [{
-      icon: "🐢",
-      t: "The Engine Behind Every Big Move",
-      b: "Turtle Soup is a false breakout — the deliberate act of pushing price above an old high or below an old low, triggering retail stops, collecting liquidity, and then moving price in the real direction. Before any big move, there is always a Turtle Soup.",
-      d: "In the 1980s, traders called the Turtles taught buying breakouts above highs. Smart Money learned exactly when those orders would be placed — and started making soup out of them. Hence the name."
-    }, {
-      icon: "🎭",
-      t: "Three Types of Turtle Soup",
-      b: "Continuation: in a trending market, sweeps a swing level before the next push. Range: false breakout at the range extreme. Reversal: at a key HTF level, signals a genuine direction change — the highest quality type.",
-      d: "The Reversal Turtle Soup is the most powerful because it has the full backing of the higher timeframe. When you have a key HTF level + Kill Zone timing + Model 1 + SMT signal — all four aligned — that's maximum probability."
-    }, {
-      icon: "⚠️",
-      t: "The Failure Swing — The Second Scare",
-      b: "After the Turtle Soup occurs and price starts to reverse, there's almost always a failure swing — price comes back close to the original extreme before the real move accelerates. This is designed to shake out traders who correctly identified the Turtle Soup.",
-      d: "If you know it's coming, you hold. If you don't know, you exit at a loss right before the big move. The failure swing is the market's way of testing your conviction. Plan for it before you're in the trade."
-    }],
-    quiz: [{
-      q: "Turtle Soup is:",
-      type: "mc",
-      opts: ["A genuine breakout above an old high", "A false breakout above old high or below old low that reverses", "A triple bottom pattern", "A candlestick formation with three wicks"],
-      a: 1,
-      exp: "Turtle Soup is a false breakout — price deliberately pushed above an old high or below an old low to trigger retail stops, collect the liquidity, and then reverse. It's the mechanism behind virtually every big move."
-    }, {
-      q: "Before every major market move, there is always a Turtle Soup.",
-      type: "tf",
-      a: true,
-      exp: "True. Romeo says it clearly: before any big move, there is always a Turtle Soup. Smart Money needs to collect liquidity before they can move price significantly. The Turtle Soup IS the fuel collection process."
-    }, {
-      q: "The highest quality Turtle Soup type is:",
-      type: "mc",
-      opts: ["Continuation — sweeping levels in a trend", "Range — false breakout at range extremes", "Reversal — at a key HTF structural level", "Any Turtle Soup during the London session"],
-      a: 2,
-      exp: "The Reversal Turtle Soup at a key HTF level is the highest quality because it has full higher timeframe backing. When combined with correct Kill Zone timing, Model 1, and SMT signal, it produces the highest probability setup in CRT."
-    }, {
-      q: "You should buy when price breaks above an old high in CRT.",
-      type: "tf",
-      a: false,
-      exp: "False. Rule #1 in CRT: never buy above an old high. Never sell below an old low. This is the most fundamental rule — what looks like a breakout is almost always a Turtle Soup designed to trap breakout buyers."
-    }, {
-      q: "The 'failure swing' after a Turtle Soup is designed to:",
-      type: "mc",
-      opts: ["Confirm the direction of the real move", "Shake out traders who correctly identified the fake move", "Indicate a double top or bottom", "Signal that the Turtle Soup was incorrect"],
-      a: 1,
-      exp: "The failure swing shakes out traders who correctly read the Turtle Soup. Price comes back close to the extreme after starting to reverse, causing informed traders to doubt themselves and exit — right before the real move accelerates."
-    }, {
-      q: "The Turtle Soup in the 1980s got its name because:",
-      type: "mc",
-      opts: ["It looks like a turtle pattern on charts", "Smart Money made 'soup' out of the Turtle traders who bought breakouts", "It was discovered by a trader named Turtle", "It first appeared in the futures markets"],
-      a: 1,
-      exp: "A group of traders called the Turtles were taught to buy breakouts above highs and sell breakdowns below lows. Smart Money learned exactly when those orders appeared and began exploiting them — making 'soup' out of the Turtle strategy."
-    }, {
-      q: "In a Bearish Turtle Soup, what happens in sequence?",
-      type: "mc",
-      opts: ["Price breaks low, bounces, continues falling", "Old high exists, buy stops accumulate above it, price is pushed above, stops triggered, price FALLS", "Price makes lower highs then breaks downward", "Price consolidates then gaps down"],
-      a: 1,
-      exp: "Bearish Turtle Soup: old high exists → buy stops stack above it → price pushed above → retail longs triggered + shorts stopped out → Smart Money sells into all that buying → liquidity collected → price falls. That's the mechanism."
-    }, {
-      q: "Turtle Soup is a Continuation type when:",
-      type: "mc",
-      opts: ["Price reverses at a key HTF level", "It occurs at a range extreme", "It occurs during a trend, sweeping a swing level before the next push", "It happens on the Monday open"],
-      a: 2,
-      exp: "A Continuation Turtle Soup occurs within a trend — price sweeps a swing low in a bullish trend (or swing high in a bearish trend) before continuing in the trend direction. Smart Money is refueling, not reversing."
-    }]
-  },
-  8: {
-    slides: [{
-      icon: "📅",
-      t: "Every CRT = Exactly 3 Candles",
-      b: "Candle 1 = Accumulation: price establishes the range. Slow, boring — intentional. Candle 2 = Manipulation: the Turtle Soup happens. Stops triggered. New traders trapped. Candle 3 = Distribution: the real move. Fast and clean.",
-      d: "This is not a pattern that sometimes plays out — it's the logic of how markets must move for Smart Money to distribute their positions to the maximum number of trapped traders. Three candles. Always."
-    }, {
-      icon: "🎯",
-      t: "Which Candle Do You Trade?",
-      b: "Candle 3. Only Candle 3. The manipulation is done, stops have been triggered, and price has a clear destination. Candle 2 is the most dangerous — it looks like the strongest move because it is. But it's designed to trap.",
-      d: "Romeo says it directly: even his most advanced students are careful with Candle 2. My recommendation: watch Candle 2 for months before even considering trading it. Trade Candle 3 consistently first."
-    }, {
-      icon: "📆",
-      t: "AMD on the Weekly and Monthly Calendar",
-      b: "Weekly: Monday = Accumulation. Tuesday = Manipulation (real high/low forms here — hunt here). Wed-Thu = Distribution. Thu-Fri = top. Monthly: Week 1 = Accumulation. Week 2 = Manipulation (best entries). Weeks 3-4 = Distribution.",
-      d: "This isn't rigid — the profile adjusts based on what the higher timeframe is doing. But understanding the base profile gives you a massive edge in timing. Tuesday setups are frequently the highest quality of the entire week."
-    }],
-    quiz: [{
-      q: "AMD stands for:",
-      type: "mc",
-      opts: ["Analysis, Momentum, Direction", "Accumulation, Manipulation, Distribution", "Average Market Data", "Asset Management Direction"],
-      a: 1,
-      exp: "Accumulation, Manipulation, Distribution. Every CRT plays out in these three phases, in this exact order. No exceptions. Candle 1 accumulates, Candle 2 manipulates (Turtle Soup), Candle 3 distributes (the real move)."
-    }, {
-      q: "Every CRT plays out in exactly 3 candles.",
-      type: "tf",
-      a: true,
-      exp: "True. Not two, not four — three. This is the structural logic of how Smart Money must move price to distribute their positions to the maximum number of trapped traders. The AMD sequence is the universal pattern of market movement."
-    }, {
-      q: "Which candle should you trade in the AMD sequence?",
-      type: "mc",
-      opts: ["Candle 1 — it's the foundation", "Candle 2 — it has the strongest move", "Candle 3 — the real move after manipulation is complete", "Any candle with the right shape"],
-      a: 2,
-      exp: "Candle 3. Only Candle 3. The manipulation is done, stops have been triggered, price has a clear destination. Candle 2 looks the strongest because it IS the strongest — but it's designed to trap. Candle 3 is your trade."
-    }, {
-      q: "Candle 2 in the AMD sequence is safe to trade because the direction is clear.",
-      type: "tf",
-      a: false,
-      exp: "False. Candle 2 is the MOST dangerous candle. It looks like the strongest move because it is — but it's designed to trap. Even Romeo's most advanced students treat it with extreme caution. Trade Candle 3."
-    }, {
-      q: "On the weekly calendar, which day most commonly forms the real high or low?",
-      type: "mc",
-      opts: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-      a: 1,
-      exp: "Tuesday. In the most common weekly profile, Monday establishes the range (Accumulation), Tuesday forms the real high or low through the Turtle Soup (Manipulation). A Model 1 on Tuesday at a key level is one of the highest probability setups in CRT."
-    }, {
-      q: "On the monthly calendar, Week 2 is:",
-      type: "mc",
-      opts: ["Accumulation — mark the range, don't trade", "Manipulation — best entry week of the month", "Distribution — manage existing trades", "The weekly top — exit positions"],
-      a: 1,
-      exp: "Week 2 is the Manipulation week — the highest quality entry week of the month. Week 1 establishes the monthly range (Accumulation). Week 2 performs the monthly Turtle Soup. Weeks 3-4 distribute. Week 2 setups are frequently the best of the month."
-    }, {
-      q: "Monday's price action in the most common weekly profile represents:",
-      type: "mc",
-      opts: ["The real weekly move — trade Monday's direction", "Accumulation — establish the range, don't trade the direction", "Manipulation — the weekly Turtle Soup", "Distribution — the week's objective being reached"],
-      a: 1,
-      exp: "Monday is typically Accumulation — it establishes the week's range. Romeo calls Monday's move the Judas move — designed to get traders positioned in the wrong direction before the real weekly move begins on Tuesday."
-    }, {
-      q: "Candle 3 (Distribution) moves fast and clean because:",
-      type: "mc",
-      opts: ["Volatility is always highest after consolidation", "Smart Money is in a hurry to reach the target", "Retail traders are chasing the move", "Volume increases naturally after breakouts"],
-      a: 1,
-      exp: "Candle 3 moves fast because Smart Money is delivering price to the target efficiently. The manipulation is complete, the liquidity was collected in Candle 2, and now price moves with purpose toward the objective."
-    }]
-  },
-  9: {
-    slides: [{
-      icon: "👁️",
-      t: "The Rule That Eliminates Most Bad Trades",
-      b: "Bullish trades happen BELOW the daily open. Bearish trades happen ABOVE the daily open. This single filter — where price is relative to the daily opening price — eliminates most bad trades before you even look at a setup.",
-      d: "Romeo makes this non-negotiable. Bullish setups above the daily open, bearish setups below it — these are low-probability trades. The daily open is the most important intraday reference level."
-    }, {
-      icon: "📖",
-      t: "How to Determine Daily Bias",
-      b: "If the prior daily candle CLOSED above its two-day-ago high → today's bias is bullish. If it CLOSED below its two-day-ago low → today's bias is bearish. If it WICKED above an old high but closed inside → today's bias is bearish. Trap.",
-      d: "Closes reveal intention. Wicks reveal deception. This applies to determining bias exactly the same way it applies to individual candles. A wick above yesterday's high means that high was a trap."
-    }, {
-      icon: "🎭",
-      t: "The Opposite Also Works",
-      b: "A daily candle that wicked BELOW an old low but closed back inside = bullish bias. Price tried lower, couldn't commit, closed back inside. That low is a trap. Smart Money is about to push higher.",
-      d: "Once you master reading bias from daily closes, you'll stop second-guessing your direction. Bias gives you the framework. Then you look for the entry within that framework — not the other way around."
-    }],
-    quiz: [{
-      q: "In CRT, bullish trades always happen:",
-      type: "mc",
-      opts: ["Above the daily open — momentum is up", "Below the daily open", "At the daily open price", "Anywhere that has a bullish candle pattern"],
-      a: 1,
-      exp: "Bullish trades happen BELOW the daily open. Always. This filter eliminates most bad trades immediately. If you're looking for a buy above the daily open, you're fighting the CRT framework."
-    }, {
-      q: "If the prior daily candle closed above its two-day-ago high, today's bias is:",
-      type: "mc",
-      opts: ["Bearish — fade the move", "Bullish — look for buys below today's open", "Neutral — wait for more information", "Choppy — no tradeable bias"],
-      a: 1,
-      exp: "Close above the two-day-ago high = bullish bias. Price broke upward and committed. Today's strategy: look for bullish setups below the daily open. The close confirmed the direction."
-    }, {
-      q: "A daily candle wicked above an old high but closed back inside the range. Today's bias is bullish.",
-      type: "tf",
-      a: false,
-      exp: "False. That wick reveals deception — price tried to go higher, couldn't commit, closed back inside. That high is a trap. Today's bias is BEARISH. Look for shorts above today's open."
-    }, {
-      q: "Bearish trades in CRT happen:",
-      type: "mc",
-      opts: ["Below the daily open", "Above the daily open", "At the prior day's low", "Anywhere above yesterday's open"],
-      a: 1,
-      exp: "Bearish trades happen ABOVE the daily open. Always. Just as bullish trades happen below, bearish trades happen above. This makes the daily open the single most important intraday reference point."
-    }, {
-      q: "A daily candle wicked BELOW an old low but closed back above it signals:",
-      type: "mc",
-      opts: ["Bearish continuation — sell the breakdown", "Bullish bias — that low was a trap", "Neutral — price is finding support", "Choppy market conditions"],
-      a: 1,
-      exp: "Wick below the old low + close back above = bullish bias. Price tried lower, couldn't hold it, closed back inside. That low is a fake. Smart Money is about to push higher. Look for buys below today's open."
-    }, {
-      q: "The daily open is important in CRT because:",
-      type: "mc",
-      opts: ["It's where most trading volume occurs", "It separates the zone for bullish and bearish trade setups", "It marks where institutional traders enter", "It's the most liquid price of the day"],
-      a: 1,
-      exp: "The daily open is the dividing line: bullish trades happen below it, bearish trades happen above it. This framework prevents you from taking counter-narrative trades and filters out low-probability setups immediately."
-    }, {
-      q: "If the prior daily candle closed below its two-day-ago low, today's bias is:",
-      type: "mc",
-      opts: ["Bullish — price is finding support", "Bearish — look for sells above today's open", "Neutral — depends on the setup", "Choppy — no clear direction"],
-      a: 1,
-      exp: "Close below the two-day-ago low = bearish bias. Price broke downward and committed. Today's strategy: look for bearish setups above the daily open. The close revealed the intention."
-    }, {
-      q: "Reading daily bias from closes and wicks allows you to:",
-      type: "mc",
-      opts: ["Predict exact price levels for tomorrow", "Know which direction to look for trades before the session opens", "Identify the best assets to trade", "Replace the need for higher timeframe analysis"],
-      a: 1,
-      exp: "Daily bias gives you your directional framework before the session begins. Once you know whether today is a bullish or bearish bias day, you only look for setups in that direction — cutting your workload and eliminating half the bad trade opportunities."
-    }]
-  },
-  10: {
-    slides: [{
-      icon: "⏰",
-      t: "Time Is More Important Than Price",
-      b: "A perfect Model 1 setup at the right level but at 3 AM on Saturday will not behave the same as the exact same setup during a Kill Zone on Tuesday. The setup is identical. The probability is completely different. What separates them is time.",
-      d: "Romeo says it directly: price levels are useless until time is considered. Time is useless unless you're at a key level. Both matter. But time is the variable most traders completely ignore."
-    }, {
-      icon: "🕐",
-      t: "The New York Kill Zone — 7 AM to 11 AM",
-      b: "The New York Kill Zone runs from 7:00 AM to 11:00 AM New York time. This is where the most significant daily moves originate. The NYSE opens at 9:30 AM — this is a major liquidity injection and the most common time for the Candle 2 Manipulation (Turtle Soup) to occur before the real move.",
-      d: "From 7 AM, pre-market activity builds momentum. At 9:30 AM, the NYSE open creates a massive surge of orders — the perfect moment for Smart Money to execute the manipulation before Candle 3 delivers the real move."
-    }, {
-      icon: "🌍",
-      t: "All Three Kill Zones",
-      b: "London Kill Zone: 1:00 AM – 5:00 AM New York time. Most common time for the daily high or low to form. New York Kill Zone: 7:00 AM – 11:00 AM (NYSE 9:30 = liquidity injection). New York PM: 1:30 PM – 4:00 PM — secondary volatility window.",
-      d: "Outside Kill Zones, price is mostly noise. Train your focus to these windows. The best setups don't appear randomly — they appear when Smart Money is active. And Smart Money has a schedule."
-    }],
-    quiz: [{
-      q: "The New York Kill Zone in CRT runs from:",
-      type: "mc",
-      opts: ["9:30 AM to 11:00 AM only", "7:00 AM to 11:00 AM New York time", "8:00 AM to 12:00 PM New York time", "6:00 AM to 10:00 AM New York time"],
-      a: 1,
-      exp: "The New York Kill Zone runs 7:00 AM to 11:00 AM New York time. This includes the pre-market build-up from 7 AM and extends past the NYSE open at 9:30 AM. The full window is when Smart Money is most active."
-    }, {
-      q: "The NYSE opening at 9:30 AM New York time is significant because:",
-      type: "mc",
-      opts: ["It's when retail traders start their day", "It creates a massive liquidity injection and is the most common time for the Candle 2 Manipulation (Turtle Soup)", "It's when all Kill Zones converge", "It marks the end of the London session"],
-      a: 1,
-      exp: "The NYSE open at 9:30 AM creates a massive surge of orders — the largest liquidity injection of the day. This is the most common moment for Smart Money to execute the Turtle Soup (Candle 2 Manipulation) before Candle 3 delivers the real move."
-    }, {
-      q: "A perfect Model 1 setup at 3 AM Saturday has the same probability as the same setup during the NY Kill Zone on Tuesday.",
-      type: "tf",
-      a: false,
-      exp: "False. Same setup, completely different probability. Time is the critical variable. The Saturday setup has almost no probability because Smart Money isn't active — there's no liquidity to drive the move. Time overrides the pattern."
-    }, {
-      q: "The London Kill Zone runs:",
-      type: "mc",
-      opts: ["5:00 AM to 8:00 AM New York time", "1:00 AM to 5:00 AM New York time", "12:00 AM to 3:00 AM New York time", "3:00 AM to 7:00 AM New York time"],
-      a: 1,
-      exp: "The London Kill Zone runs 1:00 AM to 5:00 AM New York time. This is pre-London and the London open — where the daily high or low most frequently forms. Smart Money is most active during this window for many pairs."
-    }, {
-      q: "Which day of the week most commonly forms the real weekly high or low?",
-      type: "mc",
-      opts: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-      a: 1,
-      exp: "Tuesday. In the base weekly profile, Monday is Accumulation (establishing the range) and Tuesday is Manipulation — the real weekly high or low forms here through the Turtle Soup. A Model 1 on Tuesday during a Kill Zone at a key level is the highest probability setup of the week."
-    }, {
-      q: "Thursday and Friday in the weekly profile typically represent:",
-      type: "mc",
-      opts: ["The best entry opportunities of the week", "The weekly top — when the weekly extreme is most likely to form", "A second manipulation phase", "Accumulation for the following week"],
-      a: 1,
-      exp: "Thursday and Friday typically cap the weekly range — the weekly top. A Model 1 at a key level during Thursday or Friday timing creates the highest probability condition in the weekly cycle: time AND price meeting simultaneously."
-    }, {
-      q: "Outside of Kill Zones, price action is best described as:",
-      type: "mc",
-      opts: ["The highest probability trading time", "Mostly noise — low probability for CRT setups", "A secondary window with decent setups", "The time for swing trade entries"],
-      a: 1,
-      exp: "Outside Kill Zones, price is mostly noise. Smart Money is not actively delivering price. You're looking at random movement without the institutional backing that makes CRT setups work. Train yourself to focus only on Kill Zone windows."
-    }, {
-      q: "\"Price levels are useless until time is considered\" means:",
-      type: "mc",
-      opts: ["You should only trade based on time", "A good level at the wrong time has dramatically reduced probability", "Time is more important than the level", "Kill Zones create the levels"],
-      a: 1,
-      exp: "Both matter — but time is the variable that activates the level. A perfect structural level outside a Kill Zone, outside a Tuesday/Thursday-Friday window, has low probability. The level is waiting. Time is what activates it."
-    }]
-  },
-  11: {
-    slides: [{
-      icon: "🎯",
-      t: "One Candle. One Rule. One Trigger.",
-      b: "Model 1 is the main CRT entry. Not a zone. Not a pattern. One specific candle: thick, decisive, pushing beyond an old high or low — and then CLOSING BACK INSIDE. That close is the trigger. That's it.",
-      d: "The moment that candle closes back inside the range, you know: the Turtle Soup has confirmed. Price attempted to break out, failed to hold it, and the manipulation is complete. The close tells you it's real."
-    }, {
-      icon: "📏",
-      t: "The Model 1 Requirements",
-      b: "Must be THICK — a thin wick is not a Model 1. Must hit a SIGNIFICANT old high or low — not a random level you marked. Must occur during the correct TIME — a Kill Zone. A Fair Value Gap inside the Model 1 candle increases probability significantly.",
-      d: "Selectivity is the edge. Every thick candle at a random level is not a Model 1. Every wick at a significant level without a close back inside is not a Model 1. All three conditions must be present."
-    }, {
-      icon: "📐",
-      t: "Stop, Targets, and Management",
-      b: "Stop loss: above the wick (bearish) or below the wick (bullish). Fixed. Never moved. Target 1: the 50% of the CRT range — mandatory partial on every trade, no exceptions. Target 2: the opposite extreme of the CRT range.",
-      d: "The 50% partial is sacred. It's not optional. Taking it guarantees you a positive outcome on the trade even if Target 2 never arrives. It also frees your mental state to hold the remainder without anxiety."
-    }],
-    quiz: [{
-      q: "Model 1 is:",
-      type: "mc",
-      opts: ["A 3-candle reversal pattern", "One specific thick candle that nails an old high/low and closes back inside the range", "A zone identified by multiple candles", "Any candle that makes a new high or low"],
-      a: 1,
-      exp: "Model 1 is ONE specific candle — thick, decisive, pushing beyond a structural old high or low, and then CLOSING BACK INSIDE the range. The close is the trigger. One candle, one rule, one trigger."
-    }, {
-      q: "Any candle that touches an old high or low qualifies as a Model 1.",
-      type: "tf",
-      a: false,
-      exp: "False. The candle must be THICK and DECISIVE — a small thin wick is not a Model 1. It must hit a SIGNIFICANT structural level, not a random level. And it must occur during the correct time window (Kill Zone). All three requirements must be met."
-    }, {
-      q: "The trigger for a Model 1 entry is:",
-      type: "mc",
-      opts: ["When price reaches the old high or low", "When the wick pushes beyond the level", "When the candle CLOSES BACK INSIDE the range", "When the next candle confirms direction"],
-      a: 2,
-      exp: "The CLOSE back inside the range is the trigger. Not the wick, not when price touches the level — the moment that candle closes back inside confirms the Turtle Soup. Entering before the close leaves you vulnerable to the failure swing."
-    }, {
-      q: "Where do you place the stop loss on a Bearish Model 1?",
-      type: "mc",
-      opts: ["Below the Model 1 candle's close", "Above the previous swing high", "Above the wick of the Model 1 candle", "At a 2% account risk level above entry"],
-      a: 2,
-      exp: "Stop loss goes above the WICK of the Model 1 candle (for bearish). Below the wick for bullish. This is fixed — it never moves, never adjusts to break even early, never trails until your rules say to. Fixed stop, defined risk."
-    }, {
-      q: "Target 1 on every Model 1 trade is the 50% of the CRT range, and it is mandatory.",
-      type: "tf",
-      a: true,
-      exp: "True. The 50% partial is sacred and non-negotiable. It guarantees a positive outcome on the trade even if Target 2 doesn't arrive. Romeo repeats this throughout the system: take partial at the 50%. Every trade. No exceptions."
-    }, {
-      q: "A Fair Value Gap inside the Model 1 candle:",
-      type: "mc",
-      opts: ["Invalidates the setup — too much imbalance", "Is required for a valid Model 1", "Increases the probability of the setup significantly", "Is irrelevant to Model 1 analysis"],
-      a: 2,
-      exp: "A Fair Value Gap inside the Model 1 candle increases probability significantly. It means the move had enough momentum to leave an imbalance — confirming that the Turtle Soup had conviction behind it."
-    }, {
-      q: "You should enter a Model 1 trade when the wick extends beyond the old high, before the candle closes.",
-      type: "tf",
-      a: false,
-      exp: "False. Never enter before the close. The wick phase is still in progress — price could continue and close beyond the level, making it a True Break, not a Turtle Soup. The close is the confirmation. Wait for it."
-    }, {
-      q: "A Model 1 at a valid structural level during a Kill Zone on Tuesday is:",
-      type: "mc",
-      opts: ["An average probability setup", "One of the highest probability setups in CRT", "Too obvious to be valid", "Only valid for the London session"],
-      a: 1,
-      exp: "Model 1 + valid structural level + Kill Zone timing + Tuesday = one of the highest probability configurations in the entire CRT system. Time (Tuesday/Kill Zone) + structure (significant old high/low) + trigger (Model 1 close) = maximum edge."
-    }]
-  },
-  12: {
-    slides: [{
-      icon: "💀",
-      t: "Always Before the Target. Always.",
-      b: "The Kiss of Death Turtle Soup is the final fake move that occurs right before price reaches its target. Without exception — every time a target is about to be hit, the market makes one last attempt to shake you out and trap new traders in the wrong direction.",
-      d: "Romeo says it directly: it's guaranteed. It's written. It is destined that there be a Kiss of Death before the target. Once you know it exists, you stop being its victim and start anticipating it."
-    }, {
-      icon: "🎭",
-      t: "Why It Exists — the Perfect Logic",
-      b: "When price approaches a target — say, a significant old low — retail traders see what looks like a floor forming. ICT traders see an FVG and go long. SMC traders see an Order Block and go long. Pattern traders see a double bottom and go long. All those long positions become the fuel for the final vicious move down.",
-      d: "The Kiss of Death exists because it needs trapped traders. Their wrong-side positions are the fuel Smart Money uses for the final delivery to the target. Maximum trapped traders = maximum move velocity."
-    }, {
-      icon: "🔍",
-      t: "How to Find and Trade It",
-      b: "The KOD usually appears in the lower 25% of the range (bearish) or upper 25% (bullish). A False Change of Character always accompanies it. To trade it: find a Model 1 on the lower timeframe INSIDE the Kiss of Death candle.",
-      d: "If the Kiss of Death forms, Entries 3 and 4 have expired. The KOD is now the only valid remaining entry — Entry 5. It's typically the fastest and most violent move of the entire sequence."
-    }],
-    quiz: [{
-      q: "The Kiss of Death appears:",
-      type: "mc",
-      opts: ["Sometimes, before major moves", "Always, before every target — without exception", "Only in bearish markets", "Only during the New York session"],
-      a: 1,
-      exp: "Always. Without exception. Romeo guarantees it. Before every target is reached, the market performs one final fake move. The Kiss of Death is not occasional — it's guaranteed. Planning for it is mandatory."
-    }, {
-      q: "The Kiss of Death is designed to:",
-      type: "mc",
-      opts: ["Signal that the target won't be reached", "Shake out traders who correctly identified the trade, and trap new traders on the wrong side", "Confirm the direction of the trade", "Create a better entry for the move"],
-      a: 1,
-      exp: "The KOD serves two purposes simultaneously: shake out the traders who correctly read the setup (causing them to exit before the target), and trap new traders on the wrong side (creating fuel for the final move)."
-    }, {
-      q: "A False Change of Character always accompanies the Kiss of Death.",
-      type: "tf",
-      a: true,
-      exp: "True. The False CoC is the structural mechanism of the Kiss of Death. It looks like a real structural reversal — and that's why ICT and SMC traders enter the wrong side. It's designed to be convincing."
-    }, {
-      q: "To trade the Kiss of Death, you:",
-      type: "mc",
-      opts: ["Enter immediately when you identify the KOD forming", "Find a Model 1 on the lower timeframe INSIDE the Kiss of Death candle", "Wait for a confirmed reversal", "Exit your existing trade and reverse direction"],
-      a: 1,
-      exp: "Find a Model 1 on the lower timeframe inside the KOD candle. This gives you the precise entry for Entry 5. You're not guessing — you're using the same Model 1 trigger at a lower timeframe to enter the most violent part of the move."
-    }, {
-      q: "The Kiss of Death typically forms where in the CRT range?",
-      type: "mc",
-      opts: ["At the midpoint (50%) of the range", "In the lower 25% for bearish moves, upper 25% for bullish", "At the exact target level", "In the first 10% of the range after entry"],
-      a: 1,
-      exp: "Lower 25% for bearish moves (just before the final low), upper 25% for bullish (just before the final high). It also frequently forms at the OTE (60-75% Fibonacci) where ICT traders typically enter — trapping them perfectly."
-    }, {
-      q: "When you see the Kiss of Death forming, you should exit your trade.",
-      type: "tf",
-      a: false,
-      exp: "False. The Kiss of Death is confirmation to HOLD — or even add to your position. It means the target is imminent. Exiting during the KOD is one of the most expensive mistakes in CRT — you exit right before the biggest move."
-    }, {
-      q: "If the Kiss of Death forms, which entry numbers have expired?",
-      type: "mc",
-      opts: ["Only Entry 1", "Entries 1 and 2", "Entries 3 and 4 — only Entry 5 (KOD) remains", "All entries are expired"],
-      a: 2,
-      exp: "When the KOD forms, Entries 3 (Breaker Block) and 4 (OTE) have expired. Entry 5, the Kiss of Death itself, is the only valid remaining entry. It's the last opportunity before the target."
-    }, {
-      q: "The Kiss of Death move is typically the fastest and most violent of the entire sequence because:",
-      type: "mc",
-      opts: ["Volatility always increases near targets", "The maximum number of traders are trapped on the wrong side at once", "Smart Money accelerates near targets", "Volume is highest near support and resistance"],
-      a: 1,
-      exp: "Maximum trapped traders = maximum velocity. By the time the KOD forms, ICT traders, SMC traders, pattern traders — everyone has entered the wrong side. Their positions are the fuel for the explosive final move to the target."
-    }]
-  },
-  13: {
-    slides: [{
-      icon: "🗝️",
-      t: "The Gap Price Always Returns to Fill",
-      b: "A Fair Value Gap (FVG) is a 3-candle formation where Candle 2 moved so fast in one direction that the area between Candle 1's extreme and Candle 3's extreme was never covered. Price will return to fill that gap — it acts as a magnet.",
-      d: "Think of price as a paintbrush. When the brush moves too fast, it leaves spots on the wall. Those spots — the FVGs — are areas price must return to complete the picture. They're imbalances the market needs to resolve."
-    }, {
-      icon: "📏",
-      t: "The 50% Rule — The Most Critical Level",
-      b: "Within every FVG, the 50% level is the critical threshold. As long as price doesn't close decisively beyond the 50%, the FVG remains valid and active. A decisive close beyond the 50% invalidates the FVG.",
-      d: "The 50% is where the FVG has the most value as an entry or target. Too shallow (not enough fill) or too deep (50% breached) changes the analysis. The 50% level is the decision point."
-    }, {
-      icon: "⬆️",
-      t: "High-Probability FVG Conditions",
-      b: "The FVG whose impulse move also broke a significant high or low carries maximum probability. When the impulse that created the FVG also swept structural liquidity, the FVG has the full market backing behind it.",
-      d: "An FVG created during a random small move carries low weight. An FVG created when price swept an old high or low, left an imbalance, and continued — that FVG is backed by a structural event. Order Block + FVG at the same level = maximum confluence."
-    }],
-    quiz: [{
-      q: "A Fair Value Gap (FVG) is:",
-      type: "mc",
-      opts: ["A gap on the daily chart between sessions", "A 3-candle formation where price moved too fast and left an imbalance", "A zone between support and resistance", "A double candle reversal pattern"],
-      a: 1,
-      exp: "An FVG is a 3-candle formation. Candle 2 moved so fast in one direction that the space between Candle 1's extreme and Candle 3's extreme was never covered. Price treats this gap as a magnet — it will return to fill it."
-    }, {
-      q: "A Fair Value Gap acts as a magnet — price always returns to fill it.",
-      type: "tf",
-      a: true,
-      exp: "True. The FVG represents an imbalance — an area price moved through too quickly. Markets seek balance. Price will return to fill the FVG, making it a reliable target and entry zone in CRT analysis."
-    }, {
-      q: "The 50% rule of an FVG states that:",
-      type: "mc",
-      opts: ["You take profit at exactly 50% of the FVG", "If price closes beyond 50% of the FVG, the level is invalidated", "The FVG only fills exactly 50% of the way", "You enter at 50% of the FVG always"],
-      a: 1,
-      exp: "A decisive close beyond 50% of the FVG invalidates it. The 50% level is the critical threshold. While the level is active, the 50% is also the highest probability entry within the FVG — not too early, not too late."
-    }, {
-      q: "An FVG whose impulse move also broke a significant high or low is:",
-      type: "mc",
-      opts: ["Lower quality — too much happened at once", "The same probability as any other FVG", "Higher probability — backed by structural liquidity collection", "Invalid — too complex to trade"],
-      a: 2,
-      exp: "When the impulse that created the FVG also swept structural liquidity (broke an old high or low), that FVG has the full backing of the market. It's not just an imbalance — it's an imbalance created by a meaningful structural event."
-    }, {
-      q: "In CRT, FVGs are classified as:",
-      type: "mc",
-      opts: ["External Liquidity — final targets", "Internal Liquidity — filled on pullbacks before reaching external targets", "Higher Timeframe levels", "Entry triggers only"],
-      a: 1,
-      exp: "FVGs are Internal Liquidity (IRL) — they're filled on pullbacks on the way to External Liquidity targets. Price sweeps ERL (old highs/lows), retraces to fill IRL (FVGs/OBs), then hunts the next ERL."
-    }, {
-      q: "Order Block + FVG at the same price level creates:",
-      type: "mc",
-      opts: ["A conflicting signal — avoid it", "Maximum confluence — the highest probability condition", "A double confirmation to fade", "An invalidated level"],
-      a: 1,
-      exp: "OB + FVG at the same level = maximum confluence. Two separate CRT tools pointing to the same area doubles the probability and precision. Romeo mentions this as the highest probability condition for key levels."
-    }, {
-      q: "A random FVG from a small intraday move carries the same weight as one created by a structural sweep.",
-      type: "tf",
-      a: false,
-      exp: "False. Context matters enormously. An FVG created when price swept a significant old high or low — backed by a structural liquidity event — carries far more weight than a random small-move FVG with no structural backing."
-    }, {
-      q: "The FVG is identified using:",
-      type: "mc",
-      opts: ["5 candles — looking for a gap in the pattern", "3 candles — the space between Candle 1 extreme and Candle 3 extreme", "2 candles — a gap between their bodies", "Any gap in the chart visible to the eye"],
-      a: 1,
-      exp: "The FVG requires exactly 3 candles. Candle 1 creates the base extreme. Candle 2 is the fast impulsive move. Candle 3 continues but doesn't cover the space between Candle 1's extreme and its own opposite extreme. That uncovered space is the FVG."
-    }]
-  },
-  14: {
-    slides: [{
-      icon: "📦",
-      t: "Where Smart Money Left Its Footprint",
-      b: "An Order Block is an area of balanced price delivery — where price went both directions before a major move. Unlike an FVG (one-directional), an Order Block is a zone where the market both bought AND sold before committing.",
-      d: "Think of it as the last consolidation before a major move. Smart Money was accumulating or distributing in that area. When price returns to it, they defend it. That's why Order Blocks react so consistently."
-    }, {
-      icon: "🔄",
-      t: "Bearish vs Bullish Order Blocks",
-      b: "In a bullish market: bearish (red) close candles become support — these are bullish Order Blocks. In a bearish market: bullish (green) close candles become resistance — these are bearish Order Blocks. The opposite color is the Order Block.",
-      d: "The logic: in a bullish trend, the last bearish candle before the big impulsive move up is where Smart Money placed their buy orders. When price returns to that area, they defend it. Counter-intuitive but consistent."
-    }, {
-      icon: "⚡",
-      t: "The Key Rules",
-      b: "The 50% of the Order Block is critical — until there's a decisive close through the 50%, the level stays active. A high-probability Order Block is almost always followed by a Fair Value Gap. The highest-quality OBs are from the higher timeframes.",
-      d: "An OB without an FVG following it is a lower-quality setup. But OB + FVG at the same level creates maximum confluence — two CRT tools pointing to the same area, doubling the probability and precision."
-    }],
-    quiz: [{
-      q: "An Order Block is:",
-      type: "mc",
-      opts: ["A one-directional price imbalance like an FVG", "An area where price went both directions before a major move — balanced delivery", "A Japanese candlestick pattern", "A zone created by volume clusters"],
-      a: 1,
-      exp: "An Order Block is an area of balanced price delivery — price went both directions there before committing to a major move. This is different from a Fair Value Gap (one-directional fast move). The OB shows where Smart Money accumulated before the move."
-    }, {
-      q: "In a bullish trending market, which candle type acts as a bullish Order Block?",
-      type: "mc",
-      opts: ["The last bullish (green) candle before the move up", "The last bearish (red) candle before the impulsive move up", "The largest candle in the move", "Any candle with a long wick downward"],
-      a: 1,
-      exp: "In a bullish market, bearish (red) close candles act as support — these are bullish Order Blocks. The last bearish candle before a significant upward impulse is where Smart Money placed their buy orders. Counter-intuitive but consistent."
-    }, {
-      q: "In a bearish market, bullish candles act as bearish Order Blocks (resistance).",
-      type: "tf",
-      a: true,
-      exp: "True. In a bearish market, the last bullish candle before a significant downward impulse marks where Smart Money placed their sell orders. When price retraces to that area, they defend it as resistance — a bearish Order Block."
-    }, {
-      q: "An Order Block in CRT is essentially:",
-      type: "mc",
-      opts: ["A volume-based support/resistance zone", "A supply and demand zone from SMC trading", "An old CRT range that was broken, which acts as support/resistance on retest", "A triple touch price level"],
-      a: 2,
-      exp: "An Order Block is an old CRT that was broken. The range where price consolidated before a breakout — when retested, it acts as a balanced area that rejects price in the other direction. It's a broken CRT range."
-    }, {
-      q: "The 50% level of an Order Block is:",
-      type: "mc",
-      opts: ["Where you always place your stop loss", "The critical threshold — a decisive close through it invalidates the OB", "Where you take partial profits", "The midpoint of the candle body only"],
-      a: 1,
-      exp: "The 50% is the decision threshold. Until price closes decisively through the 50% of the Order Block, the level remains valid and active. A decisive close through the 50% invalidates the OB as a key level."
-    }, {
-      q: "The highest-probability Order Blocks are from:",
-      type: "mc",
-      opts: ["The 5-minute chart — most precise", "The lower timeframes — most recent", "The higher timeframes — daily, weekly, 4H", "The same timeframe as your entry"],
-      a: 2,
-      exp: "Higher timeframe OBs (daily, weekly, 4H) carry the most weight. A daily OB is backed by more institutional activity than a 5-minute OB. Always prioritize Order Blocks from the higher timeframes for key levels."
-    }, {
-      q: "An Order Block that is followed by a Fair Value Gap creates:",
-      type: "mc",
-      opts: ["A conflicting signal — avoid the area", "Maximum confluence — the highest probability condition", "A triple confirmation — too obvious to trade", "An invalidated level due to too much structure"],
-      a: 1,
-      exp: "OB + FVG at the same level creates maximum confluence. Two separate CRT tools identifying the same area doubles the probability. Romeo mentions this specifically as the highest probability condition for any key level."
-    }, {
-      q: "Order Blocks provide less precision than Breaker Blocks in terms of drawdown.",
-      type: "tf",
-      a: true,
-      exp: "True. Breaker Blocks (Order Blocks that have been broken and flipped) provide the least drawdown of all CRT entries — Entry 3 in the five-entry sequence. Order Blocks are valid but Breaker Blocks have been through three price deliveries, making them more precise."
-    }]
-  },
-  15: {
-    slides: [{
-      icon: "🔄",
-      t: "The Order Block That Flipped",
-      b: "A Breaker Block is an Order Block that was broken and converted. What was support becomes resistance. What was resistance becomes support. But what makes the Breaker Block special is that price passed through the SAME AREA THREE TIMES.",
-      d: "Down, up, and down again — or the inverse. Three deliveries through the same price area makes it the most balanced location on the entire chart. The most balanced area gives the least drawdown on entry."
-    }, {
-      icon: "🎯",
-      t: "Why It's the Most Precise Entry",
-      b: "A Breaker Block from the intermediate timeframe is frequently the same level as an Order Block from the higher timeframe seen from below — the same area at two speeds. This creates dual-timeframe confirmation of the level.",
-      d: "Some traders only enter on Breaker Blocks specifically because of the precision and low drawdown. Entry 3 in the five-entry sequence. Not the first entry, not the highest reward — but arguably the most consistent."
-    }, {
-      icon: "📊",
-      t: "Where It Sits in the System",
-      b: "Breaker Block = Entry 3 in the five-entry sequence. After the Turtle Soup (Entry 1 or 2) and before the OTE (Entry 4) and Kiss of Death (Entry 5). The Breaker Block IS the true Change of Character — they are the same event.",
-      d: "The Breaker Block and the true CoC are one single decisive close — the close above the high that broke the lower low (bullish), or close below the low that broke the higher high (bearish). They are not two separate things."
-    }],
-    quiz: [{
-      q: "A Breaker Block is:",
-      type: "mc",
-      opts: ["A new type of candlestick pattern", "An Order Block that was broken and flipped — support becomes resistance or vice versa", "A large volume candle that breaks a level", "A consolidation zone before a breakout"],
-      a: 1,
-      exp: "A Breaker Block is an Order Block that was broken and converted. The key that made it support now makes it resistance, and vice versa. Price passed through the area three times — down, up, and down again (or inverse)."
-    }, {
-      q: "What makes a Breaker Block more precise than a regular Order Block?",
-      type: "mc",
-      opts: ["It forms on higher timeframes only", "Price passed through the same area THREE times, making it the most balanced area on the chart", "It always has a Fair Value Gap inside it", "It forms during Kill Zones only"],
-      a: 1,
-      exp: "Three price deliveries through the same area make it the most balanced — and therefore most sensitive — location on the chart. This precision is why Breaker Blocks provide the least drawdown of all CRT entry types."
-    }, {
-      q: "Breaker Blocks provide the least drawdown of all CRT entries.",
-      type: "tf",
-      a: true,
-      exp: "True. Three passes through the same price area make it the most balanced location on the chart. The more balanced the area, the more sensitive price is to it on retest, and the less room price needs to move against you before reacting."
-    }, {
-      q: "In the five-entry sequence, a Breaker Block corresponds to:",
-      type: "mc",
-      opts: ["Entry 1", "Entry 2", "Entry 3", "Entry 5"],
-      a: 2,
-      exp: "Entry 3. After the Turtle Soup wick (Entry 1) and Model 1 close (Entry 2), the Breaker Block is Entry 3. It requires more patience (more confirmation has occurred) but provides the most precise, lowest-drawdown entry of the earlier entries."
-    }, {
-      q: "The Breaker Block and the true Change of Character are:",
-      type: "mc",
-      opts: ["Related but separate events", "The same single event — one decisive close that does both simultaneously", "Only similar in appearance but different in function", "Both occur on the higher timeframe"],
-      a: 1,
-      exp: "They are the same event. The close above the high that broke the lower low (bullish) IS both the Breaker Block and the true Change of Character — simultaneously. One decisive close. Not two separate things. This is a common confusion in CRT."
-    }, {
-      q: "Some advanced traders only enter on Breaker Blocks because:",
-      type: "mc",
-      opts: ["They are the highest reward entry", "They require no higher timeframe confirmation", "The precision and low drawdown make them the most consistent entry type", "They form more frequently than Model 1"],
-      a: 2,
-      exp: "The precision of a Breaker Block — stemming from three price deliveries through the same area — creates the least drawdown and most consistent entry. The trade-off is patience: you wait longer for confirmation, accepting less reward for more precision."
-    }, {
-      q: "A Breaker Block from the intermediate timeframe is often:",
-      type: "mc",
-      opts: ["Invalid because it's not from the HTF", "The same level as an Order Block from the higher timeframe seen from a different angle", "Only valid for short-term trades", "A less reliable version of the Order Block"],
-      a: 1,
-      exp: "A Breaker Block on the intermediate timeframe is frequently the same level as an Order Block from the higher timeframe — the same structural significance viewed from two different speeds. This creates dual-timeframe confirmation of the level."
-    }, {
-      q: "To identify a bearish Breaker Block, you look for:",
-      type: "mc",
-      opts: ["A bullish candle followed by a bearish candle", "A bullish Order Block that was broken downward — old support now acting as resistance", "Price making three consecutive lower lows", "Any candle that closes below an old Order Block"],
-      a: 1,
-      exp: "A bearish Breaker Block is a bullish Order Block that was broken — what was support is now resistance. Price delivered upward (creating the original OB), broke down through it, and now returns to that same area where it acts as resistance."
-    }]
-  },
-  16: {
-    slides: [{
-      icon: "🔢",
-      t: "Five Opportunities. Fixed Order. Never Backward.",
-      b: "From the moment the Turtle Soup occurs to the moment price reaches the target, there are exactly five entry points. They appear in a fixed order. Every entry that passes is an entry that has expired. You cannot go backward.",
-      d: "Entry 1: in the Turtle Soup wick. Entry 2: Model 1 close. Entry 3: Breaker Block / true CoC. Entry 4: OTE 60-75% Fibonacci. Entry 5: Kiss of Death. In order. Always."
-    }, {
-      icon: "⚖️",
-      t: "The Trade-off: Confirmation vs Reward",
-      b: "Lower in the sequence = more confirmation, less reward. Higher in the sequence = less confirmation, more reward. Entry 1 has the biggest reward but requires thousands of hours. Entry 5 is the most confirmed but the reward is the final violent push.",
-      d: "Entry 2 (Model 1) is Romeo's public entry — master this before anything else. Once you can trade Entry 2 consistently, you have everything you need. The other entries are refinements."
-    }, {
-      icon: "⏩",
-      t: "The Sequence Doesn't Wait",
-      b: "If Entry 3 (Breaker Block) was reached — Entries 3 and 4 have expired. Wait only for Entry 5 (KOD). If Entry 1 passed — move forward to Entry 2. The market doesn't give you a second chance at a passed entry.",
-      d: "Understanding the sequence prevents a common mistake: chasing Entry 2 after Entry 3 has formed, or trying to re-enter on Entry 1 after the Model 1 already closed. The sequence only moves forward."
-    }],
-    quiz: [{
-      q: "The five entries in CRT appear in what order?",
-      type: "mc",
-      opts: ["Model 1, Turtle Soup, OTE, Breaker, KOD", "Turtle Soup wick, Model 1, Breaker Block, OTE, Kiss of Death", "Breaker Block, Model 1, OTE, Turtle Soup, KOD", "KOD, OTE, Breaker, Model 1, Turtle Soup wick"],
-      a: 1,
-      exp: "Turtle Soup wick (Entry 1) → Model 1 close (Entry 2) → Breaker Block/true CoC (Entry 3) → OTE 60-75% Fibonacci (Entry 4) → Kiss of Death (Entry 5). Fixed order. Always in this sequence."
-    }, {
-      q: "You can go backward in the five-entry sequence if you missed an earlier entry.",
-      type: "tf",
-      a: false,
-      exp: "False. Every entry that passes is expired. If Entry 3 formed, you cannot go back to Entry 2. If Entry 4 formed, you can only wait for Entry 5. The sequence only moves forward — the market doesn't give second chances on passed entries."
-    }, {
-      q: "Entry 1 (the Turtle Soup wick) is:",
-      type: "mc",
-      opts: ["The easiest entry — most confirmation available", "Romeo's public entry that all students learn first", "Romeo's personal entry — requires thousands of hours and deep intuitive reading", "The most commonly taken entry in CRT"],
-      a: 2,
-      exp: "Entry 1 is Romeo's personal entry — not publicly taught in detail. It requires entering in the wick before the candle even closes. This demands thousands of hours of chart experience and deep intuition. Students learn Entry 2 first."
-    }, {
-      q: "Romeo's publicly taught entry is:",
-      type: "mc",
-      opts: ["Entry 1 — Turtle Soup wick", "Entry 2 — Model 1 close", "Entry 3 — Breaker Block", "Entry 5 — Kiss of Death"],
-      a: 1,
-      exp: "Entry 2, the Model 1 close, is Romeo's public entry — what he teaches to all students. It's the foundation. Master this before considering any other entry. Consistent Entry 2 trading is sufficient for profitable CRT trading."
-    }, {
-      q: "The OTE (Entry 4) is:",
-      type: "mc",
-      opts: ["The 50% retracement of the CRT range", "The 60-75% Fibonacci retracement from the Turtle Soup", "The Open-To-Entry level at the daily open", "The 38% Fibonacci retracement"],
-      a: 1,
-      exp: "OTE = Optimal Trade Entry = 60-75% Fibonacci retracement from the Turtle Soup. This is also where ICT traders typically enter — and where the Kiss of Death frequently forms to trap them. Valid entry but be aware of that risk."
-    }, {
-      q: "When Entry 3 (Breaker Block) has formed, you should:",
-      type: "mc",
-      opts: ["Go back and take Entry 2 — it's higher probability", "Take Entry 3 immediately", "Wait for Entry 5 (Kiss of Death) — Entries 3 and 4 have expired", "Start the sequence over from Entry 1"],
-      a: 2,
-      exp: "When Entry 3 forms, Entries 3 and 4 have expired. You wait ONLY for Entry 5 — the Kiss of Death. If you missed Entry 3, there is no going back. The next valid entry in the sequence is Entry 5."
-    }, {
-      q: "Entry 5 (Kiss of Death) typically produces:",
-      type: "mc",
-      opts: ["The smallest move — most confirmation required", "The most confirmed but slowest move", "The fastest and most violent move — maximum trapped traders on the wrong side", "A moderate move with medium probability"],
-      a: 2,
-      exp: "Entry 5 is the fastest and most violent move because the maximum number of traders are trapped on the wrong side at the moment it occurs. ICT traders, SMC traders, pattern traders — all positioned wrong. Their orders are the fuel."
-    }, {
-      q: "Lower in the five-entry sequence means:",
-      type: "mc",
-      opts: ["Less confirmation and more reward", "More confirmation and less potential reward", "Better probability and more reward", "No difference — all entries have equal reward"],
-      a: 1,
-      exp: "Lower in the sequence (Entry 4, 5) = more confirmation, less potential reward (price has already moved significantly). Higher in the sequence (Entry 1, 2) = less confirmation, greater potential reward. This is the fundamental trade-off in the system."
-    }]
-  },
-  17: {
-    slides: [{
-      icon: "🔗",
-      t: "When One Asset Tells On the Other",
-      b: "Two correlated assets should take the same highs and lows together at the same time. When one takes a high that its correlated partner does NOT — that divergence is a signal. The move is weak. A reversal is probable.",
-      d: "Example: Bitcoin and Ethereum are directly correlated. If Bitcoin takes a new high but Ethereum doesn't — Bitcoin's new high is likely fake. Ethereum's failure to confirm tells you Smart Money doesn't have conviction for that move."
-    }, {
-      icon: "📊",
-      t: "The Main Correlated Pairs",
-      b: "EUR/USD vs DXY: inverse. GBP/USD vs DXY: inverse. BTC vs ETH: direct. S&P 500 vs NASDAQ vs Dow: direct. Gold vs Silver (XAU/XAG): direct. When inverses diverge, or when direct pairs diverge — it's a signal.",
-      d: "Charles Dow described this concept in the 19th century. ICT didn't invent it. Markets naturally move in correlation because they share underlying drivers. When that correlation breaks, it signals artificial movement — Smart Money at work."
-    }, {
-      icon: "🚦",
-      t: "How to Use SMT — the Rules",
-      b: "Step 1: Identify the divergence — one asset takes a high/low, its partner doesn't. Step 2: Wait for the Model 1 on the asset that took the level. Step 3: Enter. Never trade SMT alone — it always requires Model 1 confirmation.",
-      d: "Only look for bullish SMT in a bullish higher timeframe market. Only bearish SMT in a bearish market. SMT = expansion signal — it always precedes a major directional move. The divergence is the warning. The Model 1 is the trigger."
-    }],
-    quiz: [{
-      q: "SMT (Smart Money Technique) signals when:",
-      type: "mc",
-      opts: ["Price makes a new high on strong volume", "One correlated asset takes a high/low that its partner does NOT", "Two assets move in the same direction simultaneously", "A correlated pair confirms the same high or low"],
-      a: 1,
-      exp: "SMT divergence occurs when one asset takes a high or low that its correlated partner fails to confirm. This divergence signals that the move is artificial — Smart Money doesn't have conviction behind it, making a reversal probable."
-    }, {
-      q: "EUR/USD and DXY (Dollar Index) are directly correlated — they move in the same direction.",
-      type: "tf",
-      a: false,
-      exp: "False. EUR/USD and DXY are INVERSELY correlated. When EUR/USD goes up, DXY typically goes down, and vice versa. This is the core of their SMT relationship — when one takes a new high and the other fails to confirm the new low, it's a divergence signal."
-    }, {
-      q: "You can take a trade based on SMT divergence alone, without a Model 1.",
-      type: "tf",
-      a: false,
-      exp: "False. SMT alone is never enough. It requires Model 1 confirmation. The SMT divergence tells you a move is weak and reversal is probable — but the Model 1 close gives you the precise trigger to enter. One without the other reduces probability significantly."
-    }, {
-      q: "Bitcoin takes a new high but Ethereum fails to confirm. In CRT terms, this signals:",
-      type: "mc",
-      opts: ["Bitcoin is stronger than Ethereum — follow Bitcoin higher", "Bitcoin's new high is likely fake — bearish SMT signal", "Both assets will continue higher eventually", "An arbitrage opportunity between the two assets"],
-      a: 1,
-      exp: "If Bitcoin takes a new high but Ethereum (directly correlated) doesn't confirm by taking its corresponding high, Bitcoin's move is likely fake — a Turtle Soup. This is a bearish SMT signal for Bitcoin."
-    }, {
-      q: "SMT was originally described by:",
-      type: "mc",
-      opts: ["ICT (Inner Circle Trader) in the 2000s", "Charles Dow in the 19th century", "Romeo, creator of CRT", "Smart Money traders in the 1980s"],
-      a: 1,
-      exp: "Charles Dow described this concept in the 19th century — Dow Theory's confirmation principle. ICT popularized it in modern trading, but the concept predates him significantly. Understanding its origins clarifies why it works."
-    }, {
-      q: "A bullish SMT signal for EUR/USD would occur when:",
-      type: "mc",
-      opts: ["EUR/USD makes a new high and DXY also makes a new high", "EUR/USD takes a new low but DXY fails to take the corresponding new high", "Both EUR/USD and DXY fall simultaneously", "EUR/USD volume exceeds DXY volume"],
-      a: 1,
-      exp: "EUR/USD takes a new low (bearish move in EUR) but DXY fails to take the corresponding new high. This means Dollar strength isn't confirmed — the EUR/USD low is fake. Bullish SMT signal: expect EUR/USD to reverse upward."
-    }, {
-      q: "SMT signals always precede:",
-      type: "mc",
-      opts: ["A temporary pause in the trend", "A small pullback before continuation", "A major directional move — SMT is an expansion signal", "An increase in trading volume"],
-      a: 2,
-      exp: "SMT = expansion signal. It always precedes a major directional move. The divergence signals that Smart Money is setting up a significant move in one direction — the Model 1 confirms it and the Candle 3 delivers it."
-    }, {
-      q: "Which pairs are directly correlated in CRT?",
-      type: "mc",
-      opts: ["EUR/USD and GBP/USD vs DXY", "S&P 500, NASDAQ, and Dow Jones", "EUR/USD and DXY", "GBP/USD and EUR/USD vs Gold"],
-      a: 1,
-      exp: "S&P 500 (ES), NASDAQ (NQ), and Dow Jones (YM) are directly correlated — they should move together. Bitcoin and Ethereum are directly correlated. Gold and Silver are directly correlated. These are the primary direct correlation pairs in CRT."
-    }]
-  },
-  18: {
-    slides: [{
-      icon: "⚠️",
-      t: "The Trap That Destroys More Accounts Than Any Setup",
-      b: "A False Change of Character looks perfect. Lower highs, lower lows, clean structural break — textbook. ICT and SMC traders see it and immediately enter short. What actually happened: the Kiss of Death formed. Price reverses and leaves everyone trapped.",
-      d: "The false CoC is designed specifically to fool informed participants. It's not random noise — it's a precisely constructed trap targeting the most educated retail traders. Knowing CRT makes you a target for this trap."
-    }, {
-      icon: "✅",
-      t: "What a REAL Change of Character Looks Like",
-      b: "Swing low → swing high → lower low (retail stops purged violently) → clean decisive CLOSE above the swing high. That close — the one that broke the lower low and crossed the swing high simultaneously — is both the true CoC AND the Breaker Block.",
-      d: "The purge of the lower low is intentional — it eliminates informed participants and changes their bias before the real move. Real breakouts never allow easy participation. If the breakout feels comfortable to enter, treat it as suspicious."
-    }, {
-      icon: "🔍",
-      t: "The Verification Checklist",
-      b: "Before acting on any Change of Character: 1. Is there a key HTF level here? No key level = probably false. 2. Is the timing right? Kill Zone? Not a Kill Zone = reduced probability. 3. Does the correlated pair confirm? No SMT = be very cautious.",
-      d: "A lower timeframe CoC in an HTF premium zone is not a buy signal — it's a sell signal disguised as one. The most expensive mistakes happen when traders read a lower timeframe CoC without checking what the higher timeframe says."
-    }],
-    quiz: [{
-      q: "A real Change of Character requires:",
-      type: "mc",
-      opts: ["Three consecutive candles in the same direction", "A decisive CLOSE through the level — not just a wick", "Two timeframe confirmations", "A Fair Value Gap at the breakout level"],
-      a: 1,
-      exp: "A real CoC requires a decisive CLOSE — not just a wick through the level. A wick reveals deception; a close reveals intention. If price only wicked through the structural level without closing beyond it, it's not a real CoC."
-    }, {
-      q: "The Breaker Block and the true Change of Character are the same event.",
-      type: "tf",
-      a: true,
-      exp: "True. The decisive close above the swing high (that broke the lower low) IS simultaneously the true CoC AND the Breaker Block. One close. Two names for the same structural event. They are not separate occurrences."
-    }, {
-      q: "A false Change of Character is designed to trap:",
-      type: "mc",
-      opts: ["New traders who don't know CRT", "Traders who correctly identified the structural shift and entered early", "Random market participants", "Only ICT and SMC traders"],
-      a: 1,
-      exp: "The false CoC specifically targets informed traders who correctly read the structure. It looks textbook — exactly what ICT/SMC education teaches you to enter on. That's the trap: your education is the weapon used against you."
-    }, {
-      q: "A real breakout in CRT should feel comfortable and easy to enter.",
-      type: "tf",
-      a: false,
-      exp: "False. Real breakouts NEVER allow easy participation. They expand violently and make it feel like you're chasing. If a breakout lets you in comfortably, treat it with suspicion — it may be a false CoC designed to trap you."
-    }, {
-      q: "Before acting on any Change of Character, the first thing you must verify is:",
-      type: "mc",
-      opts: ["The pattern has three confirming candles", "Is there a significant HTF key level here?", "Is volume increasing on the breakout?", "Has price already moved 50 pips from the level?"],
-      a: 1,
-      exp: "Check the HTF level first. No significant HTF level = probably a false CoC. A lower timeframe CoC without a higher timeframe reason is likely the Kiss of Death in disguise. Always verify the HTF context before acting on structure."
-    }, {
-      q: "A lower timeframe Change of Character in an HTF premium zone is:",
-      type: "mc",
-      opts: ["A strong buy signal — confirmation at multiple levels", "A sell signal disguised as a buy signal", "A neutral signal — wait for more confirmation", "An invalid setup — ignore it"],
-      a: 1,
-      exp: "A lower timeframe CoC in an HTF premium zone is where most retail accounts go to die. It LOOKS like a buy setup. It IS a sell signal. Smart Money uses the structure to trap buyers in the premium zone before pushing price lower."
-    }, {
-      q: "A real Change of Character requires the lower low to be:",
-      type: "mc",
-      opts: ["Barely touched before reversing", "Violently purged — stops cleared out aggressively", "Only wicked below before recovering", "Preceded by a fake high"],
-      a: 1,
-      exp: "The purge must be violent and convincing. Smart Money needs to stop out the informed participants who were positioned correctly. A gentle, barely-touched lower low doesn't clear out enough stops to fuel the real move."
-    }, {
-      q: "No SMT confirmation on a Change of Character means:",
-      type: "mc",
-      opts: ["The setup is automatically invalid", "Be very cautious — probability is significantly reduced", "Wait for SMT before any other analysis", "The setup is stronger — fewer tools needed"],
-      a: 1,
-      exp: "No SMT confirmation = reduced probability. SMT divergence is one of the key verifiers of a true CoC. Without correlated pair confirmation, you're missing a significant layer of evidence that the move has institutional backing."
-    }]
-  },
-  19: {
-    slides: [{
-      icon: "📈",
-      t: "A Setup Factory — If You Know the Rules",
-      b: "A range is a defined area where price simultaneously rejects both the swing high and swing low. It's not indecision — it's accumulation. Smart Money is building positions on both sides before the real breakout.",
-      d: "Romeo says you can blindly go long below the range low or short above the range high with fairly high precision — the key is stop loss placement. The extremes are where the edge is."
-    }, {
-      icon: "📋",
-      t: "The Rules of Range Trading",
-      b: "Rule 1: Buy the range low. Sell the range high. Never the middle. Rule 2: The first breakout is almost always the fake — wait for the Turtle Soup of that breakout. Rule 3: Never go long after a false breakout above. Wait for the re-entry at the extreme.",
-      d: "Ranges end. They always end. The key levels of the higher timeframe tell you when. When the higher timeframe has a reason for price to break out in a particular direction, the range Turtle Soup confirms the direction."
-    }, {
-      icon: "🎯",
-      t: "Targets Inside a Range",
-      b: "From a range low buy: Target 1 = the high that formed the range low. Target 2 = the range high. From a range high sell: Target 1 = the low that formed the range high. Target 2 = the range low.",
-      d: "The most powerful transition in CRT: Range → first false breakout (Turtle Soup) → real trend begins. This transition from range to trend is where the biggest moves originate. The range was the fuel. The Turtle Soup was the spark."
-    }],
-    quiz: [{
-      q: "A trading range in CRT is best described as:",
-      type: "mc",
-      opts: ["A random period of low volatility", "A defined area where price rejects both the swing high and swing low simultaneously", "A pattern of equal highs and equal lows", "Any consolidation lasting more than 3 days"],
-      a: 1,
-      exp: "A range is defined by both extremes being rejected simultaneously — the swing high is resistance AND the swing low is support. It's not random consolidation — it's accumulation. Smart Money is building positions on both sides."
-    }, {
-      q: "You should trade the middle of a range for the best risk/reward.",
-      type: "tf",
-      a: false,
-      exp: "False. The middle of a range is no man's land — worst risk/reward, most noise, lowest probability. You have no clear stop placement, no defined structure, no directional edge. Trade ONLY at the extremes."
-    }, {
-      q: "The first breakout of a range is:",
-      type: "mc",
-      opts: ["The highest probability trade — momentum confirms direction", "Almost always the fake — wait for the Turtle Soup", "A signal to enter with full position size", "Valid only if confirmed by volume"],
-      a: 1,
-      exp: "The first breakout of any range is almost always fake. Romeo is unambiguous. Smart Money pushes price through the extreme, triggers all the stops and breakout orders, collects liquidity, and reverses. Trade the Turtle Soup of the breakout — not the breakout."
-    }, {
-      q: "From a range low buy, Target 1 is:",
-      type: "mc",
-      opts: ["The 50% of the entire range", "The range high", "The high that formed the range low", "The prior swing high outside the range"],
-      a: 2,
-      exp: "From a range low buy: Target 1 = the high that formed the range low. That high is internal liquidity — price needs to revisit the point where the range low was created. Target 2 is the range high (external liquidity of the range)."
-    }, {
-      q: "A range represents accumulation because:",
-      type: "mc",
-      opts: ["Price is consolidating after a trend", "Smart Money is building positions on both sides before the real breakout direction is revealed", "Volume is decreasing during consolidation", "Price is waiting for news to drive direction"],
-      a: 1,
-      exp: "Ranges are accumulation by Smart Money — they're building positions on both sides. The false first breakout (Turtle Soup) serves to collect the maximum liquidity before Smart Money commits the real directional move."
-    }, {
-      q: "After a false breakout above the range high, you should:",
-      type: "mc",
-      opts: ["Buy the confirmed breakout on the retest", "Wait for re-entry at the range high extreme area", "Exit all range positions immediately", "Look for a different asset to trade"],
-      a: 1,
-      exp: "After a false breakout above the range high (Turtle Soup), you wait for re-entry at the range high area — the level that just confirmed its role as a structural level. This gives you the Turtle Soup entry with the range high as a key reference."
-    }, {
-      q: "Ranges always end because:",
-      type: "mc",
-      opts: ["Price can only consolidate for so long before volatility forces a move", "Key higher timeframe levels eventually drive price out of the range in a specific direction", "Volume eventually forces a directional commitment", "Smart Money exits the range randomly"],
-      a: 1,
-      exp: "Ranges end when higher timeframe context requires price to move in a specific direction. The HTF level outside the range eventually draws price out — and the first breakout is the fake, the second is the real move (or the Turtle Soup of the first confirms direction)."
-    }, {
-      q: "The most powerful CRT transition is:",
-      type: "mc",
-      opts: ["Trend to range — consolidation confirms direction", "Choppy to trend — clarity emerging", "Range → false breakout (Turtle Soup) → real trend begins", "Range to choppy — accumulation resetting"],
-      a: 2,
-      exp: "Range → false breakout → real trend is the most powerful transition in CRT. The range was the accumulation phase. The Turtle Soup of the breakout is the manipulation. And the resulting trend is the distribution. This is AMD playing out at the macro level."
-    }]
-  },
-  20: {
-    slides: [{
-      icon: "🏗️",
-      t: "The Entry Is Always Last",
-      b: "There is no good CRT trade that skips the process. The entry is always the last thing. Never the first. A beautiful Model 1 without higher timeframe context is not a trade — it's a gamble.",
-      d: "The process forces you to think before you act. By the time you've answered all the questions, you know exactly why you're in the trade, where price is going, and what would invalidate the setup. That clarity is the edge."
-    }, {
-      icon: "📋",
-      t: "The Top-Down Process",
-      b: "1. What week of the month? 2. What is the HTF candle shape and narrative? 3. Is price above or below the daily open? 4. What is the liquidity target? 5. Am I in a Kill Zone? 6. Is there a valid old high or low? 7. Is there a thick Model 1 candle?",
-      d: "Notice that you identify the target (step 4) before you look for the entry (step 7). You always know where you're going before you look for how to get there. Top-down. Every time. No exceptions."
-    }, {
-      icon: "✅",
-      t: "Before You Press the Button",
-      b: "Before pressing the button, you must know: your stop loss level, your 50% target (mandatory partial), your full target, and the percentage of your account you're risking. If you can't answer all four instantly, you're not ready.",
-      d: "Planning the trade takes 2 minutes. Pressing the button takes 2 seconds. Holding through the manipulation and the Kiss of Death takes hours. That time — and what you do with your mind during it — is where most traders fail."
-    }],
-    quiz: [{
-      q: "In the top-down process, the entry is:",
-      type: "mc",
-      opts: ["The first thing you look for — identify entry, then find context", "The second step after identifying the HTF bias", "The last step — always", "Identified simultaneously with the liquidity target"],
-      a: 2,
-      exp: "The entry is ALWAYS last. Never first. You work from the macro (week of month, HTF narrative) down to the micro (Model 1 trigger). By the time you reach the entry, you've already answered 6 other questions that confirm the setup."
-    }, {
-      q: "A perfect Model 1 candle without higher timeframe context is a valid CRT trade.",
-      type: "tf",
-      a: false,
-      exp: "False. A Model 1 without HTF context is a gamble — not a trade. The HTF provides the WHY. Without the WHY, you have no structural reason for price to reverse at that level. Beautiful entry, no foundation. Romeo says it clearly."
-    }, {
-      q: "You should identify your liquidity target:",
-      type: "mc",
-      opts: ["After you find the Model 1 entry", "After you enter the trade", "Before looking for any entry — Step 4 in the process", "At the same time as placing your stop loss"],
-      a: 2,
-      exp: "The liquidity target is Step 4 — identified BEFORE looking for any entry. This is fundamental. You must know where price is going before you look for how to get in. Trading without a defined target is trading without a destination."
-    }, {
-      q: "Which week of the month typically offers the best entry opportunities?",
-      type: "mc",
-      opts: ["Week 1 — the freshest momentum", "Week 2 — the manipulation week", "Week 3 — after the trend is confirmed", "Week 4 — end of month positioning"],
-      a: 1,
-      exp: "Week 2 is the Manipulation week — the best entry week of the month. Week 1 accumulates the monthly range. Week 2 performs the Turtle Soup. Weeks 3-4 distribute. Week 2 setups are frequently the highest quality of the entire month."
-    }, {
-      q: "The \"above or below the daily open\" check eliminates:",
-      type: "mc",
-      opts: ["10-20% of bad trades", "Most bad counter-direction trades immediately", "Only a few poor setups", "Only relevant for intraday traders"],
-      a: 1,
-      exp: "This single filter — bullish setups only below the daily open, bearish setups only above — eliminates most bad trades immediately. Romeo calls it non-negotiable. If your bullish setup is above the daily open, it's counter to the framework."
-    }, {
-      q: "Before pressing the button, you must know all four of these:",
-      type: "mc",
-      opts: ["Asset, direction, entry price, exit price", "Stop loss level, 50% target, full target, percentage of account risked", "HTF bias, ITF confirmation, LTF entry, stop loss", "Entry, stop, target, and correlated pair"],
-      a: 1,
-      exp: "Four things before the button: stop loss level (exact), 50% target (mandatory partial), full target (defined), and risk percentage (1-2%). If you can't answer all four instantly and precisely, you're not ready to press the button."
-    }, {
-      q: "\"Planning the trade takes 2 minutes, pressing the button takes 2 seconds\" — the hardest part is:",
-      type: "mc",
-      opts: ["Finding the right setup — that takes most of the time", "The hours of holding through manipulation and the KOD", "Placing the correct stop loss level", "Calculating the position size"],
-      a: 1,
-      exp: "Holding through the manipulation (failure swing) and the Kiss of Death is where most traders fail. The trade is planned and entered in minutes. But holding for hours while price tests your conviction — and your stop — is the real work."
-    }, {
-      q: "The top-down process in CRT always goes from:",
-      type: "mc",
-      opts: ["Lower timeframe to higher timeframe — precise entry first, then context", "Higher timeframe to lower timeframe — context first, entry last", "Same timeframe analysis throughout", "The most important level regardless of timeframe"],
-      a: 1,
-      exp: "Top-down: macro context first (HTF), then intermediate confirmation (ITF), then precise entry (LTF). Never bottom-up — never find an entry first and then look for context to justify it. Context before entry. Always."
-    }]
-  },
-  21: {
-    slides: [{
-      icon: "⚡",
-      t: "Two Valid Entries. Nothing Else.",
-      b: "Model 1 close: thick candle nails old high/low and closes back inside — that close is the trigger. True Change of Character: swing low → swing high → lower low (stops purged) → close above the swing high. These two and nothing else. If your entry doesn't fit one of these, it's not a CRT trade.",
-      d: "The discipline to only take valid entries — and pass on everything else — is what separates profitable traders from the rest. Not the ability to find setups. The discipline to reject the ones that don't qualify."
-    }, {
-      icon: "🧠",
-      t: "80% of Trading Is Behavior",
-      b: "The stop is placed. The targets are marked. The button is pressed. Everything after that is behavioral. Managing your mind during the trade — through the failure swing, through the Kiss of Death, through the slow grind — is where most traders fail.",
-      d: "When the lower timeframe looks chaotic: step back to the 4H. The structure is always clear there. When you feel impatient: name it out loud — 'I'm feeling impatient right now.' Then do nothing. The trade that takes the longest often arrives the cleanest."
-    }, {
-      icon: "📓",
-      t: "The Journal — The Real Edge",
-      b: "Every profession documents. Doctors document patients. Pilots document flights. Trading is no different. If you don't have a journal, you're not a trader — you're someone pressing buttons. The journal is where patterns in your mistakes become visible.",
-      d: "Before: what do you expect and why? After: what happened? What would you do differently? Add annotated screenshots at entry, at the 50%, and at the final exit. Include your emotional state. Behavioral patterns only become visible when you write them down."
-    }],
-    quiz: [{
-      q: "The two valid entry types in CRT are:",
-      type: "mc",
-      opts: ["Model 1 and Order Block retest", "Model 1 close and True Change of Character", "Turtle Soup and Model 1", "OTE and Kiss of Death"],
-      a: 1,
-      exp: "Model 1 close and True Change of Character — these two only. If your entry doesn't fit one of these descriptions, it's not a CRT trade. Every other type of entry is improvisation — which means gambling with your framework."
-    }, {
-      q: "You should move your stop loss to break even as soon as price moves in your favor.",
-      type: "tf",
-      a: false,
-      exp: "False. The stop is fixed — it never moves. Moving your stop to break even prematurely is one of the most common behavioral errors in trading. It converts a properly structured trade into one that gets stopped out by normal price movement before the target."
-    }, {
-      q: "When price moves slowly toward the target after entry, you should:",
-      type: "mc",
-      opts: ["Close the trade — momentum is weak", "Add to the position to average down", "Hold — Smart Money is creating hope for the trapped side before the final move", "Move the stop to break even to protect the position"],
-      a: 2,
-      exp: "Slow movement toward the target is normal and often intentional — Smart Money creates hope for the trapped side to keep them from exiting before the final move liquidates them. The slow grind is the setup for the acceleration. Hold."
-    }, {
-      q: "80% of trading is:",
-      type: "mc",
-      opts: ["Finding the right setups", "Technical analysis and pattern recognition", "Behavior — managing your psychology during the trade", "Risk management and position sizing"],
-      a: 2,
-      exp: "80% of trading is behavior. The setup took 2 minutes. The button took 2 seconds. Everything for the next several hours — every impulse to exit early, every temptation to move the stop, every moment of impatience — is behavioral work."
-    }, {
-      q: "The purpose of taking the mandatory 50% partial is:",
-      type: "mc",
-      opts: ["To reduce position size risk", "To guarantee a positive outcome on the trade and free your mental state to hold the remainder", "To lock in maximum profit quickly", "Because the 50% is always the full target"],
-      a: 1,
-      exp: "The 50% partial guarantees a positive outcome regardless of what happens to the remainder. This frees your psychology — you can hold through the Kiss of Death and failure swing without anxiety, because you're already guaranteed a win."
-    }, {
-      q: "The trading journal is important because:",
-      type: "mc",
-      opts: ["It's required by regulators for active traders", "Behavioral and mistake patterns only become visible when consistently documented", "It helps track profits and losses for tax purposes", "It proves your edge to other traders"],
-      a: 1,
-      exp: "The journal makes invisible patterns visible. You won't notice you always lose on FOMO trades, or that you're most profitable on London session Tuesday entries, or that you always move your stop when anxious — until you can see it in documented data."
-    }, {
-      q: "\"Every exit is an entry, every entry is an exit\" means:",
-      type: "mc",
-      opts: ["You should always be in a trade", "Think about your market position at all times — what you're long or short at any given moment", "Exit and entry signals are always symmetrical", "You must enter a trade in the opposite direction when you exit"],
-      a: 1,
-      exp: "At all times, you are either long, short, or flat — and each of those is a position. When you exit a long, you're going flat (or short). Think about WHERE you want to be in the market at all times, not just the individual trade."
-    }, {
-      q: "Adding to a losing position in CRT is:",
-      type: "mc",
-      opts: ["A valid strategy if the setup is strong", "Acceptable if your original stop hasn't been hit", "Never correct — never add to a losing position", "Only acceptable on Model 1 trades"],
-      a: 2,
-      exp: "Never add to a losing position. If price has moved against you significantly, your original read may be wrong. Adding to a loser violates the fundamental rule of risk management and converts a controlled loss into a potential account catastrophe."
-    }]
-  },
-  22: {
-    slides: [{
-      icon: "🏆",
-      t: "One Logic. Every Market. Every Timeframe.",
-      b: "CRT is not a collection of patterns. It is one logic — and that logic is the charts. Open. Key Level. Turtle Soup. Decline. That is all that is always happening. Verify it.",
-      d: "Romeo's final statement in the complete system: CRT and Turtle Soup — that is all that is always happening on charts. Verify it. The entire system reduces to this single sentence. Once you see it, you can't unsee it."
-    }, {
-      icon: "🔄",
-      t: "The 1% Rule",
-      b: "1% better every day. You're not competing with anyone else. Only with who you were yesterday. The traders who rush always end up taking longer. The traders who document everything always develop faster.",
-      d: "The market will be here in 10, 20, and 30 years. The charts will be here. There is no rush. Give yourself one year from today — from right now — to learn CRT properly. The shortcut in trading has one name: losses."
-    }, {
-      icon: "🖨️",
-      t: "Print It. Put It On Your Wall. Live It.",
-      b: "One page. The complete system. CRT, Turtle Soup, AMD, Model 1, Kiss of Death, five entries, ERL/IRL, key levels, SMT, Kill Zones, risk management, market profiles. Not to read — to live.",
-      d: "Knowledge is not enough. CRT isn't learned by reading once — it's learned by watching the Turtle Soup form 100 times. By recognizing the Kiss of Death before it hits the target. By being wrong, documenting it, and being 1% better the next day."
-    }],
-    quiz: [{
-      q: "\"Open. Key Level. Turtle Soup. Decline.\" This quote describes:",
-      type: "mc",
-      opts: ["A specific setup pattern to memorize", "The fundamental pattern of ALL price movement — what is always happening on charts", "The stages of a single AMD candle", "A weekly profile template"],
-      a: 1,
-      exp: "This is Romeo's description of the fundamental pattern of all price movement. Price opens, reaches a key structural level, performs a Turtle Soup (fake move), then declines (or advances in the real direction). This is always happening on every timeframe."
-    }, {
-      q: "CRT works only in specific market conditions and specific assets.",
-      type: "tf",
-      a: false,
-      exp: "False. CRT works in every market, every timeframe, every condition. The fractal nature of candles and the universality of the Turtle Soup mechanism means the logic applies whether you're trading Bitcoin, Gold, Forex, or Futures — on any timeframe."
-    }, {
-      q: "What differentiates profitable traders from the rest according to the CRT system?",
-      type: "mc",
-      opts: ["Having a higher win rate", "Finding more setups per day", "Consistent documentation — the trading journal", "Using multiple timeframe alignment"],
-      a: 2,
-      exp: "Romeo says it directly: the difference between a profitable trader and one who isn't is the trading journal. Behavioral and mistake patterns become visible only through consistent documentation. Without the journal, you're repeating the same errors indefinitely."
-    }, {
-      q: "The 8-loss streak:",
-      type: "mc",
-      opts: ["Only happens to undisciplined traders", "Can be avoided with the right system", "Comes to every trader — the only question is whether your risk management survives it", "Happens when you're trading the wrong strategy"],
-      a: 2,
-      exp: "The 8-loss streak comes to every trader — no exceptions. Not because the system fails, but because markets are probabilistic. The question is never whether it's coming. It's whether your position sizing means it's an inconvenience or a catastrophe."
-    }, {
-      q: "The fractal nature of CRT means:",
-      type: "mc",
-      opts: ["Bigger timeframes are more important and override smaller ones", "The same logic that applies on the monthly chart applies on the 1-minute chart", "CRT only works on timeframes above 1 hour", "Higher timeframes predict lower timeframe movement"],
-      a: 1,
-      exp: "Every candle — monthly, weekly, daily, 4H, 1H, 15m, 5m, 1m — has the same CRT logic and structure. A monthly candle IS a 1-minute candle at a different speed. Every rep at the lower timeframe is practice for reading the higher timeframe."
-    }, {
-      q: "\"1% better every day\" means:",
-      type: "mc",
-      opts: ["Increase your win rate by 1% monthly", "You're competing with the best traders in your group", "You're only competing with who you were yesterday — not anyone else", "Grow your account by 1% daily"],
-      a: 2,
-      exp: "You're only competing with who you were yesterday. Not other traders, not Romeo, not anyone in your community. 1% better understanding today than yesterday. Over a year, that compounds into complete mastery. Comparison to others is noise."
-    }, {
-      q: "The shortcut in trading has one name:",
-      type: "mc",
-      opts: ["A better strategy", "The right mentor", "Losses", "More capital"],
-      a: 2,
-      exp: "\"The shortcut in trading has one name: losses.\" Romeo says it directly. Every attempt to shortcut the process — skipping the journal, trading before you've observed enough, switching strategies — results in losses. The process is the shortcut."
-    }, {
-      q: "CRT is learned by:",
-      type: "mc",
-      opts: ["Reading the complete system document once thoroughly", "Memorizing the patterns and their names", "Watching Turtle Soups form in real time 100 times, being wrong, documenting it, and being 1% better each day", "Taking a live trading course"],
-      a: 2,
-      exp: "CRT is not learned by reading — it's learned by repetition, experience, and documentation. Watching the Turtle Soup happen in real time. Recognizing the Kiss of Death before it hits. Being wrong and understanding exactly why. 1% better, every day."
-    }]
+    slides: 6,
+    minQ: 10,
+    label: "Advanced"
   }
 };
 
+/* ═══ DYNAMIC LESSON GENERATION ═══ */
+var MODEL = "claude-sonnet-4-20250514";
+function generateLesson(_x, _x2) {
+  return _generateLesson.apply(this, arguments);
+}
 /* ═══ SYSTEM PROMPT ═══ */
+function _generateLesson() {
+  _generateLesson = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3(chapter, lang) {
+    var _data$content2;
+    var cacheKey, cached, _d$slides, d, cfg, isES, sys, res, data, text, clean, parsed, _t3;
+    return _regenerator().w(function (_context3) {
+      while (1) switch (_context3.p = _context3.n) {
+        case 0:
+          cacheKey = "lesson_ch".concat(chapter.id, "_").concat(lang);
+          _context3.p = 1;
+          _context3.n = 2;
+          return window.storage.get(cacheKey);
+        case 2:
+          cached = _context3.v;
+          if (!(cached !== null && cached !== void 0 && cached.value)) {
+            _context3.n = 3;
+            break;
+          }
+          d = JSON.parse(cached.value);
+          if (!((d === null || d === void 0 || (_d$slides = d.slides) === null || _d$slides === void 0 ? void 0 : _d$slides.length) > 0)) {
+            _context3.n = 3;
+            break;
+          }
+          return _context3.a(2, d);
+        case 3:
+          _context3.n = 5;
+          break;
+        case 4:
+          _context3.p = 4;
+          _t3 = _context3.v;
+        case 5:
+          cfg = COMPLEXITY[chapter.level] || COMPLEXITY[1];
+          isES = lang === "es";
+          sys = "You generate lesson content for a day trading education app called Donna. Return ONLY valid JSON \u2014 no markdown, no preamble, no explanation.\n\nFORMAT:\n{\"slides\":[{\"icon\":\"1 emoji\",\"title\":\"max 5 words\",\"body\":\"2-4 sentences. MUST include a specific real market example with actual numbers (Gold at 2010, Bitcoin at 65000, EUR/USD at 1.0850, Nasdaq at 17000 etc).\",\"donna\":\"1-2 sentences in Donna's voice \u2014 warm, direct friend texting, can be slightly funny.\"}],\"quiz\":[{\"q\":\"Scenario-based question testing understanding NOT definitions\",\"type\":\"mc\",\"opts\":[\"A\",\"B\",\"C\",\"D\"],\"a\":0,\"exp\":\"2-3 sentence explanation\"}]}\n\nRULES:\n- EVERY slide body must include a real example with specific price numbers\n- Quiz questions MUST test understanding of examples/scenarios, not memorized definitions\n- Mix mc and tf types. For tf questions: {\"q\":\"statement\",\"type\":\"tf\",\"a\":true,\"exp\":\"...\"}\n- ".concat(chapter.id <= 2 ? "STRICTLY avoid CRT jargon: no 'Smart Money', 'Turtle Soup', 'Model 1', 'AMD', 'Kill Zone', 'Liquidity'. Use plain English: 'fake breakout', 'real move', 'key level', 'the candle close'" : "Use CRT terminology naturally", "\n- ").concat(isES ? "Generate ALL content in Spanish — natural conversational Mexican/Latin Spanish" : "Generate ALL content in English", "\n- Generate EXACTLY ").concat(cfg.slides, " slides and ").concat(cfg.minQ, " quiz questions\n- Return ONLY the JSON object. Nothing else.");
+          _context3.n = 6;
+          return fetch("/api/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: MODEL,
+              max_tokens: 3500,
+              system: sys,
+              messages: [{
+                role: "user",
+                content: "Chapter ".concat(chapter.id, ": \"").concat(chapter.title, "\". Topic: ").concat(chapter.desc, ". Language: ").concat(lang, ". Complexity Level ").concat(chapter.level, ": generate ").concat(cfg.slides, " slides and ").concat(cfg.minQ, " questions.")
+              }]
+            })
+          });
+        case 6:
+          res = _context3.v;
+          if (res.ok) {
+            _context3.n = 7;
+            break;
+          }
+          throw new Error("API ".concat(res.status));
+        case 7:
+          _context3.n = 8;
+          return res.json();
+        case 8:
+          data = _context3.v;
+          text = ((_data$content2 = data.content) === null || _data$content2 === void 0 || (_data$content2 = _data$content2[0]) === null || _data$content2 === void 0 ? void 0 : _data$content2.text) || "";
+          clean = text.replace(/```json|```/g, "").trim();
+          parsed = JSON.parse(clean);
+          _context3.n = 9;
+          return window.storage.set(cacheKey, JSON.stringify(parsed));
+        case 9:
+          return _context3.a(2, parsed);
+      }
+    }, _callee3, null, [[1, 4]]);
+  }));
+  return _generateLesson.apply(this, arguments);
+}
 function buildPrompt(p, stats) {
   var isAdv = p.mode === "advanced",
     isES = p.lang === "es";
@@ -2167,7 +865,7 @@ function ChecklistModal(_ref6) {
       color: color,
       fontWeight: 600
     }
-  }, DONNA.gradeComment(grade, lang))), /*#__PURE__*/React.createElement("div", {
+  }, gradeComment(grade, lang))), /*#__PURE__*/React.createElement("div", {
     style: {
       overflowY: "auto",
       WebkitOverflowScrolling: "touch",
@@ -2288,49 +986,89 @@ function ChecklistModal(_ref6) {
   }, t.clClose))));
 }
 
-/* ═══ LESSON MODAL ═══ */
+/* ═══ LESSON MODAL — DYNAMIC ═══ */
 function LessonModal(_ref7) {
   var chapter = _ref7.chapter,
     lang = _ref7.lang,
     onClose = _ref7.onClose,
     onComplete = _ref7.onComplete;
-  var t = T[lang],
-    data = L[chapter.id];
-  var _useState = useState("slides"),
+  var t = T[lang];
+  var _useState = useState(null),
     _useState2 = _slicedToArray(_useState, 2),
-    phase = _useState2[0],
-    setPhase = _useState2[1];
-  var _useState3 = useState(0),
+    data = _useState2[0],
+    setData = _useState2[1];
+  var _useState3 = useState(true),
     _useState4 = _slicedToArray(_useState3, 2),
-    si = _useState4[0],
-    setSi = _useState4[1];
-  var _useState5 = useState(0),
+    loading = _useState4[0],
+    setLoading = _useState4[1];
+  var _useState5 = useState(false),
     _useState6 = _slicedToArray(_useState5, 2),
-    qi = _useState6[0],
-    setQi = _useState6[1];
-  var _useState7 = useState(null),
+    error = _useState6[0],
+    setError = _useState6[1];
+  var _useState7 = useState("slides"),
     _useState8 = _slicedToArray(_useState7, 2),
-    ans = _useState8[0],
-    setAns = _useState8[1];
-  var _useState9 = useState(null),
+    phase = _useState8[0],
+    setPhase = _useState8[1];
+  var _useState9 = useState(0),
     _useState0 = _slicedToArray(_useState9, 2),
-    ok = _useState0[0],
-    setOk = _useState0[1];
+    si = _useState0[0],
+    setSi = _useState0[1];
   var _useState1 = useState(0),
     _useState10 = _slicedToArray(_useState1, 2),
-    score = _useState10[0],
-    setScore = _useState10[1];
-  var _useState11 = useState(0),
+    qi = _useState10[0],
+    setQi = _useState10[1];
+  var _useState11 = useState(null),
     _useState12 = _slicedToArray(_useState11, 2),
-    ak = _useState12[0],
-    setAk = _useState12[1];
-  var slides = (data === null || data === void 0 ? void 0 : data.slides) || [];
-  var quiz = (data === null || data === void 0 ? void 0 : data.quiz) || [];
+    ans = _useState12[0],
+    setAns = _useState12[1];
+  var _useState13 = useState(null),
+    _useState14 = _slicedToArray(_useState13, 2),
+    ok = _useState14[0],
+    setOk = _useState14[1];
+  var _useState15 = useState(0),
+    _useState16 = _slicedToArray(_useState15, 2),
+    score = _useState16[0],
+    setScore = _useState16[1];
+  var _useState17 = useState(0),
+    _useState18 = _slicedToArray(_useState17, 2),
+    ak = _useState18[0],
+    setAk = _useState18[1];
+  var load = useCallback(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
+    var d, _t;
+    return _regenerator().w(function (_context) {
+      while (1) switch (_context.p = _context.n) {
+        case 0:
+          setLoading(true);
+          setError(false);
+          _context.p = 1;
+          _context.n = 2;
+          return generateLesson(chapter, lang);
+        case 2:
+          d = _context.v;
+          setData(d);
+          _context.n = 4;
+          break;
+        case 3:
+          _context.p = 3;
+          _t = _context.v;
+          setError(true);
+        case 4:
+          setLoading(false);
+        case 5:
+          return _context.a(2);
+      }
+    }, _callee, null, [[1, 3]]);
+  })), [chapter, lang]);
+  useEffect(function () {
+    load();
+  }, [load]);
+  var slides = (data === null || data === void 0 ? void 0 : data.slides) || [],
+    quiz = (data === null || data === void 0 ? void 0 : data.quiz) || [];
   var totalSteps = slides.length + quiz.length;
   var curStep = phase === "slides" ? si : slides.length + qi;
-  var progress = curStep / totalSteps * 100;
-  var slide = slides[si];
-  var q = quiz[qi];
+  var progress = totalSteps > 0 ? curStep / totalSteps * 100 : 0;
+  var slide = slides[si],
+    q = quiz[qi];
   var confetti = Array.from({
     length: 12
   }, function (_, i) {
@@ -2343,10 +1081,10 @@ function LessonModal(_ref7) {
   });
   var handleAnswer = function handleAnswer(a) {
     if (ans !== null) return;
-    var correct = a === q.a;
+    var c = a === q.a;
     setAns(a);
-    setOk(correct);
-    if (correct) {
+    setOk(c);
+    if (c) {
       Sounds.correct();
       setScore(function (s) {
         return s + 1;
@@ -2366,95 +1104,18 @@ function LessonModal(_ref7) {
         setAns(null);
         setOk(null);
       }
-    } else if (phase === "quiz") {
-      if (qi < quiz.length - 1) {
-        setQi(function (i) {
-          return i + 1;
-        });
-        setAns(null);
-        setOk(null);
-      } else {
-        setPhase("done");
-        Sounds.complete();
-      }
+    } else if (qi < quiz.length - 1) {
+      setQi(function (i) {
+        return i + 1;
+      });
+      setAns(null);
+      setOk(null);
+    } else {
+      setPhase("done");
+      Sounds.complete();
     }
   };
-  if (!data) {
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        position: "absolute",
-        inset: 0,
-        zIndex: 995,
-        background: "#000",
-        display: "flex",
-        flexDirection: "column"
-      },
-      className: "slide-in"
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        padding: "16px",
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        borderBottom: "1px solid ".concat(DARK)
-      }
-    }, /*#__PURE__*/React.createElement("button", {
-      onClick: onClose,
-      style: {
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: MUTED,
-        fontSize: 22
-      }
-    }, "\u2715"), /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontFamily: "'Sora',sans-serif",
-        fontWeight: 800,
-        fontSize: 16
-      }
-    }, chapter.title)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: 16,
-        padding: 32,
-        textAlign: "center"
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 40
-      }
-    }, chapter.icon), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontFamily: "'Sora',sans-serif",
-        fontWeight: 800,
-        fontSize: 20
-      }
-    }, chapter.title), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 14,
-        color: MUTED,
-        lineHeight: 1.7
-      }
-    }, lang === "es" ? "Este capítulo se completa en el chat con Donna." : "This chapter continues in your chat with Donna."), /*#__PURE__*/React.createElement("button", {
-      onClick: onClose,
-      style: {
-        padding: "14px 32px",
-        borderRadius: 14,
-        background: RED,
-        border: "none",
-        cursor: "pointer",
-        fontFamily: "'Sora',sans-serif",
-        fontWeight: 800,
-        fontSize: 15,
-        color: "#fff"
-      }
-    }, lang === "es" ? "Volver" : "Go Back")));
-  }
+  var cfg = COMPLEXITY[chapter.level] || COMPLEXITY[1];
   return /*#__PURE__*/React.createElement("div", {
     style: {
       position: "absolute",
@@ -2500,7 +1161,7 @@ function LessonModal(_ref7) {
       borderRadius: 4,
       transition: "width .4s"
     }
-  })), /*#__PURE__*/React.createElement("span", {
+  })), !loading && !error && /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 12,
       color: MUTED,
@@ -2508,13 +1169,108 @@ function LessonModal(_ref7) {
     }
   }, phase === "slides" ? "".concat(si + 1, "/").concat(slides.length) : "Q".concat(qi + 1, "/").concat(quiz.length))), /*#__PURE__*/React.createElement("div", {
     style: {
+      background: "".concat(RED, "11"),
+      borderBottom: "1px solid ".concat(RED, "22"),
+      padding: "6px 16px",
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 16
+    }
+  }, chapter.icon), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 700,
+      fontSize: 13
+    }
+  }, chapter.title), /*#__PURE__*/React.createElement("span", {
+    style: {
+      marginLeft: "auto",
+      fontSize: 11,
+      color: MUTED,
+      background: DARK,
+      padding: "2px 8px",
+      borderRadius: 10
+    }
+  }, "L", chapter.level, " \xB7 ", cfg.slides, " slides \xB7 ", cfg.minQ, "Q")), /*#__PURE__*/React.createElement("div", {
+    style: {
       flex: 1,
       overflowY: "auto",
       WebkitOverflowScrolling: "touch",
       padding: "16px",
       minHeight: 0
     }
+  }, loading && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100%",
+      gap: 16
+    }
+  }, /*#__PURE__*/React.createElement(DAvatar, {
+    size: 52,
+    online: true
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      color: MUTED,
+      textAlign: "center"
+    }
+  }, lang === "es" ? "Preparando tu lección..." : "Building your lesson..."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6
+    }
+  }, [0, 1, 2].map(function (i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        width: 8,
+        height: 8,
+        borderRadius: "50%",
+        background: RED,
+        animation: "dot 1.2s ease-in-out ".concat(i * .2, "s infinite")
+      }
+    });
+  }))), error && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100%",
+      gap: 16
+    }
   }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 40
+    }
+  }, "\u26A0\uFE0F"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      color: MUTED,
+      textAlign: "center"
+    }
+  }, lang === "es" ? "No se pudo cargar. Toca para reintentar." : "Couldn't load lesson. Tap to retry."), /*#__PURE__*/React.createElement("button", {
+    onClick: load,
+    style: {
+      padding: "12px 24px",
+      borderRadius: 12,
+      background: RED,
+      border: "none",
+      cursor: "pointer",
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 700,
+      fontSize: 14,
+      color: "#fff"
+    }
+  }, "Retry")), !loading && !error && data && /*#__PURE__*/React.createElement("div", {
     key: ak,
     className: "fade-up"
   }, phase === "slides" && slide && /*#__PURE__*/React.createElement("div", {
@@ -2530,7 +1286,7 @@ function LessonModal(_ref7) {
       gap: 10
     }
   }, /*#__PURE__*/React.createElement(DAvatar, {
-    size: 48,
+    size: 46,
     online: true
   }), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2543,7 +1299,7 @@ function LessonModal(_ref7) {
       lineHeight: 1.65,
       color: "#D1D1D6"
     }
-  }, slide.d)), /*#__PURE__*/React.createElement("div", {
+  }, slide.donna || slide.d)), /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#111",
       border: "1px solid ".concat(DARK2),
@@ -2568,13 +1324,13 @@ function LessonModal(_ref7) {
       fontSize: 18,
       color: "#fff"
     }
-  }, slide.t)), /*#__PURE__*/React.createElement("p", {
+  }, slide.title || slide.t)), /*#__PURE__*/React.createElement("p", {
     style: {
       fontSize: 15,
       color: "#D1D1D6",
       lineHeight: 1.7
     }
-  }, slide.b))), phase === "quiz" && q && /*#__PURE__*/React.createElement("div", {
+  }, slide.body || slide.b))), phase === "quiz" && q && /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
@@ -2598,9 +1354,9 @@ function LessonModal(_ref7) {
     }
   }, t.quizTitle), /*#__PURE__*/React.createElement("p", {
     style: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: 600,
-      lineHeight: 1.55,
+      lineHeight: 1.6,
       color: "#fff"
     }
   }, q.q)), q.type === "tf" ? /*#__PURE__*/React.createElement("div", {
@@ -2619,9 +1375,9 @@ function LessonModal(_ref7) {
     c: RED
   }].map(function (opt) {
     var sel = ans === opt.val,
-      ir = opt.val === q.a;
-    var bg = ans !== null ? ir ? "rgba(48,209,88,.14)" : sel ? "rgba(232,37,60,.14)" : "transparent" : "transparent";
-    var br = ans !== null ? ir ? GREEN : sel ? RED : DARK2 : DARK2;
+      ir = opt.val === q.a,
+      bg = ans !== null ? ir ? "rgba(48,209,88,.14)" : sel ? "rgba(232,37,60,.14)" : "transparent" : "transparent",
+      br = ans !== null ? ir ? GREEN : sel ? RED : DARK2 : DARK2;
     return /*#__PURE__*/React.createElement("button", {
       key: String(opt.val),
       onClick: function onClick() {
@@ -2636,8 +1392,7 @@ function LessonModal(_ref7) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 8,
-        transition: "all .2s"
+        gap: 8
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -2648,8 +1403,7 @@ function LessonModal(_ref7) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 20,
-        transition: "all .2s"
+        fontSize: 20
       }
     }, ans !== null && ir ? "✓" : ans === opt.val && !ir ? "✗" : opt.val ? "✓" : "✗"), /*#__PURE__*/React.createElement("span", {
       style: {
@@ -2665,11 +1419,11 @@ function LessonModal(_ref7) {
       flexDirection: "column",
       gap: 10
     }
-  }, q.opts.map(function (opt, i) {
+  }, (q.opts || []).map(function (opt, i) {
     var sel = ans === i,
-      ir = i === q.a;
-    var bg = ans !== null ? ir ? "rgba(48,209,88,.13)" : sel ? "rgba(232,37,60,.13)" : "transparent" : "transparent";
-    var br = ans !== null ? ir ? GREEN : sel ? RED : DARK2 : DARK2;
+      ir = i === q.a,
+      bg = ans !== null ? ir ? "rgba(48,209,88,.13)" : sel ? "rgba(232,37,60,.13)" : "transparent" : "transparent",
+      br = ans !== null ? ir ? GREEN : sel ? RED : DARK2 : DARK2;
     return /*#__PURE__*/React.createElement("button", {
       key: i,
       onClick: function onClick() {
@@ -2685,7 +1439,6 @@ function LessonModal(_ref7) {
         alignItems: "center",
         gap: 12,
         textAlign: "left",
-        transition: "all .2s",
         opacity: ans !== null && !ir && !sel ? .4 : 1
       }
     }, /*#__PURE__*/React.createElement("div", {
@@ -2700,8 +1453,7 @@ function LessonModal(_ref7) {
         fontWeight: 800,
         fontSize: 13,
         color: "#fff",
-        flexShrink: 0,
-        transition: "all .2s"
+        flexShrink: 0
       }
     }, ans !== null && ir ? "✓" : ans === i && !ir ? "✗" : String.fromCharCode(65 + i)), /*#__PURE__*/React.createElement("span", {
       style: {
@@ -2726,7 +1478,7 @@ function LessonModal(_ref7) {
       color: ok ? GREEN : RED,
       marginBottom: 6
     }
-  }, ok ? DONNA.correct(lang) : DONNA.wrong(lang)), /*#__PURE__*/React.createElement("p", {
+  }, ok ? lang === "es" ? "Exacto." : "Exactly." : lang === "es" ? "No del todo:" : "Not quite:"), /*#__PURE__*/React.createElement("p", {
     style: {
       fontSize: 13,
       color: "#D1D1D6",
@@ -2790,16 +1542,9 @@ function LessonModal(_ref7) {
       fontSize: 14,
       color: RED,
       fontWeight: 700,
-      marginBottom: 20
+      marginBottom: 24
     }
-  }, t.chScore(score, quiz.length)), /*#__PURE__*/React.createElement("p", {
-    style: {
-      fontSize: 13,
-      color: MUTED,
-      fontStyle: "italic",
-      marginBottom: 28
-    }
-  }, DONNA.chapterDone(chapter.title, lang)), /*#__PURE__*/React.createElement("button", {
+  }, t.chScore(score, quiz.length)), /*#__PURE__*/React.createElement("button", {
     onClick: function onClick() {
       return onComplete(chapter.id);
     },
@@ -2814,7 +1559,7 @@ function LessonModal(_ref7) {
       fontSize: 17,
       color: "#fff"
     }
-  }, lang === "es" ? "Continuar →" : "Continue →")))), phase !== "done" && /*#__PURE__*/React.createElement("div", {
+  }, lang === "es" ? "Continuar →" : "Continue →")))), !loading && !error && phase !== "done" && /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "12px 16px 20px",
       borderTop: "1px solid ".concat(DARK),
@@ -2852,10 +1597,10 @@ function LessonModal(_ref7) {
 }
 
 /* ═══ ACADEMY SCREEN ═══ */
-function AcademyScreen(_ref8) {
-  var profile = _ref8.profile,
-    completed = _ref8.completed,
-    onOpen = _ref8.onOpen;
+function AcademyScreen(_ref9) {
+  var profile = _ref9.profile,
+    completed = _ref9.completed,
+    onOpen = _ref9.onOpen;
   var lang = profile.lang || "en";
   var xp = completed.size * 50;
   return /*#__PURE__*/React.createElement("div", {
@@ -2895,11 +1640,11 @@ function AcademyScreen(_ref8) {
       display: "flex",
       gap: 16
     }
-  }, [["🔥", 0, "STREAK"], ["⚡", xp, "XP"], ["🏆", Math.floor(completed.size / 3) + 1, "LEVEL"]].map(function (_ref9) {
-    var _ref0 = _slicedToArray(_ref9, 3),
-      ic = _ref0[0],
-      v = _ref0[1],
-      lb = _ref0[2];
+  }, [["🔥", 0, "STREAK"], ["⚡", xp, "XP"], ["🏆", Math.floor(completed.size / 3) + 1, "LEVEL"]].map(function (_ref0) {
+    var _ref1 = _slicedToArray(_ref0, 3),
+      ic = _ref1[0],
+      v = _ref1[1],
+      lb = _ref1[2];
     return /*#__PURE__*/React.createElement("div", {
       key: lb,
       style: {
@@ -3087,75 +1832,75 @@ function AcademyScreen(_ref8) {
 
 /* ═══ MAIN APP ═══ */
 function App() {
-  var _useState13 = useState("onboard"),
-    _useState14 = _slicedToArray(_useState13, 2),
-    phase = _useState14[0],
-    setPhase = _useState14[1];
-  var _useState15 = useState(""),
-    _useState16 = _slicedToArray(_useState15, 2),
-    nameInput = _useState16[0],
-    setName = _useState16[1];
-  var _useState17 = useState("en"),
-    _useState18 = _slicedToArray(_useState17, 2),
-    selLang = _useState18[0],
-    setSelLang = _useState18[1];
-  var _useState19 = useState(null),
+  var _useState19 = useState("onboard"),
     _useState20 = _slicedToArray(_useState19, 2),
-    selMode = _useState20[0],
-    setSelMode = _useState20[1];
-  var _useState21 = useState({}),
+    phase = _useState20[0],
+    setPhase = _useState20[1];
+  var _useState21 = useState(""),
     _useState22 = _slicedToArray(_useState21, 2),
-    profile = _useState22[0],
-    setProfile = _useState22[1];
-  var _useState23 = useState("chat"),
+    nameInput = _useState22[0],
+    setName = _useState22[1];
+  var _useState23 = useState("en"),
     _useState24 = _slicedToArray(_useState23, 2),
-    tab = _useState24[0],
-    setTab = _useState24[1];
-  var _useState25 = useState([]),
+    selLang = _useState24[0],
+    setSelLang = _useState24[1];
+  var _useState25 = useState(null),
     _useState26 = _slicedToArray(_useState25, 2),
-    msgs = _useState26[0],
-    setMsgs = _useState26[1];
-  var _useState27 = useState(""),
+    selMode = _useState26[0],
+    setSelMode = _useState26[1];
+  var _useState27 = useState({}),
     _useState28 = _slicedToArray(_useState27, 2),
-    input = _useState28[0],
-    setInput = _useState28[1];
-  var _useState29 = useState(false),
+    profile = _useState28[0],
+    setProfile = _useState28[1];
+  var _useState29 = useState("chat"),
     _useState30 = _slicedToArray(_useState29, 2),
-    loading = _useState30[0],
-    setLoading = _useState30[1];
-  var _useState31 = useState(null),
+    tab = _useState30[0],
+    setTab = _useState30[1];
+  var _useState31 = useState([]),
     _useState32 = _slicedToArray(_useState31, 2),
-    imgData = _useState32[0],
-    setImgData = _useState32[1];
-  var _useState33 = useState(null),
+    msgs = _useState32[0],
+    setMsgs = _useState32[1];
+  var _useState33 = useState(""),
     _useState34 = _slicedToArray(_useState33, 2),
-    imgPreview = _useState34[0],
-    setImgPrev = _useState34[1];
-  var _useState35 = useState(0),
+    input = _useState34[0],
+    setInput = _useState34[1];
+  var _useState35 = useState(false),
     _useState36 = _slicedToArray(_useState35, 2),
-    pqStep = _useState36[0],
-    setPqStep = _useState36[1];
-  var _useState37 = useState(false),
+    loading = _useState36[0],
+    setLoading = _useState36[1];
+  var _useState37 = useState(null),
     _useState38 = _slicedToArray(_useState37, 2),
-    showCL = _useState38[0],
-    setShowCL = _useState38[1];
-  var _useState39 = useState(new Set()),
+    imgData = _useState38[0],
+    setImgData = _useState38[1];
+  var _useState39 = useState(null),
     _useState40 = _slicedToArray(_useState39, 2),
-    clChecked = _useState40[0],
-    setClChecked = _useState40[1];
-  var _useState41 = useState(null),
+    imgPreview = _useState40[0],
+    setImgPrev = _useState40[1];
+  var _useState41 = useState(0),
     _useState42 = _slicedToArray(_useState41, 2),
-    flowState = _useState42[0],
-    setFlow = _useState42[1];
-  var _useState43 = useState(null),
+    pqStep = _useState42[0],
+    setPqStep = _useState42[1];
+  var _useState43 = useState(false),
     _useState44 = _slicedToArray(_useState43, 2),
-    activeJ = _useState44[0],
-    setActiveJ = _useState44[1];
-  var _useState45 = useState([]),
+    showCL = _useState44[0],
+    setShowCL = _useState44[1];
+  var _useState45 = useState(new Set()),
     _useState46 = _slicedToArray(_useState45, 2),
-    journal = _useState46[0],
-    setJournal = _useState46[1];
-  var _useState47 = useState({
+    clChecked = _useState46[0],
+    setClChecked = _useState46[1];
+  var _useState47 = useState(null),
+    _useState48 = _slicedToArray(_useState47, 2),
+    flowState = _useState48[0],
+    setFlow = _useState48[1];
+  var _useState49 = useState(null),
+    _useState50 = _slicedToArray(_useState49, 2),
+    activeJ = _useState50[0],
+    setActiveJ = _useState50[1];
+  var _useState51 = useState([]),
+    _useState52 = _slicedToArray(_useState51, 2),
+    journal = _useState52[0],
+    setJournal = _useState52[1];
+  var _useState53 = useState({
       total: 0,
       wins: 0,
       losses: 0,
@@ -3163,25 +1908,25 @@ function App() {
       bestSession: null,
       worstEmotion: null
     }),
-    _useState48 = _slicedToArray(_useState47, 2),
-    stats = _useState48[0],
-    setStats = _useState48[1];
-  var _useState49 = useState(null),
-    _useState50 = _slicedToArray(_useState49, 2),
-    notif = _useState50[0],
-    setNotif = _useState50[1];
-  var _useState51 = useState(new Set()),
-    _useState52 = _slicedToArray(_useState51, 2),
-    completedCh = _useState52[0],
-    setCompletedCh = _useState52[1];
-  var _useState53 = useState(null),
     _useState54 = _slicedToArray(_useState53, 2),
-    openChapter = _useState54[0],
-    setOpenChapter = _useState54[1];
+    stats = _useState54[0],
+    setStats = _useState54[1];
   var _useState55 = useState(null),
     _useState56 = _slicedToArray(_useState55, 2),
-    apiError = _useState56[0],
-    setApiError = _useState56[1];
+    notif = _useState56[0],
+    setNotif = _useState56[1];
+  var _useState57 = useState(new Set()),
+    _useState58 = _slicedToArray(_useState57, 2),
+    completedCh = _useState58[0],
+    setCompletedCh = _useState58[1];
+  var _useState59 = useState(null),
+    _useState60 = _slicedToArray(_useState59, 2),
+    openChapter = _useState60[0],
+    setOpenChapter = _useState60[1];
+  var _useState61 = useState(null),
+    _useState62 = _slicedToArray(_useState61, 2),
+    apiError = _useState62[0],
+    setApiError = _useState62[1];
   var fileRef = useRef(null),
     bottomRef = useRef(null),
     inputRef = useRef(null),
@@ -3221,16 +1966,19 @@ function App() {
     };
     setProfile(p);
     setPhase("main");
-    addMsg("donna", DONNA.greet(p.name, p.lang, h));
     if (selMode === "advanced") {
-      addMsg("donna", p.lang === "es" ? "La mayoría de los traders pierden porque siguen reglas que alguien más les vendió. Tú ya sabes que hay algo más detrás de cómo se mueve el precio.\n\nSoy Donna. No te digo qué operar. Te hago las preguntas que preferirías saltarte." : "Most traders lose because they follow rules someone else sold them. You already know there's more behind how price moves.\n\nI'm Donna. I don't tell you what to trade. I ask the questions you'd rather skip.");
+      addMsg("donna", p.lang === "es" ? "La mayor\xEDa de los traders pierden porque siguen reglas que alguien m\xE1s les vendi\xF3. T\xFA ya sabes que hay algo m\xE1s detr\xE1s de c\xF3mo se mueve el precio.\n\nSoy Donna. No te digo qu\xE9 operar. Te hago las preguntas que preferir\xEDas saltarte." : "Most traders lose because they follow rules someone else sold them. You already know there's something more behind how price moves.\n\nI'm Donna. I don't tell you what to trade. I ask the questions you'd rather skip.");
+      setPqStep(1);
+      setTimeout(function () {
+        return addMsg("donna", p.lang === "es" ? "¿Cuál es tu vela principal?" : "What's your main candle?");
+      }, 900);
     } else {
-      addMsg("donna", p.lang === "es" ? "La mayoría cree que el mercado es impredecible. No lo es.\n\nTiene una lógica — y yo te la enseño desde cero. Soy Donna." : "Most people think the market is unpredictable. It isn't.\n\nIt has a logic — and I'll teach you to see it from scratch. I'm Donna.");
+      addMsg("donna", p.lang === "es" ? "La mayor\xEDa cree que el mercado es impredecible. No lo es.\n\nTiene una l\xF3gica \u2014 y yo te la ense\xF1o desde cero. Soy Donna." : "Most people think the market is unpredictable. It isn't.\n\nIt has a logic \u2014 and I'll teach you to see it from scratch. I'm Donna.");
+      setPqStep(1);
+      setTimeout(function () {
+        return addMsg("donna", p.lang === "es" ? "¿Qué te trajo hasta aquí?" : "What brought you here?");
+      }, 900);
     }
-    setPqStep(1);
-    setTimeout(function () {
-      return addMsg("donna", selMode === "advanced" ? selLang === "es" ? "Una pregunta antes de empezar. ¿Cuál es tu vela principal?" : "One quick thing before we start. What's your main candle?" : selLang === "es" ? "Cuéntame — ¿qué fue lo que te inspiró a querer aprender a operar en los mercados?" : "Tell me — what was it that inspired you to want to learn trading?");
-    }, 1400);
   };
   var getPQPills = function getPQPills(step, mode, lang) {
     var es = lang === "es",
@@ -3258,27 +2006,15 @@ function App() {
         return addMsg("donna", adv ? p.lang === "es" ? "¿Y cuál es tu proceso antes de entrar?" : "And what's your process before entering?" : p.lang === "es" ? "Me alegra que estés aquí. ¿Alguna vez has abierto un gráfico de trading?" : "I'm glad you're here. Have you ever actually looked at a trading chart before?");
       }, 400);
     } else if (step === 2) {
-      setProfile(function (pr) {
-        return adv ? _objectSpread(_objectSpread({}, pr), {}, {
-          process: pill
-        }) : _objectSpread(_objectSpread({}, pr), {}, {
-          chartExp: pill
-        });
-      });
-      setPqStep(3);
-      setTimeout(function () {
-        return addMsg("donna", adv ? p.lang === "es" ? "Última. ¿Qué es lo que realmente te tiene aquí?" : "Last one. What's the real thing holding you back right now?" : p.lang === "es" ? "¿Y cuándo sueles tener tiempo durante el día?" : "When are you usually free during the day?");
-      }, 400);
-    } else if (step === 3) {
       var up = adv ? _objectSpread(_objectSpread({}, profile), {}, {
-        challenge: pill
+        process: pill
       }) : _objectSpread(_objectSpread({}, profile), {}, {
-        availability: pill
+        chartExp: pill
       });
       setProfile(up);
       setPqStep(0);
       setTimeout(function () {
-        return addMsg("donna", adv ? p.lang === "es" ? "Anotado. \"".concat(pill, "\" \u2014 en eso trabajamos. M\xE1ndame setups, adjunta screenshots, pasa el checklist antes de cada entrada. \xBFQu\xE9 tienes en el radar?") : "Noted. \"".concat(pill, "\" \u2014 that's what we're working on. Send me setups, attach charts, run the checklist before any entry. What's on the radar?") : p.lang === "es" ? "Perfecto. Con esa disponibilidad, las velas diarias y de 4 horas encajan mejor con tu vida \u2014 no necesitas estar pegado a la pantalla. Empecemos desde el principio. \xBFSabes qu\xE9 es una vela japonesa?" : "Perfect. With that schedule, daily and 4H candles fit your life best \u2014 no need to be glued to a screen. Let's start at the beginning. Do you know what a Japanese candlestick is?");
+        return addMsg("donna", adv ? p.lang === "es" ? "Anotado. M\xE1ndame setups, adjunta gr\xE1ficos, pasa el checklist antes de cada entrada. \xBFQu\xE9 tienes en el radar?" : "Noted. Send me setups, attach charts, run the checklist before every entry. What's on the radar?" : p.lang === "es" ? "Perfecto. Empieza por la Academia \u2014 Cap\xEDtulo 1. No te saltes nada. Cada pieza construye sobre la anterior. Y preg\xFAntame lo que sea en el camino." : "Perfect. Start in the Academy \u2014 Chapter 1. Don't skip anything. Each piece builds on the last. And ask me anything along the way.");
       }, 500);
     }
   };
@@ -3434,7 +2170,7 @@ function App() {
     return false;
   };
   var sendMessage = /*#__PURE__*/function () {
-    var _ref1 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(text) {
+    var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(text) {
       var img,
         userText,
         _data$content,
@@ -3446,26 +2182,26 @@ function App() {
         ed,
         data,
         reply,
-        _args = arguments,
-        _t;
-      return _regenerator().w(function (_context) {
-        while (1) switch (_context.p = _context.n) {
+        _args2 = arguments,
+        _t2;
+      return _regenerator().w(function (_context2) {
+        while (1) switch (_context2.p = _context2.n) {
           case 0:
-            img = _args.length > 1 && _args[1] !== undefined ? _args[1] : null;
+            img = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : null;
             if (!(!(text !== null && text !== void 0 && text.trim()) && !img || loading)) {
-              _context.n = 1;
+              _context2.n = 1;
               break;
             }
-            return _context.a(2);
+            return _context2.a(2);
           case 1:
             userText = (text === null || text === void 0 ? void 0 : text.trim()) || (lang === "es" ? "[Gráfico adjunto]" : "[Chart attached]");
             if (!(text !== null && text !== void 0 && text.trim() && handleJournalText(text.trim()))) {
-              _context.n = 2;
+              _context2.n = 2;
               break;
             }
             addMsg("user", text.trim());
             setInput("");
-            return _context.a(2);
+            return _context2.a(2);
           case 2:
             addMsg("user", userText, img ? {
               img: img
@@ -3475,7 +2211,7 @@ function App() {
             setImgPrev(null);
             setLoading(true);
             setApiError(null);
-            _context.p = 3;
+            _context2.p = 3;
             sys = buildPrompt(profile, stats);
             history = msgs.slice(-14).map(function (m) {
               if (m.role === "donna") return {
@@ -3520,14 +2256,11 @@ function App() {
               role: "user",
               content: cur
             });
-            _context.n = 4;
-            return fetch("https://api.anthropic.com/v1/messages", {
+            _context2.n = 4;
+            return fetch("/api/chat", {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
-                "x-api-key": window.ANTHROPIC_KEY || "",
-                "anthropic-version": "2023-06-01",
-                "anthropic-dangerous-direct-browser-access": "true"
+                "Content-Type": "application/json"
               },
               body: JSON.stringify({
                 model: "claude-sonnet-4-20250514",
@@ -3537,50 +2270,50 @@ function App() {
               })
             });
           case 4:
-            res = _context.v;
+            res = _context2.v;
             if (res.ok) {
-              _context.n = 6;
+              _context2.n = 6;
               break;
             }
-            _context.n = 5;
+            _context2.n = 5;
             return res.json().catch(function () {
               return {};
             });
           case 5:
-            ed = _context.v;
+            ed = _context2.v;
             throw new Error(((_ed$error = ed.error) === null || _ed$error === void 0 ? void 0 : _ed$error.message) || "API ".concat(res.status));
           case 6:
-            _context.n = 7;
+            _context2.n = 7;
             return res.json();
           case 7:
-            data = _context.v;
+            data = _context2.v;
             reply = (_data$content = data.content) === null || _data$content === void 0 || (_data$content = _data$content[0]) === null || _data$content === void 0 ? void 0 : _data$content.text;
             if (!reply) {
-              _context.n = 8;
+              _context2.n = 8;
               break;
             }
             addMsg("donna", reply);
-            _context.n = 9;
+            _context2.n = 9;
             break;
           case 8:
             throw new Error("Empty response");
           case 9:
-            _context.n = 11;
+            _context2.n = 11;
             break;
           case 10:
-            _context.p = 10;
-            _t = _context.v;
-            setApiError(_t.message);
+            _context2.p = 10;
+            _t2 = _context2.v;
+            setApiError(_t2.message);
             addMsg("donna", DONNA.fallback(lang, profile.mode));
           case 11:
             setLoading(false);
           case 12:
-            return _context.a(2);
+            return _context2.a(2);
         }
-      }, _callee, null, [[3, 10]]);
+      }, _callee2, null, [[3, 10]]);
     }));
-    return function sendMessage(_x) {
-      return _ref1.apply(this, arguments);
+    return function sendMessage(_x3) {
+      return _ref10.apply(this, arguments);
     };
   }();
   var handleSend = function handleSend() {
@@ -3593,7 +2326,7 @@ function App() {
   var onCLConfirm = function onCLConfirm(grade) {
     setShowCL(false);
     setFlow("jb-1");
-    addMsg("donna", lang === "es" ? "".concat(grade, " \u2014 ").concat(DONNA.gradeComment(grade, lang), "\n\nVamos a registrarlo. \xBFQu\xE9 activo es?") : "".concat(grade, " \u2014 ").concat(DONNA.gradeComment(grade, lang), "\n\nLet's log it. What's the asset?"));
+    addMsg("donna", lang === "es" ? "".concat(grade, " \u2014 ").concat(gradeComment(grade, lang), "\n\nVamos a registrarlo. \xBFQu\xE9 activo es?") : "".concat(grade, " \u2014 ").concat(gradeComment(grade, lang), "\n\nLet's log it. What's the asset?"));
   };
   var getFlowPills = function getFlowPills(fs) {
     var es = lang === "es";
@@ -3875,7 +2608,7 @@ function App() {
       });
       setOpenChapter(null);
       setTimeout(function () {
-        return showNotif(DONNA.chapterDone(openChapter.title, lang));
+        return showNotif(lang === "es" ? "".concat(openChapter.title, " completado.") : "".concat(openChapter.title, " complete."));
       }, 300);
     }
   }), notif && /*#__PURE__*/React.createElement("div", {
@@ -4132,7 +2865,7 @@ function App() {
       color: "#FF6B6B",
       border: "1px solid ".concat(RED, "44")
     }
-  }, "API: ", apiError), /*#__PURE__*/React.createElement("div", {
+  }, apiError !== null && apiError !== void 0 && apiError.includes("invalid x-api-key") ? "⚠️ API key not set — open index.html and replace YOUR_KEY_HERE with your Anthropic key." : "⚠️ " + apiError), /*#__PURE__*/React.createElement("div", {
     ref: bottomRef
   })), displayPills && /*#__PURE__*/React.createElement("div", {
     style: {
