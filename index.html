@@ -35,7 +35,7 @@ window.storage={
    STATIC LESSONS — instant load, no API, bilingual
    Donna chat still uses AI. Lessons never do.
 ═══════════════════════════════════════════════════════════ */
-const SL={
+window.SL={
 en:{
 0:{s:[
 {icon:"👋",title:"Hey. I'm Donna.",body:"I'm your trading accountability coach. I'm not a signal service, a chatbot, or a magic system. I'm here to help you build discipline, learn to read price, and become consistent. Use me in the CHAT tab whenever you want to talk through a trade, get feedback, or just think out loud.",donna:"I'm real talk, not hype. Let's get to work."},
@@ -543,18 +543,29 @@ const COMPLEXITY={
 
 /* ── CHAPTERS ──────────────────────────────────── */
 const CHAPTERS=[
-  {id:0,icon:"🎯",title:"Start Here",sub:"What is Donna and how CRT works.",level:1,static:true,
-   slides:[
-     {icon:"📖",title:"What is CRT?",body:"Candle Range Theory reads price through Smart Money logic. Every candle has exactly two possible outcomes: a Turtle Soup (wick beyond a level, closes inside = fake move) or a True Break (close beyond = real move). Gold at 2000, for example — if it wicks to 2015 but closes at 1998, that is a Turtle Soup. Price is going down.",donna:"Think of every candle as a vote. The wick is where they tried. The close is where they committed. Never confuse the two."},
-     {icon:"🤝",title:"What Donna Does",body:"Donna analyzes your charts with CRT, walks you through an 8-point pre-trade checklist, helps you log every trade, and teaches you through 22 structured chapters from basic candles to the complete trading system. She is not a signal service. She is your coach.",donna:"I will remember your trades, track your patterns, and call out your mistakes by name. That is the deal."},
-     {icon:"⚖️",title:"The Three Rules",body:"Rule 1: Risk 1 to 2 percent maximum per trade, no exceptions. Rule 2: The stop never moves once placed above or below the Model 1 wick. Rule 3: First take is always at 50 percent of the range. These three rules, followed consistently, separate traders who last from those who blow up.",donna:"You will want to break all three. That is normal. Do not."}
-   ],
-   quiz:[
-     {q:"A candle wicks above an old high but closes back inside the range. What does CRT call this?",type:"mc",opts:["True Break — go long","Turtle Soup — fake move","Neutral candle","Change of character"],a:1,exp:"A wick above that closes inside is a Turtle Soup — a fake breakout. The close reveals intention. The wick revealed deception."},
-     {q:"Your stop is correctly placed. Price moves against you slightly. What do you do?",type:"mc",opts:["Move stop wider","Close early","Do nothing — stop stays","Add to position"],a:2,exp:"The stop never moves. Moving it is how good setups become account-destroying losses. Set it and let the market decide."},
-     {q:"You must always take partial profit at 50% of the range before the full target.",type:"tf",a:true,exp:"Always. The 50% partial is mandatory. It locks in profit and lets the rest of the trade run free."}
-   ]
-  },
+  {id:0,icon:"🎯",title:"Start Here",title_es:"Empezar Aquí",sub:"What is trading and how does it work.",sub_es:"Qué es el trading y cómo funciona.",level:1,static:true,
+  slides_en:[
+    {icon:"💡",title:"What is trading?",body:"Trading means buying and selling things that change in price — like currencies, gold, stocks, or crypto. The best part? You can make money whether the price goes UP or DOWN. Most people don't know that. You're not stuck waiting for something to rise.",donna:"Up or down — doesn't matter. If you know which way it's going, there's money in it."},
+    {icon:"💰",title:"You don't need your own money",body:"Most people think you need thousands of dollars to start trading. That's not true. Funded trading accounts let companies give you real money to trade with — you keep a percentage of the profits. You prove you can trade, they fund you. That's how most serious traders operate.",donna:"No capital? Not an excuse anymore. The industry literally gives you money if you can prove you know what you're doing."},
+    {icon:"🗺️",title:"What happens next",body:"Donna is going to teach you everything from scratch. How to read a chart. How price actually moves. How to make decisions without gambling. It's going to take time — that's normal. Go through each chapter in order and don't skip anything. Every chapter builds on the last one.",donna:"You're at the beginning of something real. Take it one chapter at a time. I'll be here the whole way."}
+  ],
+  slides_es:[
+    {icon:"💡",title:"¿Qué es el trading?",body:"El trading significa comprar y vender cosas que cambian de precio — como divisas, oro, acciones o cripto. Lo mejor? Puedes ganar dinero tanto cuando el precio SUBE como cuando BAJA. La mayoría de la gente no sabe eso. No estás atascado esperando que algo suba.",donna:"Arriba o abajo — no importa. Si sabes hacia dónde va, hay dinero en eso."},
+    {icon:"💰",title:"No necesitas tu propio dinero",body:"La mayoría de la gente cree que necesita miles de dólares para empezar a hacer trading. Eso no es verdad. Las cuentas fondeadas permiten que las empresas te den dinero real para operar — tú te quedas un porcentaje de las ganancias. Demuestras que sabes operar, ellos te fondean. Así es como operan la mayoría de los traders serios.",donna:"¿Sin capital? Ya no es una excusa. La industria literalmente te da dinero si puedes demostrar que sabes lo que haces."},
+    {icon:"🗺️",title:"Qué pasa ahora",body:"Donna te va a enseñar todo desde cero. Cómo leer un gráfico. Cómo se mueve el precio de verdad. Cómo tomar decisiones sin apostar. Va a tomar tiempo — eso es normal. Ve cada capítulo en orden y no te saltes nada. Cada capítulo construye sobre el anterior.",donna:"Estás al principio de algo real. Ve un capítulo a la vez. Voy a estar aquí en todo momento."}
+  ],
+  quiz_en:[
+    {q:"Can you make money in trading when the price of something goes DOWN?",type:"tf",a:true,exp:"Yes! This is called going short or short-selling. In trading, you can profit from price moving in either direction — up or down. This is one of the biggest advantages over traditional investing."},
+    {q:"To start trading seriously, you always need to use your own money.",type:"tf",a:false,exp:"False. Funded trading accounts exist specifically for this. Companies give traders real capital to trade with, and you keep a percentage of the profits. Many professional traders never use their own money."},
+    {q:"What is Donna here to do?",type:"mc",opts:["Tell you exactly which trades to take","Teach you how markets work and keep you accountable","Manage your trading account","Predict where price is going"],a:1,exp:"Donna is your coach and accountability partner. She teaches you how to read price and make your own decisions — she never tells you what to trade."}
+  ],
+  quiz_es:[
+    {q:"¿Puedes ganar dinero en el trading cuando el precio de algo BAJA?",type:"tf",a:true,exp:"¡Sí! Esto se llama vender en corto o short-selling. En el trading, puedes ganar tanto cuando el precio sube como cuando baja. Esta es una de las mayores ventajas frente a la inversión tradicional."},
+    {q:"Para empezar a hacer trading en serio, siempre necesitas usar tu propio dinero.",type:"tf",a:false,exp:"Falso. Las cuentas fondeadas existen exactamente para esto. Las empresas dan a los traders capital real para operar, y tú te quedas un porcentaje de las ganancias. Muchos traders profesionales nunca usan su propio dinero."},
+    {q:"¿Para qué está aquí Donna?",type:"mc",opts:["Decirte exactamente qué operaciones tomar","Enseñarte cómo funcionan los mercados y mantenerte responsable","Gestionar tu cuenta de trading","Predecir hacia dónde va el precio"],a:1,exp:"Donna es tu coach y compañera de accountability. Te enseña a leer el precio y tomar tus propias decisiones — nunca te dice qué operar."}
+  ]
+},
+
   {id:1,icon:"🕯️",title:"Reading Candles",sub:"What every candle is actually telling you.",level:1,desc:"The four parts of a candlestick (OHLC), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples with real numbers."},
   {id:2,icon:"📊",title:"Market States",sub:"First question every time you open a chart.",level:1,desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), no structure (no trade). How to identify each. The devastating mistake of applying trending strategy in a ranging market. The no-man\'s-land concept — never trade the middle of a range."},
   {id:3,icon:"🔭",title:"The Three Timeframes",sub:"HTF · ITF · LTF — one purpose each.",level:2,desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."},
@@ -761,8 +772,9 @@ const Sounds={
 
 async function generateLesson(chapter, lang){
   // Static content — instant, always works
-  const langData = SL[lang] || SL['en'];
-  const chData = langData[chapter.id] || SL['en'][chapter.id];
+  const _SL=window.SL||{};
+  const langData = _SL[lang] || _SL['en'] || {};
+  const chData = langData[chapter.id] || (_SL['en']||{})[chapter.id];
   if(chData){
     // Normalize keys for rendering
     const slides = chData.s.map(s=>({icon:s.icon,title:s.title,body:s.body,donna:s.donna}));
@@ -1330,6 +1342,35 @@ function LessonModal({chapter,lang,onClose,onComplete}){
 /* ═══════════════════════════════════
    ACADEMY SCREEN
 ═══════════════════════════════════ */
+
+const CH_TITLES_ES={
+  0:"Empezar Aquí",1:"Leyendo Velas",2:"Estados del Mercado",
+  3:"Los Tres Marcos de Tiempo",4:"Quién Mueve el Precio",
+  5:"Por Qué Se Mueve el Precio",6:"Conocer Tu Objetivo",
+  7:"El Rompimiento Falso",8:"Secuencia AMD",9:"Leyendo el Sesgo",
+  10:"Kill Zones",11:"La Entrada Model 1",12:"Kiss of Death",
+  13:"Fair Value Gaps",14:"Order Blocks",15:"Breaker Blocks",
+  16:"La Secuencia de 5 Entradas",17:"Divergencia SMT",
+  18:"Falso Cambio de Carácter",19:"Operando en Rangos",
+  20:"El Proceso Completo",21:"Gestión de Operaciones",
+  22:"Integrando Todo"
+};
+const CH_SUBS_ES={
+  0:"Qué es el trading y cómo funciona.",
+  1:"Lo que cada vela te está diciendo.",2:"Identificando la condición del mercado.",
+  3:"HTF, ITF, LTF — el sistema completo.",4:"Retail vs Smart Money.",
+  5:"Liquidez y desequilibrio.",6:"Siempre el objetivo primero.",
+  7:"El Turtle Soup — el setup más importante.",8:"AMD en cada marco temporal.",
+  9:"Cómo leer el sesgo del mercado.",10:"Cuándo operar — las ventanas.",
+  11:"Una vela. Una regla. Un trigger.",12:"El último movimiento antes del objetivo.",
+  13:"Los gaps que el precio siempre llena.",14:"Dónde entró el Smart Money.",
+  15:"Cuando el soporte se convierte en resistencia.",
+  16:"Cinco entradas. Una secuencia.",17:"Cuando los mercados se delatan.",
+  18:"El setup que atrapa traders inteligentes.",
+  19:"Comprar cerca del mínimo, vender cerca del máximo.",
+  20:"Top-down siempre.",21:"Gestiona bien o pierde bien.",
+  22:"El patrón universal."
+};
 function AcademyScreen({profile,completed,passedCh=new Set(),onOpen}){
   const lang=profile.lang||"en";
   const xp=completed.size*50;
@@ -1372,6 +1413,8 @@ function AcademyScreen({profile,completed,passedCh=new Set(),onOpen}){
           const current=ch.id===0?!done:!done&&prevPassed;
           const locked=ch.id===0?false:!done&&!prevPassed;
           const isLeft=i%2===0;
+          const displayTitle=lang==="es"?(CH_TITLES_ES[ch.id]||ch.title):ch.title;
+          const displaySub=lang==="es"?(CH_SUBS_ES[ch.id]||ch.sub):ch.sub;
           const bc=done?RED:current?RED:DARK2;
           const cfg=COMPLEXITY[ch.level]||COMPLEXITY[1];
           return(
@@ -1384,8 +1427,8 @@ function AcademyScreen({profile,completed,passedCh=new Set(),onOpen}){
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:10,fontWeight:700,color:current||done?RED:MUTED,letterSpacing:1.5}}>{ch.id===0?"★ START HERE":"CH "+String(ch.id).padStart(2,"0")}</div>
-                  <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13,color:locked?MUTED:"#fff",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:1}}>{ch.title}</div>
-                  <div style={{fontSize:12,color:MUTED,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{ch.sub}</div>
+                  <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13,color:locked?MUTED:"#fff",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:1}}>{displayTitle}</div>
+                  <div style={{fontSize:12,color:MUTED,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{displaySub}</div>
                 </div>
                 <div style={{flexShrink:0,display:"flex",flexDirection:"column",gap:3,alignItems:"flex-end"}}>
                   {current&&<div style={{background:RED,borderRadius:8,padding:"3px 8px",fontSize:12,fontWeight:700,color:"#fff"}}>▶</div>}
@@ -1591,38 +1634,11 @@ function App(){
     setProfile(p);setPhase("main");
 
     if(selMode==="advanced"){
-      const msg=p.lang==="es"
-        ?`${p.name}. Sin rodeos.
-
-Sé que ya sabes que el precio se mueve por dos razones. Lo que yo hago es la parte de disciplina — checklist antes de cada entrada, diario después de cada operación, y revisión de patrones cuando estás perdiendo.
-
-Funciones disponibles:
-📊 Analizo tus gráficos con CRT
-✅ Checklist pre-operación de 8 puntos
-📝 Diario de operaciones con seguimiento
-🎓 Academia completa de 22 capítulos
-🎤 Habla conmigo — activa el micrófono
-
-Soy tu socia de accountability. ¿Qué tienes en el radar?`
-        :`${p.name}. Let's skip the tour.
-
-You already know price moves for two reasons. What I'm here for is the discipline side — checklist before every entry, trade log after every trade, pattern review when you're losing.
-
-What Donna does:
-📊 Reads your charts with CRT
-✅ 8-point pre-trade checklist
-📝 Trade journal with accountability
-🎓 Full 22-chapter academy
-🎤 Voice input — tap the mic
-
-I'm your accountability partner. Send me a setup or tell me what you're watching.`;
-      addMsg("donna",msg);
-      setPqStep(1);
-      setTimeout(()=>{
-        const q=p.lang==="es"?"¿Cuál es tu vela principal de trabajo?":"What's your main working candle?";
-        addMsg("donna",q);
-        setContextPills(p.lang==="es"?["📅 Diaria","🕓 4H","⏰ 1H","🌊 Las combino"]:["📅 Daily","🕓 4H","⏰ 1H","🌊 I combine them"]);
-      },1000);
+      // Advanced: no questionnaire, go straight to chat with accountability message
+      const welcomeAdv=p.lang==="es"
+        ?"Hey. Soy Donna. Estoy aquí para mantenerte responsable — no para enseñarte los básicos. Dime en qué estás trabajando o comparte un setup cuando estés listo."
+        :"Hey. I'm Donna. I'm here to keep you accountable — not to teach you basics. Tell me what you're working on, or share a setup when you're ready.";
+      addMsg("donna",welcomeAdv);
     }else{
       const msg=p.lang==="es"
         ?`¡Hola ${p.name}! 👋 Soy Donna, tu mentora de trading CRT.
@@ -1654,14 +1670,10 @@ Here's what I can do for you:
 
 Let's start with the most important thing:`;
       addMsg("donna",msg);
-      setPqStep(1);
-      setTimeout(()=>{
-        const q=p.lang==="es"?"¿Qué te trajo hasta aquí? ¿Por qué quieres aprender a operar?":"What brought you here? Why do you want to learn trading?";
-        addMsg("donna",q);
-        setContextPills(p.lang==="es"
-          ?["🎯 Libertad financiera","👀 Vi a otros hacerlo","💡 Perdí dinero y quiero entender","❤️ Más para mi familia","🤔 Pura curiosidad"]
-          :["🎯 Financial freedom","👀 I saw others doing it","💡 I lost money","❤️ More for my family","🤔 Pure curiosity"]);
-      },1000);
+      // No questionnaire - go straight to chat with helpful pills
+      setContextPills(p.lang==="es"
+        ?["🎓 Ir a la Academia","💬 Tengo preguntas","✅ Ver el checklist"]
+        :["🎓 Go to Academy","💬 I have questions","✅ See the checklist"]);
     }
   };
 
@@ -1766,6 +1778,10 @@ Let's start with the most important thing:`;
   };
 
   const handleSend=()=>{
+    // Intercept checklist requests from typed input
+    const inp=input.toLowerCase().trim();
+    const isChkRequest=["checklist","check list","lista de verificación","lista de control"].some(k=>inp.includes(k));
+    if(isChkRequest&&!imgData){triggerChecklist();setInput("");return;}
     if(imgData&&userPlan!=="pro"&&userPlan!=="free_trial"){
       setShowPaywall(true);return;
     }
