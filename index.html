@@ -16,227 +16,289 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html{height:100%;height:-webkit-fill-available;}
     body{height:100%;min-height:-webkit-fill-available;background:#000;overflow:hidden;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;}
-    #root{height:100%;height:-webkit-fill-available;display:flex;flex-direction:column;overscroll-behavior:none;}
+    #root{height:100%;height:-webkit-fill-available;display:flex;flex-direction:column;}
   </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script>
-window.storage = {
-  get: async (key) => {
-    const v = localStorage.getItem(key);
-    if (v === null) throw new Error('Not found');
-    return { key, value: v };
-  },
-  set: async (key, value) => {
-    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
-    return { key, value };
-  },
-  delete: async (key) => { localStorage.removeItem(key); return { key, deleted: true }; },
-  list: async (prefix) => {
-    const keys = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (!prefix || k.startsWith(prefix)) keys.push(k);
-    }
-    return { keys, prefix };
-  }
+window.storage={
+  get:async(k)=>{const v=localStorage.getItem(k);if(v===null)throw new Error("nf");return{key:k,value:v};},
+  set:async(k,v)=>{localStorage.setItem(k,typeof v==="string"?v:JSON.stringify(v));return{key:k,value:v};},
+  delete:async(k)=>{localStorage.removeItem(k);return{key:k,deleted:true};},
+  list:async(p)=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!p||k.startsWith(p))ks.push(k);}return{keys:ks};}
 };
 </script>
-
 <script type="text/babel">
-const { useState, useRef, useEffect, useCallback } = React;
+const {useState,useRef,useEffect,useCallback,useMemo}=React;
 
-/* ═══════════════════════════════════════════════════
-   CONSTANTS
-═══════════════════════════════════════════════════ */
-const RED   = "#E8253C";
-const DARK  = "#1C1C1E";
-const DARK2 = "#2C2C2E";
-const MUTED = "#8E8E93";
-const GREEN = "#30D158";
-const BLUE  = "#007AFF";
-const GOLD  = "#FF9F0A";
-const FREE_MSG_LIMIT = 10;
+/* ── CONSTANTS ─────────────────────────────────── */
+const RED="#E8253C",DARK="#1C1C1E",DARK2="#2C2C2E",MUTED="#8E8E93",
+      GREEN="#30D158",BLUE="#007AFF",GOLD="#FF9F0A",FREE=10;
 
-/* ═══════════════════════════════════════════════════
-   COMPLEXITY CONFIG  (THE VARIABLE DEPTH FEATURE)
-   Level 1 = Foundation    → 3 slides, 6 quiz questions
-   Level 2 = Intermediate  → 5 slides, 8 quiz questions
-   Level 3 = Advanced      → 6 slides, 10 quiz questions
-═══════════════════════════════════════════════════ */
-const COMPLEXITY = {
-  1: { slides: 3,  minQ: 6,  label: "Foundation"   },
-  2: { slides: 5,  minQ: 8,  label: "Intermediate" },
-  3: { slides: 6,  minQ: 10, label: "Advanced"     },
+const COMPLEXITY={
+  1:{slides:3,minQ:6,label:"Foundation",color:"#4ECDC4",emoji:"🌱"},
+  2:{slides:5,minQ:8,label:"Intermediate",color:GOLD,emoji:"📈"},
+  3:{slides:6,minQ:10,label:"Advanced",color:RED,emoji:"🔥"},
 };
 
-const LVL_COLOR = { 1: "#4ECDC4", 2: GOLD, 3: RED };
-const LVL_EMOJI = { 1: "🌱", 2: "📈", 3: "🔥" };
-
-/* ═══════════════════════════════════════════════════
-   CHAPTERS  (level drives slide depth)
-═══════════════════════════════════════════════════ */
-const CHAPTERS = [
-  { id:1,  icon:"🕯️", title:"Reading Candles",       sub:"What every candle is actually telling you.",        level:1, desc:"The four parts of a candlestick (Open High Low Close), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples." },
-  { id:2,  icon:"📊", title:"Market States",          sub:"First question every time you open a chart.",       level:1, desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), choppy (no trade). How to identify each on a chart. The devastating mistake of applying trending strategy in a ranging market. Include the 'no-man's-land' concept — never trade the middle of a range." },
-  { id:3,  icon:"🔭", title:"The Three Timeframes",   sub:"HTF · ITF · LTF — one purpose each.",              level:2, desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle." },
-  { id:4,  icon:"🌊", title:"Who Moves Price",         sub:"Smart Money vs Retail — the invisible hand.",      level:2, desc:"Large participants use predictable retail behavior as fuel. Retail was taught to buy breakouts above highs — large players know exactly where those orders are. CRT teaches you to read their footprints. Dumb Money buys above highs; Smart Money sells to them. Include the buy stop / sell stop accumulation concept." },
-  { id:5,  icon:"💧", title:"Why Price Moves",         sub:"Two reasons. Only two. Every move in history.",    level:2, desc:"Price moves to reach liquidity (stacked orders at old highs and lows) or to fill an imbalance. The ERL/IRL cycle. Buy stops above highs, sell stops below lows. Why every price move in history reduces to one of these two. Old highs that formed after sweeping a low matter most." },
-  { id:6,  icon:"🗺️", title:"Knowing Your Target",    sub:"Always know where before you look for how.",       level:2, desc:"Why you must identify the target BEFORE looking for an entry. External liquidity (old highs/lows — final destination) vs Internal liquidity (imbalances along the way). Which levels carry the most weight. The liquidity cycle. Without a target, there is no trade." },
-  { id:7,  icon:"🐢", title:"The Fake Breakout",       sub:"The engine behind every big move.",                level:3, desc:"The fake breakout precedes every major move. Price pushes above an old high, triggers buy stops, collects liquidity, then reverses. Three types: continuation, range, reversal. The failure swing. Rule 1: never buy above old high, never sell below old low. Reversal type at HTF key level = highest quality." },
-  { id:8,  icon:"📅", title:"The 3-Candle Sequence",   sub:"Accumulation · Manipulation · Distribution.",     level:3, desc:"Every price move follows AMD: C1 accumulates the range, C2 performs the fake breakout (never trade this candle), C3 is the real move (your trade). Weekly: Monday=accumulation, Tuesday=manipulation and real high/low, Wednesday-Thursday=distribution. Month: Week 2 is the manipulation week." },
-  { id:9,  icon:"👁️", title:"Reading Bias",            sub:"Closes reveal. Wicks deceive.",                   level:1, desc:"How to read daily bias from candle closes. Bullish trades only below the daily open. Bearish trades only above the daily open. Prior daily closed above old high = bullish bias. Wicked above but closed inside = bearish bias. This one filter eliminates most bad trades." },
-  { id:10, icon:"⏰", title:"Trading Sessions",        sub:"When matters more than where.",                    level:2, desc:"Three Kill Zones: Asia 8PM-12AM NY (Gold, JPY), London 2-5AM NY (EUR/USD, GBP), NY Open 7-11AM (Indices, Crypto, USD). NYSE opens 9:30AM = biggest liquidity injection, not automatically manipulation. Session AMD profiles. A perfect level at 3AM Saturday has different probability than the same level during Tuesday London Kill Zone." },
-  { id:11, icon:"🎯", title:"The Entry Candle",        sub:"One candle. One rule. One trigger.",               level:3, desc:"The Model 1 entry: one thick decisive candle that nails a structural level and closes back inside. Three requirements: thick, real structural level, Kill Zone timing. The close is the trigger — never the wick. Stop above/below the wick (fixed, never moved). T1=50% mandatory first, T2=opposite end. An FVG inside the Model 1 candle increases probability." },
-  { id:12, icon:"💀", title:"The Final Trap",          sub:"It happens before every target. Every time.",      level:3, desc:"The Kiss of Death: the last fake move right before price reaches its target. Always happens — guaranteed. Designed to shake out traders who entered correctly. How to identify it. Why it's Entry 5 and the most violent move. If you're stopped out by the KoD, you didn't lose — you just didn't size it right." },
-  { id:13, icon:"🗝️", title:"Price Imbalances",        sub:"The gap price always comes back to fill.",         level:2, desc:"Fair Value Gaps: 3-candle imbalances where price moved too fast and left a gap. Acts as a magnet. The 50% rule — the 50% of the FVG is the critical level. High-probability FVGs are backed by structural events. OB+FVG at same level = maximum confluence. FVGs as Internal Liquidity." },
-  { id:14, icon:"📦", title:"Order Blocks",            sub:"Where big money left its footprint.",              level:2, desc:"The last candle of the opposite color before a major move = Order Block. In a bullish market, the last bearish candle before the impulse up = support. The 50% rule. Higher TF Order Blocks carry more weight. OB+FVG confluence. Why institutions leave these footprints and why price returns to them." },
-  { id:15, icon:"🔄", title:"Flipped Levels",          sub:"Old support becomes resistance — and vice versa.", level:2, desc:"Breaker Blocks: Order Blocks that were broken and flipped. Three price passes through same area = most balanced location on chart. Least drawdown of all entries — Entry 3 in the sequence. Same event as the true Change of Character. What makes a valid flip vs a random level." },
-  { id:16, icon:"🔢", title:"Five Entry Points",       sub:"The full sequence. Never go backward.",            level:3, desc:"E1: Turtle Soup wick (live, hardest, highest reward). E2: Model 1 close (daily confirmed, standard entry). E3: Breaker Block (least drawdown). E4: OTE 60-75% retrace (where ICT traders enter — KoD often traps them here). E5: Kiss of Death (most violent, most certain). Never go backward — if E3 formed, only E5 remains." },
-  { id:17, icon:"🔗", title:"Correlated Markets",     sub:"When one market tells on another.",                level:2, desc:"SMT divergence: correlated assets not confirming each other. EUR/USD vs DXY (inverse). BTC vs ETH (direct). S&P vs NASDAQ (direct). One takes a high the other doesn't = fake move in the one that took it. Never trade SMT alone — always combine with Model 1 confirmation at a structural level." },
-  { id:18, icon:"⚠️", title:"Real vs Fake Breakouts", sub:"The trap that destroys the most accounts.",        level:3, desc:"False Change of Character looks perfect — that's the point. Real CoC: violent purge of stops + decisive close through the level. False CoC: textbook-perfect setup designed to trap informed traders. Verification: key HTF level + Kill Zone + correlated market confirmation. A 1H CoC in an HTF premium zone is a sell signal dressed as a buy." },
-  { id:19, icon:"📈", title:"Trading Ranges",          sub:"Rules, targets, and the fake breakout rule.",      level:2, desc:"Buy at range low, sell at range high, never the middle. The first breakout is almost always fake — wait for the fake to confirm direction. Range = accumulation for the next big move. Range to trend transition. Targets from range extremes. What defines a valid range vs choppy noise." },
-  { id:20, icon:"🏗️", title:"Building a Trade",        sub:"Top-down always. Entry is the last step.",        level:3, desc:"The complete top-down process: week of month → HTF narrative → daily open position → liquidity target → Kill Zone → structural level → entry candle. Entry is ALWAYS last. Four things to know before pressing the button: stop level, 50% target, full target, risk percentage. Never work bottom-up." },
-  { id:21, icon:"⚡", title:"Managing the Trade",      sub:"From button to exit — behavior is everything.",    level:3, desc:"Two valid entry types only (Model 1 close and true CoC). Why the stop never moves. Managing through the failure swing. Managing through the Kiss of Death. The mandatory 50% partial and why it's sacred. The behavioral patterns that cause losses: early exits, moving stops, FOMO entries. The trading journal as the real edge." },
-  { id:22, icon:"🏆", title:"The Complete System",     sub:"Put it all together. This is your process.",       level:3, desc:"The universal pattern: Open. Key Level. Fake breakout. Real move. The fractal nature — same logic at every speed. The 1-2% risk rule. The 8-loss streak that comes for everyone. Why documentation separates profitable traders. The shortcut in trading has one name: losses." },
+/* ── CHAPTERS ──────────────────────────────────── */
+const CHAPTERS=[
+  {id:1,icon:"🕯️",title:"Reading Candles",sub:"What every candle is actually telling you.",level:1,desc:"The four parts of a candlestick (OHLC), body vs wick, why the CLOSE is the single most important data point. Closes reveal intention. Wicks reveal deception. A wick above a high that closes inside = failed attempt = bearish. A close above a high = commitment = bullish. Include specific price examples with real numbers."},
+  {id:2,icon:"📊",title:"Market States",sub:"First question every time you open a chart.",level:1,desc:"Three market states: trending (clear direction), ranging (bouncing between two levels), choppy (no trade). How to identify each. The devastating mistake of applying trending strategy in a ranging market. The no-man\'s-land concept — never trade the middle of a range."},
+  {id:3,icon:"🔭",title:"The Three Timeframes",sub:"HTF · ITF · LTF — one purpose each.",level:2,desc:"Higher TF tells you WHY price should move. Intermediate confirms the CRT is happening. Lower gives the WHEN and WHERE. What breaks when one is missing. Daily→4H→1H example. A Model 1 without an HTF reason is just a candle."},
+  {id:4,icon:"🌊",title:"Who Moves Price",sub:"Smart Money vs Retail — the invisible hand.",level:2,desc:"Large participants use predictable retail behavior as fuel. Retail was taught to buy breakouts above highs — large players know exactly where those orders are. Dumb Money buys above highs; Smart Money sells to them. Include the buy stop / sell stop accumulation concept."},
+  {id:5,icon:"💧",title:"Why Price Moves",sub:"Two reasons. Only two. Every move in history.",level:2,desc:"Price moves to reach liquidity (stacked orders at old highs and lows) or to fill an imbalance. The ERL/IRL cycle. Buy stops above highs, sell stops below lows. Old highs that formed after sweeping a low matter most."},
+  {id:6,icon:"🗺️",title:"Knowing Your Target",sub:"Always know where before you look for how.",level:2,desc:"Why you must identify the target BEFORE looking for an entry. External liquidity (old highs/lows) vs Internal liquidity (imbalances along the way). Without a target, there is no trade."},
+  {id:7,icon:"🐢",title:"The Fake Breakout",sub:"The engine behind every big move.",level:3,desc:"The fake breakout precedes every major move. Price pushes above an old high, triggers buy stops, collects liquidity, then reverses. Three types: continuation, range, reversal. Rule 1: never buy above old high, never sell below old low. Reversal type at HTF key level = highest quality."},
+  {id:8,icon:"📅",title:"The 3-Candle Sequence",sub:"Accumulation · Manipulation · Distribution.",level:3,desc:"Every price move follows AMD: C1 accumulates the range, C2 performs the fake breakout (never trade this candle), C3 is the real move. Weekly: Monday=accumulation, Tuesday=manipulation and real high/low, Wednesday-Thursday=distribution."},
+  {id:9,icon:"👁️",title:"Reading Bias",sub:"Closes reveal. Wicks deceive.",level:1,desc:"How to read daily bias from candle closes. Bullish trades only below the daily open. Bearish trades only above the daily open. Prior daily closed above old high = bullish bias. Wicked above but closed inside = bearish bias. This one filter eliminates most bad trades."},
+  {id:10,icon:"⏰",title:"Trading Sessions",sub:"When matters more than where.",level:2,desc:"Three Kill Zones: Asia 8PM-12AM NY (Gold, JPY), London 2-5AM NY (EUR/USD, GBP), NY Open 7-11AM (Indices, Crypto, USD). NYSE opens 9:30AM = biggest liquidity injection. A perfect level at 3AM Saturday has different probability than the same level during Tuesday London Kill Zone."},
+  {id:11,icon:"🎯",title:"The Entry Candle",sub:"One candle. One rule. One trigger.",level:3,desc:"The Model 1 entry: one thick decisive candle that nails a structural level and closes back inside. Three requirements: thick, real structural level, Kill Zone timing. The close is the trigger — never the wick. Stop above/below the wick (fixed, never moved). T1=50% mandatory first, T2=opposite end."},
+  {id:12,icon:"💀",title:"The Final Trap",sub:"It happens before every target. Every time.",level:3,desc:"The Kiss of Death: the last fake move right before price reaches its target. Always happens — guaranteed. Designed to shake out traders who entered correctly. Why it\'s Entry 5 and the most violent move. If you\'re stopped out by the KoD, you didn\'t lose — you just didn\'t size it right."},
+  {id:13,icon:"🗝️",title:"Price Imbalances",sub:"The gap price always comes back to fill.",level:2,desc:"Fair Value Gaps: 3-candle imbalances where price moved too fast and left a gap. Acts as a magnet. The 50% rule. High-probability FVGs are backed by structural events. OB+FVG at same level = maximum confluence."},
+  {id:14,icon:"📦",title:"Order Blocks",sub:"Where big money left its footprint.",level:2,desc:"The last candle of the opposite color before a major move = Order Block. In a bullish market, the last bearish candle before the impulse up = support. The 50% rule. Higher TF Order Blocks carry more weight."},
+  {id:15,icon:"🔄",title:"Flipped Levels",sub:"Old support becomes resistance — and vice versa.",level:2,desc:"Breaker Blocks: Order Blocks that were broken and flipped. Three price passes through same area = most balanced location on chart. Least drawdown of all entries. Same event as the true Change of Character."},
+  {id:16,icon:"🔢",title:"Five Entry Points",sub:"The full sequence. Never go backward.",level:3,desc:"E1: Turtle Soup wick (live, hardest, highest reward). E2: Model 1 close (standard entry). E3: Breaker Block (least drawdown). E4: OTE 60-75% retrace (KoD often traps here). E5: Kiss of Death (most violent, most certain). Never go backward — if E3 formed, only E5 remains."},
+  {id:17,icon:"🔗",title:"Correlated Markets",sub:"When one market tells on another.",level:2,desc:"SMT divergence: correlated assets not confirming each other. EUR/USD vs DXY (inverse). BTC vs ETH (direct). S&P vs NASDAQ (direct). One takes a high the other doesn\'t = fake move in the one that took it. Never trade SMT alone — combine with Model 1 at structural level."},
+  {id:18,icon:"⚠️",title:"Real vs Fake Breakouts",sub:"The trap that destroys the most accounts.",level:3,desc:"False Change of Character looks perfect — that\'s the point. Real CoC: violent purge of stops + decisive close through the level. False CoC: textbook-perfect setup designed to trap informed traders. Verification: key HTF level + Kill Zone + correlated market confirmation."},
+  {id:19,icon:"📈",title:"Trading Ranges",sub:"Rules, targets, and the fake breakout rule.",level:2,desc:"Buy at range low, sell at range high, never the middle. The first breakout is almost always fake — wait for the fake to confirm direction. Range = accumulation for the next big move. What defines a valid range vs choppy noise."},
+  {id:20,icon:"🏗️",title:"Building a Trade",sub:"Top-down always. Entry is the last step.",level:3,desc:"The complete top-down process: week of month → HTF narrative → daily open position → liquidity target → Kill Zone → structural level → entry candle. Entry is ALWAYS last. Four things to know before pressing the button: stop level, 50% target, full target, risk percentage."},
+  {id:21,icon:"⚡",title:"Managing the Trade",sub:"From button to exit — behavior is everything.",level:3,desc:"Two valid entry types only (Model 1 close and true CoC). Why the stop never moves. Managing through the failure swing and the Kiss of Death. The mandatory 50% partial and why it\'s sacred. The behavioral patterns that cause losses: early exits, moving stops, FOMO entries."},
+  {id:22,icon:"🏆",title:"The Complete System",sub:"Put it all together. This is your process.",level:3,desc:"The universal pattern: Open. Key Level. Fake breakout. Real move. The fractal nature — same logic at every timeframe. The 1-2% risk rule. The 8-loss streak that comes for everyone. Why documentation separates profitable traders."},
 ];
 
-/* ═══════════════════════════════════════════════════
-   TRANSLATIONS
-═══════════════════════════════════════════════════ */
-const T = {
-  en: {
-    tagline: "Your trading mentor. 10 free messages.",
-    nameLabel: "YOUR NAME", namePH: "Your name...",
-    langLabel: "LANGUAGE / IDIOMA", modeLabel: "MODE",
-    beg: "Beginner", begSub: "Step by step",
-    adv: "Advanced", advSub: "No hand-holding",
-    start: "Start with Donna",
-    disclaimer: "Not financial advice. Just candle theory.",
-    privacy: "All data stays on your device only.",
-    tabChat: "CHAT", tabAcademy: "ACADEMY",
-    msgPH: "Message Donna...",
-    trialLeft: (n) => `${n} free messages left`,
-    paywallTitle: "You've used your 10 free messages.",
-    paywallSub: "Upgrade for unlimited chat, live chart reads, and full academy.",
-    upgrade: "Upgrade to Pro →", later: "Maybe later",
-    advMode: "Advanced Mode", begMode: "Beginner Mode",
-    clTitle: "Pre-Trade Checklist", clSub: "Tap to confirm each point",
-    clCTA: (g) => `${g} — Log this trade`,
-    clDontTrade: "Don't trade this — wait for better",
-    clClose: "Not ready yet",
-    lessonContinue: "Continue →", lessonStart: "Start Quiz ⚡",
-    quizTitle: "QUIZ", nextQ: "Next →",
-    finishCh: "Complete Chapter 🏆",
-    chDone: "Chapter Complete!",
-    chScore: (s, t) => `${s}/${t} correct`,
+/* ── TRANSLATIONS ───────────────────────────────── */
+const T={
+  en:{
+    nameLabel:"YOUR NAME",namePH:"Your name...",
+    langLabel:"LANGUAGE / IDIOMA",modeLabel:"MODE",
+    beg:"Beginner",begSub:"Step by step",
+    adv:"Advanced",advSub:"No hand-holding",
+    start:"Start with Donna",
+    disclaimer:"Not financial advice. Just candle theory.",
+    privacy:"All data stays on your device only.",
+    tabChat:"CHAT",tabJournal:"JOURNAL",tabAcademy:"ACADEMY",
+    msgPH:"Message Donna...",
+    trialLeft:(n)=>`${n} free messages left`,
+    paywallTitle:"You\'ve used your 10 free messages.",
+    paywallSub:"Upgrade for unlimited chat, live chart reads, and full academy.",
+    upgrade:"Upgrade to Pro →",later:"Maybe later",
+    advMode:"Advanced Mode",begMode:"Beginner Mode",
+    clTitle:"Pre-Trade Checklist",clSub:"Tap to confirm each point",
+    clCTA:(g)=>`${g} — Log this trade`,
+    clDontTrade:"Don\'t trade this — wait for better",
+    clClose:"Not ready yet",
+    lessonContinue:"Continue →",lessonStart:"Start Quiz ⚡",
+    quizTitle:"QUIZ",nextQ:"Next →",
+    finishCh:"Complete Chapter 🏆",
+    chDone:"Chapter Complete!",
+    chScore:(s,t)=>`${s}/${t} correct`,
+    journalEmpty:"No trades logged yet.",
+    journalLog:"Log a Trade",
+    tradeAsset:"What asset?",
+    tradeDirection:"Direction?",
+    tradeKZ:"Kill Zone?",
+    tradeEmotion:"How are you feeling?",
+    tradeReason:"Why this trade? (one sentence)",
+    tradeRisk:"Risk %?",
+    tradeClose:"Close this trade",
+    tradeResult:"Result?",
+    tradeR:"R multiple?",
+    tradeDoneRight:"One thing you did right",
+    tradeWouldChange:"One thing you\'d change",
+    tradeSave:"Save Trade",
+    activeTrade:"Active Trade",
+    checkIn:"Check In",
   },
-  es: {
-    tagline: "Tu mentora de trading. 10 mensajes gratis.",
-    nameLabel: "TU NOMBRE", namePH: "Tu nombre...",
-    langLabel: "IDIOMA / LANGUAGE", modeLabel: "MODO",
-    beg: "Principiante", begSub: "Paso a paso",
-    adv: "Avanzado", advSub: "Sin mano extra",
-    start: "Empezar con Donna",
-    disclaimer: "No es asesoramiento financiero. Solo teoría de velas.",
-    privacy: "Todos los datos se quedan en tu dispositivo.",
-    tabChat: "CHAT", tabAcademy: "ACADEMIA",
-    msgPH: "Mensaje a Donna...",
-    trialLeft: (n) => `${n} mensajes restantes`,
-    paywallTitle: "Has usado tus 10 mensajes gratuitos.",
-    paywallSub: "Actualiza para chat ilimitado, análisis de gráficos y academia completa.",
-    upgrade: "Actualizar a Pro →", later: "Quizás después",
-    advMode: "Modo Avanzado", begMode: "Modo Principiante",
-    clTitle: "Checklist Pre-Operación", clSub: "Toca para confirmar cada punto",
-    clCTA: (g) => `${g} — Registrar operación`,
-    clDontTrade: "No operes esto — espera un mejor setup",
-    clClose: "Aún no estoy listo",
-    lessonContinue: "Continuar →", lessonStart: "Empezar Quiz ⚡",
-    quizTitle: "QUIZ", nextQ: "Siguiente →",
-    finishCh: "Completar Capítulo 🏆",
-    chDone: "¡Capítulo Completado!",
-    chScore: (s, t) => `${s}/${t} correctas`,
+  es:{
+    nameLabel:"TU NOMBRE",namePH:"Tu nombre...",
+    langLabel:"IDIOMA / LANGUAGE",modeLabel:"MODO",
+    beg:"Principiante",begSub:"Paso a paso",
+    adv:"Avanzado",advSub:"Sin mano extra",
+    start:"Empezar con Donna",
+    disclaimer:"No es asesoramiento financiero. Solo teoría de velas.",
+    privacy:"Todos los datos se quedan en tu dispositivo.",
+    tabChat:"CHAT",tabJournal:"DIARIO",tabAcademy:"ACADEMIA",
+    msgPH:"Mensaje a Donna...",
+    trialLeft:(n)=>`${n} mensajes restantes`,
+    paywallTitle:"Has usado tus 10 mensajes gratuitos.",
+    paywallSub:"Actualiza para chat ilimitado, análisis de gráficos y academia completa.",
+    upgrade:"Actualizar a Pro →",later:"Quizás después",
+    advMode:"Modo Avanzado",begMode:"Modo Principiante",
+    clTitle:"Checklist Pre-Operación",clSub:"Toca para confirmar cada punto",
+    clCTA:(g)=>`${g} — Registrar operación`,
+    clDontTrade:"No operes esto — espera un mejor setup",
+    clClose:"Aún no estoy listo",
+    lessonContinue:"Continuar →",lessonStart:"Empezar Quiz ⚡",
+    quizTitle:"QUIZ",nextQ:"Siguiente →",
+    finishCh:"Completar Capítulo 🏆",
+    chDone:"¡Capítulo Completado!",
+    chScore:(s,tt)=>`${s}/${tt} correctas`,
+    journalEmpty:"Aún no hay operaciones registradas.",
+    journalLog:"Registrar Operación",
+    tradeAsset:"¿Qué activo?",
+    tradeDirection:"¿Dirección?",
+    tradeKZ:"¿Kill Zone?",
+    tradeEmotion:"¿Cómo te sientes?",
+    tradeReason:"¿Por qué esta entrada? (una frase)",
+    tradeRisk:"¿Riesgo %?",
+    tradeClose:"Cerrar operación",
+    tradeResult:"¿Resultado?",
+    tradeR:"¿Ratio R?",
+    tradeDoneRight:"Una cosa que hiciste bien",
+    tradeWouldChange:"Una cosa que cambiarías",
+    tradeSave:"Guardar Operación",
+    activeTrade:"Operación Activa",
+    checkIn:"Check In",
   }
 };
 
-/* ═══════════════════════════════════════════════════
-   CHECKLIST DATA
-═══════════════════════════════════════════════════ */
-const CL = {
-  en: [
-    { id:1, icon:"🧭", label:"HTF bias is clear",           sub:"I know which direction the higher candle is pointing." },
-    { id:2, icon:"🎯", label:"Liquidity target identified", sub:"I know WHERE price is going before I look for entry." },
-    { id:3, icon:"⏰", label:"Inside a Kill Zone",          sub:"London 1-5 AM · New York 7-11 AM (NYSE 9:30 = liquidity) · NY PM 1:30-4 PM" },
-    { id:4, icon:"📍", label:"Valid old high or low",       sub:"There's a structural level for the Turtle Soup." },
-    { id:5, icon:"🕯️", label:"Clear Model 1 candle",       sub:"Thick, decisive, closing back inside the range." },
-    { id:6, icon:"🛑", label:"Stop loss placed",           sub:"Above/below the Model 1 wick. Fixed. Not moving." },
-    { id:7, icon:"✂️", label:"Targets are marked",         sub:"50% partial AND full target are on the chart." },
-    { id:8, icon:"🛡️", label:"Risk is 1-2% max",           sub:"No exceptions. No matter how good the setup looks." },
+/* ── CHECKLIST DATA ─────────────────────────────── */
+const CL={
+  en:[
+    {id:1,icon:"🧭",label:"HTF bias is clear",sub:"I know which direction the higher candle is pointing."},
+    {id:2,icon:"🎯",label:"Liquidity target identified",sub:"I know WHERE price is going before I look for entry."},
+    {id:3,icon:"⏰",label:"Inside a Kill Zone",sub:"London 1-5 AM · New York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
+    {id:4,icon:"📍",label:"Valid old high or low",sub:"There\'s a structural level for the Turtle Soup."},
+    {id:5,icon:"🕯️",label:"Clear Model 1 candle",sub:"Thick, decisive, closing back inside the range."},
+    {id:6,icon:"🛑",label:"Stop loss placed",sub:"Above/below the Model 1 wick. Fixed. Not moving."},
+    {id:7,icon:"✂️",label:"Targets are marked",sub:"50% partial AND full target are on the chart."},
+    {id:8,icon:"🛡️",label:"Risk is 1-2% max",sub:"No exceptions. No matter how good the setup looks."},
   ],
-  es: [
-    { id:1, icon:"🧭", label:"Sesgo HTF claro",                  sub:"Sé hacia dónde apunta la vela de mayor temporalidad." },
-    { id:2, icon:"🎯", label:"Objetivo de liquidez identificado", sub:"Sé ADÓNDE va el precio antes de buscar entrada." },
-    { id:3, icon:"⏰", label:"Dentro de una Kill Zone",          sub:"Londres 1-5 AM · Nueva York 7-11 AM (NYSE 9:30 = liquidez) · NY PM 1:30-4 PM" },
-    { id:4, icon:"📍", label:"Máximo o mínimo anterior válido",   sub:"Hay un nivel estructural para el Turtle Soup." },
-    { id:5, icon:"🕯️", label:"Vela Model 1 clara",              sub:"Gruesa, decisiva, cerrando dentro del rango." },
-    { id:6, icon:"🛑", label:"Stop loss colocado",              sub:"Por encima/debajo del wick del Model 1. Fijo." },
-    { id:7, icon:"✂️", label:"Objetivos marcados",              sub:"50% parcial Y objetivo completo en el gráfico." },
-    { id:8, icon:"🛡️", label:"Riesgo máximo 1-2%",              sub:"Sin excepciones. Por muy buena que sea la entrada." },
+  es:[
+    {id:1,icon:"🧭",label:"Sesgo HTF claro",sub:"Sé hacia dónde apunta la vela de mayor temporalidad."},
+    {id:2,icon:"🎯",label:"Objetivo de liquidez identificado",sub:"Sé ADÓNDE va el precio antes de buscar entrada."},
+    {id:3,icon:"⏰",label:"Dentro de una Kill Zone",sub:"Londres 1-5 AM · Nueva York 7-11 AM (NYSE 9:30) · NY PM 1:30-4 PM"},
+    {id:4,icon:"📍",label:"Máximo o mínimo anterior válido",sub:"Hay un nivel estructural para el Turtle Soup."},
+    {id:5,icon:"🕯️",label:"Vela Model 1 clara",sub:"Gruesa, decisiva, cerrando dentro del rango."},
+    {id:6,icon:"🛑",label:"Stop loss colocado",sub:"Por encima/debajo del wick del Model 1. Fijo."},
+    {id:7,icon:"✂️",label:"Objetivos marcados",sub:"50% parcial Y objetivo completo en el gráfico."},
+    {id:8,icon:"🛡️",label:"Riesgo máximo 1-2%",sub:"Sin excepciones. Por muy buena que sea la entrada."},
   ]
 };
 
-/* ═══════════════════════════════════════════════════
-   DONNA PERSONALITY — all gradeComment calls go
-   through DONNA.gradeComment(grade, lang)
-═══════════════════════════════════════════════════ */
-const DONNA = {
-  gradeComment: (g, l) => {
-    const en = { "A+":"All 8. Perfect setup. Execute with discipline.", "A":"Strong. One condition open — know what it is.", "A-":"Solid but two gaps. Size down slightly.", "B+":"Decent. Proceed with half size.", "B-":"More missing than confirmed. Are you sure?", "F":"Don't trade this. Wait for a clean setup." };
-    const es = { "A+":"Los 8 puntos. Setup perfecto. Ejecuta con disciplina.", "A":"Sólido. Un punto abierto — sé cuál es.", "A-":"Sólido pero dos huecos. Reduce el tamaño.", "B+":"Decente. Procede con la mitad del tamaño.", "B-":"Más puntos sin confirmar. ¿Estás seguro?", "F":"No operes esto. Espera un setup limpio." };
-    return (l === "es" ? es : en)[g] || "";
+/* ── DONNA PERSONALITY ──────────────────────────── */
+const DONNA={
+  gradeComment:(g,l)=>{
+    const en={"A+":"All 8. Perfect setup. Execute with discipline.","A":"Strong. One condition open — know what it is.","A-":"Solid but two gaps. Size down slightly.","B+":"Decent. Proceed with half size.","B-":"More missing than confirmed. Are you sure?","F":"Don\'t trade this. Wait for a clean setup."};
+    const es={"A+":"Los 8 puntos. Setup perfecto. Ejecuta con disciplina.","A":"Sólido. Un punto abierto — sé cuál es.","A-":"Sólido pero dos huecos. Reduce el tamaño.","B+":"Decente. Procede con la mitad del tamaño.","B-":"Más puntos sin confirmar. ¿Estás seguro?","F":"No operes esto. Espera un setup limpio."};
+    return(l==="es"?es:en)[g]||"";
   },
-  fallback: (l, m) => {
-    const a = l === "es"
-      ? m === "advanced" ? ["¿Cuál es tu sesgo HTF?","¿Dónde está tu objetivo de liquidez?","¿Estás en una Kill Zone?","¿Pasaste el checklist?","Primera pregunta — ¿qué te dice la vela de mayor temporalidad?"] : ["Buena pregunta. Piensa en el mercado como un río.","Déjame explicarlo de forma simple.","Estás haciendo las preguntas correctas.","Una idea a la vez.","El cierre siempre revela la verdad."]
-      : m === "advanced" ? ["What's your HTF bias?","Where's your liquidity target?","Are you in a Kill Zone?","Did you run the checklist?","First question — what does the higher candle tell you?"] : ["Good question. Think of it this way.","Let me break that down simply.","You're asking the right things.","One idea at a time.","The close always tells the truth."];
-    return a[Math.floor(Math.random() * a.length)];
+  fallback:(l,m)=>{
+    const a=l==="es"
+      ?m==="advanced"?["¿Cuál es tu sesgo HTF?","¿Dónde está tu objetivo de liquidez?","¿Estás en una Kill Zone?","¿Pasaste el checklist?","¿Qué te dice la vela mayor?"]
+                     :["Buena pregunta. Una idea a la vez.","El cierre siempre revela la verdad.","Estás haciendo las preguntas correctas.","Déjame explicarlo simple.","Piensa en el mercado como un río."]
+      :m==="advanced"?["What\'s your HTF bias?","Where\'s your liquidity target?","Are you in a Kill Zone?","Did you run the checklist?","What does the higher candle tell you?"]
+                     :["Good question. One idea at a time.","The close always tells the truth.","You\'re asking the right things.","Let me break that down simply.","Think of price like a river."];
+    return a[Math.floor(Math.random()*a.length)];
+  },
+  tradeReview:(trade,trades,l)=>{
+    const closed=trades.filter(t=>t.status==="closed"&&t.id!==trade.id);
+    const noKZ=closed.filter(t=>t.killZone==="No KZ"&&t.result==="loss").length;
+    const fomo=closed.filter(t=>(t.emotion==="FOMO"||t.emotion==="Anxious"||t.emotion==="😤 FOMO"||t.emotion==="😰 Ansioso")&&t.result==="loss").length;
+    if(l==="es"){
+      let msg=`${trade.asset} ${trade.direction} registrado. `;
+      if(noKZ>=2)msg+=`Nota: tienes ${noKZ} pérdidas fuera de Kill Zone. Ese patrón te está costando. `;
+      if(fomo>=2)msg+=`Y ${fomo} pérdidas con FOMO o ansiedad. Las emociones están operando por ti. `;
+      msg+=`¿Checklist completo antes de entrar?`;
+      return msg;
+    }
+    let msg=`${trade.asset} ${trade.direction} logged. `;
+    if(noKZ>=2)msg+=`Note: you have ${noKZ} losses outside Kill Zone. That pattern is costing you. `;
+    if(fomo>=2)msg+=`And ${fomo} losses with FOMO or anxiety. Your emotions are trading for you. `;
+    msg+=`Full checklist before entry?`;
+    return msg;
   }
 };
 
-/* ═══════════════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════════════ */
-const getGrade = (n) => {
-  if (n === 8) return { grade:"A+", color:GREEN };
-  if (n === 7) return { grade:"A",  color:GREEN };
-  if (n === 6) return { grade:"A-", color:"#34C759" };
-  if (n === 5) return { grade:"B+", color:GOLD };
-  if (n === 4) return { grade:"B-", color:"#FF6B35" };
-  return { grade:"F", color:RED };
+/* ── HELPERS ────────────────────────────────────── */
+const getGrade=(n)=>{
+  if(n===8)return{grade:"A+",color:GREEN};
+  if(n===7)return{grade:"A",color:GREEN};
+  if(n===6)return{grade:"A-",color:"#34C759"};
+  if(n===5)return{grade:"B+",color:GOLD};
+  if(n===4)return{grade:"B-",color:"#FF6B35"};
+  return{grade:"F",color:RED};
 };
 
-/* ═══════════════════════════════════════════════════
-   SOUNDS
-═══════════════════════════════════════════════════ */
-const Sounds = {
-  correct: () => [[523.25,0],[659.25,.1],[783.99,.2]].forEach(([f,t]) => { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.22,c.currentTime+t+.05);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.35);o.start(c.currentTime+t);o.stop(c.currentTime+t+.35); }catch(e){} }),
-  wrong: () => { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(260,c.currentTime);o.frequency.linearRampToValueAtTime(160,c.currentTime+.35);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.45);o.start(c.currentTime);o.stop(c.currentTime+.45); }catch(e){} },
-  complete: () => [[523.25,0],[659.25,.12],[783.99,.24],[1046.5,.38],[1318.5,.54]].forEach(([f,t]) => { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.28,c.currentTime+t+.06);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.55);o.start(c.currentTime+t);o.stop(c.currentTime+t+.55); }catch(e){} }),
-  tap: () => { try { const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(); o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=800;g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.08);o.start(c.currentTime);o.stop(c.currentTime+.08); }catch(e){} },
+const timeAgo=(ts)=>{
+  const m=Math.floor((Date.now()-ts)/60000);
+  if(m<60)return`${m}m`;
+  const h=Math.floor(m/60);
+  if(h<24)return`${h}h`;
+  return`${Math.floor(h/24)}d`;
 };
 
-/* ═══════════════════════════════════════════════════
-   CSS
-═══════════════════════════════════════════════════ */
-const CSS = `
+const getStats=(trades)=>{
+  const closed=trades.filter(t=>t.status==="closed");
+  const wins=closed.filter(t=>t.result==="win").length;
+  const losses=closed.filter(t=>t.result==="loss").length;
+  return{total:closed.length,wins,losses,winRate:closed.length>0?Math.round(wins/closed.length*100):0};
+};
+
+/* ── SOUNDS ─────────────────────────────────────── */
+const Sounds={
+  correct:()=>[[523.25,0],[659.25,.1],[783.99,.2]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.22,c.currentTime+t+.05);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.35);o.start(c.currentTime+t);o.stop(c.currentTime+t+.35);}catch(e){}}),
+  wrong:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sawtooth";o.frequency.setValueAtTime(260,c.currentTime);o.frequency.linearRampToValueAtTime(160,c.currentTime+.35);g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.45);o.start(c.currentTime);o.stop(c.currentTime+.45);}catch(e){}},
+  complete:()=>[[523.25,0],[659.25,.12],[783.99,.24],[1046.5,.38],[1318.5,.54]].forEach(([f,t])=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(0,c.currentTime+t);g.gain.linearRampToValueAtTime(.28,c.currentTime+t+.06);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t+.55);o.start(c.currentTime+t);o.stop(c.currentTime+t+.55);}catch(e){}}),
+  tap:()=>{try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type="sine";o.frequency.value=800;g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.08);o.start(c.currentTime);o.stop(c.currentTime+.08);}catch(e){}},
+};
+
+/* ── LESSON GENERATION ──────────────────────────── */
+async function generateLesson(chapter,lang){
+  const cacheKey=`lesson_ch${chapter.id}_${lang}`;
+  try{const cached=await window.storage.get(cacheKey);if(cached?.value){const d=JSON.parse(cached.value);if(d?.slides?.length>0)return d;}}catch(e){}
+  const cfg=COMPLEXITY[chapter.level]||COMPLEXITY[1];
+  const isES=lang==="es";
+  const sys=`You generate lesson content for a CRT trading education app. Return ONLY valid JSON.
+FORMAT: {"slides":[{"icon":"emoji","title":"max 5 words","body":"2-4 sentences with REAL market examples and specific numbers","donna":"1-2 sentences Donna voice — warm, direct, slightly funny"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"explanation"}]}
+RULES: Every slide needs a real price example. Quiz tests understanding not definitions. Mix mc and tf types. ${chapter.id<=2?"Avoid jargon — use plain English":"Use CRT terminology"}. ${isES?"ALL content in Spanish":"ALL content in English"}. EXACTLY ${cfg.slides} slides and ${cfg.minQ} questions. Return ONLY JSON.`;
+  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
+  if(!res.ok)throw new Error(`API ${res.status}`);
+  const data=await res.json();
+  const text=data.content?.[0]?.text||"";
+  const clean=text.replace(/```json|```/g,"").trim();
+  const parsed=JSON.parse(clean);
+  await window.storage.set(cacheKey,JSON.stringify(parsed));
+  return parsed;
+}
+
+/* ── SYSTEM PROMPT BUILDER ──────────────────────── */
+function buildPrompt(profile,trades,activeTrade){
+  const isAdv=profile.mode==="advanced",isES=profile.lang==="es";
+  const stats=getStats(trades);
+  const closed=trades.filter(t=>t.status==="closed").slice(-10);
+  const kz=isES?"Kill Zones: Londres 1-5 AM hora NY · Nueva York 7-11 AM hora NY (NYSE 9:30 AM = mayor inyección de liquidez y momento típico del Candle 2/Turtle Soup) · NY PM 1:30-4 PM":"Kill Zones: London 1-5 AM NY time · New York 7-11 AM NY time (NYSE opens 9:30 AM = biggest liquidity injection and most common time for Candle 2 Manipulation/Turtle Soup) · NY PM 1:30-4 PM";
+  const profileCtx=isAdv?`TRADER: ${profile.name}, Advanced. Candle: ${profile.candle||"?"}. Process: ${profile.process||"?"}.`:`TRADER: ${profile.name}, Beginner. Inspired by: ${profile.inspiration||"?"}. Chart exp: ${profile.chartExp||"none"}.`;
+  const statsCtx=stats.total>0?`STATS: ${stats.total} trades, ${stats.winRate}% win rate, ${stats.wins}W/${stats.losses}L.`:"No trades logged yet.";
+  const tradeHistory=closed.length>0?`\nRECENT TRADES:\n${closed.map(t=>`- ${t.asset} ${t.direction} (${t.killZone||"?"}): ${(t.result||"open").toUpperCase()} ${t.rMultiple?t.rMultiple+"R":""} | Emotion: ${t.emotion||"?"} | Would change: ${t.wouldChange||"N/A"}`).join("\n")}`:"";
+  const activeCtx=activeTrade?`\n⚠️ IN A LIVE TRADE RIGHT NOW: ${activeTrade.asset} ${activeTrade.direction} | ${activeTrade.killZone} | Open for ${timeAgo(activeTrade.openedAt)}. Check in. Ask about their 50%, stop, emotion.`:"";
+  const noKZ=closed.filter(t=>t.killZone==="No KZ"&&t.result==="loss").length;
+  const fomoL=closed.filter(t=>(t.emotion||"").includes("FOMO")&&t.result==="loss").length;
+  const patternCtx=noKZ>=2?`\nPATTERN: ${noKZ} losses outside Kill Zone — address this proactively.`:"";
+  const fomoCtx=fomoL>=2?`\nPATTERN: ${fomoL} FOMO-driven losses — call it out when relevant.`:"";
+  const voice=isAdv?"VOICE — ADVANCED: 2-3 sentences max. Peer-level. Sharp and direct. Challenge sloppy thinking. First response to any setup = a question. Push back before validating. Reference their stats and patterns. End with a challenge or question.":"VOICE — BEGINNER: 3 sentences max. Warm — like a knowledgeable older sibling. One idea at a time. One analogy per concept. Celebrate understanding. Correct kindly with the WHY. End with an engaging question.";
+  const chartP=`CHART: 1.Identify timeframe/asset/structure. 2.CRT read: Turtle Soups? Model 1? FVG/OB/Breaker? Liquidity above/below? 3.ONE strongest feature and WHY. 4.ONE risk. 5.End: "What are you seeing here?" Never confirm a trade.`;
+  const crt=`CRT: Turtle Soup(wick beyond,closes inside=fake) or True Break(close beyond=real). AMD: C1=Accumulation,C2=Manipulation,C3=Distribution. Model 1: thick candle,nails old high/low,closes inside,close=trigger,stop=above/below wick(fixed),T1=50%,T2=opposite extreme. KoD=always before target. 5 entries never backward. HTF=WHY,ITF=WHAT,LTF=WHEN/WHERE. SMT=divergence+Model1. ${kz}. Risk=1-2%max.`;
+  return`You are Donna — CRT trading accountability mentor and coach.
+${isES?"Responde en español conversacional.":"Respond in English."}
+${profileCtx}
+${statsCtx}${tradeHistory}${activeCtx}${patternCtx}${fomoCtx}
+${voice}
+${chartP}
+${crt}
+NEVER give financial advice. Never say take a specific trade. ALWAYS be an accountability partner — reference their history when relevant.`;
+}
+
+/* ── CSS ─────────────────────────────────────────── */
+const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100vh;background:#000;overflow:hidden;}
 #root{height:100vh;overflow:hidden;}
 body{font-family:'DM Sans',sans-serif;color:#fff;}
-input,button,textarea{font-family:'DM Sans',sans-serif;}
+input,button,textarea,select{font-family:'DM Sans',sans-serif;}
 ::-webkit-scrollbar{width:0;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -245,6 +307,7 @@ input,button,textarea{font-family:'DM Sans',sans-serif;}
 @keyframes dot{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
 @keyframes notifDrop{0%{transform:translateY(-110%);opacity:0}12%{transform:translateY(0);opacity:1}82%{transform:translateY(0);opacity:1}100%{transform:translateY(-110%);opacity:0}}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,37,60,.5)}70%{box-shadow:0 0 0 10px rgba(232,37,60,0)}}
+@keyframes pulseMic{0%,100%{box-shadow:0 0 0 0 rgba(232,37,60,.7)}70%{box-shadow:0 0 0 8px rgba(232,37,60,0)}}
 @keyframes checkPop{0%{transform:scale(0)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
 @keyframes gradeIn{0%{transform:scale(.4) rotate(-15deg);opacity:0}60%{transform:scale(1.1) rotate(3deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 @keyframes correctFlash{0%,100%{background:transparent}40%{background:rgba(48,209,88,.1)}}
@@ -257,375 +320,484 @@ input,button,textarea{font-family:'DM Sans',sans-serif;}
 .msg-in{animation:msgIn .2s ease forwards}
 .pulse{animation:pulse 2s ease-in-out infinite}
 .check-pop{animation:checkPop .25s cubic-bezier(.36,.07,.19,.97) forwards}
-.grade-in{animation:gradeIn .5s cubic-bezier(.36,.07,.19,.97) forwards}
+.gradeIn{animation:gradeIn .5s cubic-bezier(.36,.07,.19,.97) forwards}
 .correct-flash{animation:correctFlash .5s ease}
 .wrong-shake{animation:wrongShake .4s ease}
 .celebrate{animation:celebrate .5s cubic-bezier(.36,.07,.19,.97) forwards}
 `;
 
-/* ═══════════════════════════════════════════════════
-   LESSON GENERATION  (calls /api/chat)
-═══════════════════════════════════════════════════ */
-async function generateLesson(chapter, lang) {
-  const cacheKey = `lesson_ch${chapter.id}_${lang}`;
-  try {
-    const cached = await window.storage.get(cacheKey);
-    if (cached?.value) {
-      const d = JSON.parse(cached.value);
-      if (d?.slides?.length > 0) return d;
-    }
-  } catch(e) {}
-
-  const cfg  = COMPLEXITY[chapter.level] || COMPLEXITY[1];
-  const isES = lang === "es";
-
-  const sys = `You generate lesson content for a CRT trading education app called Donna. Return ONLY valid JSON — no markdown, no preamble, no explanation.
-
-FORMAT:
-{"slides":[{"icon":"1 emoji","title":"max 5 words","body":"2-4 sentences. MUST include a specific real market example with actual numbers (Gold at 2010, Bitcoin at 65000, EUR/USD at 1.0850, Nasdaq at 17000 etc).","donna":"1-2 sentences in Donna's voice — warm, direct, slightly funny."}],"quiz":[{"q":"Scenario question testing understanding NOT definitions","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"2-3 sentence explanation"}]}
-
-RULES:
-- EVERY slide body must include a real example with specific price numbers
-- Quiz questions MUST test scenario understanding, not memorized definitions
-- Mix mc and tf types. For tf: {"q":"statement","type":"tf","a":true,"exp":"..."}
-- ${chapter.id <= 2 ? "AVOID CRT jargon: no 'Smart Money','Turtle Soup','Model 1','AMD','Kill Zone','Liquidity'. Use plain English: 'fake breakout','real move','key level','the candle close'" : "Use CRT terminology naturally"}
-- ${isES ? "Generate ALL content in Spanish — natural conversational Mexican/Latin Spanish" : "Generate ALL content in English"}
-- Generate EXACTLY ${cfg.slides} slides and ${cfg.minQ} quiz questions
-- Return ONLY the JSON object. Nothing else.`;
-
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 3500,
-      system: sys,
-      messages: [{ role: "user", content: `Chapter ${chapter.id}: "${chapter.title}". Topic: ${chapter.desc}. Language: ${lang}. Level ${chapter.level} (${cfg.label}): generate ${cfg.slides} slides and ${cfg.minQ} questions.` }]
-    })
-  });
-
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const data   = await res.json();
-  const text   = data.content?.[0]?.text || "";
-  const clean  = text.replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(clean);
-  await window.storage.set(cacheKey, JSON.stringify(parsed));
-  return parsed;
-}
-
-/* ═══════════════════════════════════════════════════
-   SYSTEM PROMPT BUILDER
-═══════════════════════════════════════════════════ */
-function buildPrompt(p, stats) {
-  const isAdv = p.mode === "advanced", isES = p.lang === "es";
-  const kzInfo = isES
-    ? "Kill Zones: Londres 1-5 AM hora NY · Nueva York 7-11 AM hora NY (NYSE abre 9:30 AM = mayor inyección de liquidez y momento típico de manipulación/Candle 2) · NY PM 1:30-4 PM"
-    : "Kill Zones: London 1-5 AM New York time · New York 7-11 AM New York time (NYSE opens 9:30 AM = biggest liquidity injection and most common time for the Candle 2 Manipulation/Turtle Soup) · NY PM 1:30-4 PM";
-  const statsCtx = stats.total > 0
-    ? `TRADER STATS: ${stats.total} trades. Win rate: ${Math.round(stats.wins/stats.total*100)}%. Best session: ${stats.bestSession||"TBD"}. Emotion pattern on losses: ${stats.worstEmotion||"TBD"}.`
-    : "";
-  const profileCtx = isAdv
-    ? `TRADER: ${p.name}, Advanced. Candle: ${p.candle||"?"}. Process: ${p.process||"?"}. Challenge: ${p.challenge||"?"}.${statsCtx}`
-    : `TRADER: ${p.name}, Beginner. Inspired by: ${p.inspiration||"?"}. Chart exp: ${p.chartExp||"none"}. Available: ${p.availability||"?"}.${statsCtx}`;
-  const voice = isAdv
-    ? "VOICE — ADVANCED: 2-3 sentences max. Peer-level. No explaining basics unless asked. Sharp and funny when sloppy. First response to any setup = a question. Push back before validating. Bring up stats when relevant. End with challenge or question."
-    : "VOICE — BEGINNER: 3 sentences max. Warm — like a knowledgeable older sibling. One idea per message. One analogy per concept. Celebrate understanding. Correct kindly with the WHY. End with an engaging question. Explain every CRT term first time used.";
-  const chartP = `CHART ANALYSIS: 1.Identify timeframe/asset/structure(trend-range-choppy). 2.CRT read: Turtle Soups? Model 1? Key levels (FVG/OB/Breaker)? Liquidity above/below? 3.Name ONE strongest structural feature and WHY. 4.Name ONE risk or weakness. 5.Advanced: challenge first. Beginner: teach from the image. ALWAYS end: "What are you seeing here?" Never confirm a trade.`;
-  const crt = `CRT: Two outcomes only — Turtle Soup(wick beyond,closes inside=fake) or True Break(close beyond=real). Closes=intention,Wicks=deception. Rule1: never buy above old high/sell below old low. AMD: C1=Accumulation,C2=Manipulation,C3=Distribution(your trade). Model 1: thick candle,nails old high/low,closes inside,that close=trigger,stop=above/below wick(fixed),T1=50%(mandatory),T2=opposite extreme. KoD=always before target. 5 entries never backward. TF alignment: HTF=WHY,ITF=WHAT,LTF=WHEN/WHERE. SMT=divergence+Model1. ${kzInfo}. Risk=1-2%max.`;
-  return `You are Donna — CRT trading accountability mentor.\n${isES?"Responde en español conversacional.":"Respond in English."}\n${profileCtx}\n${voice}\n${chartP}\n${crt}\nNEVER give financial advice. Never say take a specific trade.`;
-}
-
-/* ═══════════════════════════════════════════════════
-   COMPONENT: DAvatar
-═══════════════════════════════════════════════════ */
-function DAvatar({ size = 36, online = false }) {
-  return (
-    <div style={{ position:"relative", flexShrink:0, width:size, height:size }}>
-      <div style={{ width:size, height:size, borderRadius:"50%", background:RED, display:"flex", alignItems:"center", justifyContent:"center" }}>
-        <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:size*.44, color:"#fff" }}>D</span>
-      </div>
-      {online && <div style={{ position:"absolute", bottom:1, right:1, width:size*.28, height:size*.28, borderRadius:"50%", background:GREEN, border:"2px solid #000" }} />}
-    </div>
-  );
-}
-
-function CandleIcon() {
-  return (
-    <svg width="40" height="54" viewBox="0 0 40 54">
-      <line x1="20" y1="0" x2="20" y2="12" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
-      <rect x="7" y="12" width="26" height="30" rx="3" fill="#fff"/>
-      <line x1="20" y1="42" x2="20" y2="54" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+/* ═══════════════════════════════════
+   SVG FLAGS
+═══════════════════════════════════ */
+function FlagUS({w=36,h=24}){
+  const s=h/13;
+  return(
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{borderRadius:3,display:"block",overflow:"hidden"}}>
+      <rect width={w} height={h} fill="#B22234"/>
+      {[1,3,5,7,9,11].map(i=><rect key={i} y={i*s} width={w} height={s} fill="#fff"/>)}
+      <rect width={w*.4} height={h*7/13} fill="#3C3B6E"/>
+      <text x={w*.2} y={h*.38} fontSize={h*.22} fill="#fff" textAnchor="middle" dominantBaseline="middle">★★★</text>
+      <text x={w*.2} y={h*.64} fontSize={h*.22} fill="#fff" textAnchor="middle" dominantBaseline="middle">★★</text>
     </svg>
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   COMPONENT: ChecklistModal
-   FIX: gradeComment now calls DONNA.gradeComment()
-═══════════════════════════════════════════════════ */
-function ChecklistModal({ lang, checked, onToggle, onConfirm, onClose }) {
-  const t = T[lang], cl = CL[lang];
-  const n = checked.size;
-  const { grade, color } = getGrade(n);
-  const pct = n / 8 * 100, canTrade = n >= 4;
+function FlagES({w=36,h=24}){
+  return(
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{borderRadius:3,display:"block",overflow:"hidden"}}>
+      <rect width={w} height={h} fill="#AA151B"/>
+      <rect y={h/4} width={w} height={h/2} fill="#F1BF00"/>
+      <rect x={w*.25} y={h*.32} width={w*.08} height={h*.36} rx="1" fill="#AA151B" opacity=".7"/>
+    </svg>
+  );
+}
 
-  return (
-    <div style={{ position:"absolute", inset:0, zIndex:990, background:"rgba(0,0,0,.75)", display:"flex", flexDirection:"column", justifyContent:"flex-end" }}>
-      <div className="slide-up-panel" style={{ background:"#111", borderRadius:"22px 22px 0 0", maxHeight:"92%", display:"flex", flexDirection:"column" }}>
-        <div style={{ display:"flex", justifyContent:"center", padding:"12px 0 4px" }}>
-          <div style={{ width:36, height:4, borderRadius:2, background:DARK2 }} />
+/* ═══════════════════════════════════
+   DAVATAR
+═══════════════════════════════════ */
+function DAvatar({size=36,online=false}){
+  return(
+    <div style={{position:"relative",flexShrink:0,width:size,height:size}}>
+      <div style={{width:size,height:size,borderRadius:"50%",background:RED,display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <span style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:size*.44,color:"#fff"}}>D</span>
+      </div>
+      {online&&<div style={{position:"absolute",bottom:1,right:1,width:size*.28,height:size*.28,borderRadius:"50%",background:GREEN,border:"2px solid #000"}}/>}
+    </div>
+  );
+}
+
+function CandleIcon(){
+  return(
+    <svg width="38" height="52" viewBox="0 0 38 52">
+      <line x1="19" y1="0" x2="19" y2="11" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+      <rect x="6" y="11" width="26" height="30" rx="3" fill="#fff"/>
+      <line x1="19" y1="41" x2="19" y2="52" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════
+   VOICE BUTTON
+═══════════════════════════════════ */
+function VoiceButton({onResult,lang}){
+  const [listening,setListening]=useState(false);
+  const recRef=useRef(null);
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  const toggle=()=>{
+    if(listening){recRef.current?.stop();setListening(false);return;}
+    try{
+      const r=new SR();
+      r.lang=lang==="es"?"es-ES":"en-US";
+      r.continuous=false;r.interimResults=false;
+      r.onresult=(e)=>{const txt=e.results[0][0].transcript;onResult(txt);};
+      r.onend=()=>setListening(false);
+      r.onerror=()=>setListening(false);
+      recRef.current=r;r.start();setListening(true);
+    }catch(e){setListening(false);}
+  };
+  return(
+    <button onClick={toggle} style={{width:36,height:36,borderRadius:"50%",background:listening?RED:DARK2,border:"none",cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"#fff",transition:"background .2s",animation:listening?"pulseMic 1s ease-in-out infinite":"none"}}>
+      🎤
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════
+   PILLS ROW
+═══════════════════════════════════ */
+function PillsRow({pills,onTap}){
+  if(!pills||pills.length===0)return null;
+  return(
+    <div style={{padding:"4px 14px 8px",display:"flex",gap:8,overflowX:"auto",flexShrink:0,WebkitOverflowScrolling:"touch"}}>
+      {pills.map(p=>(
+        <button key={p} onClick={()=>{Sounds.tap();onTap(p);}}
+          style={{padding:"9px 16px",borderRadius:22,whiteSpace:"nowrap",background:`${BLUE}18`,border:`1.5px solid ${BLUE}55`,color:BLUE,fontSize:14,fontWeight:600,cursor:"pointer",flexShrink:0,letterSpacing:.2}}>
+          {p}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════
+   CHECKLIST MODAL
+═══════════════════════════════════ */
+function ChecklistModal({lang,checked,onToggle,onConfirm,onClose}){
+  const t=T[lang],cl=CL[lang],n=checked.size;
+  const{grade,color}=getGrade(n);
+  const pct=n/8*100,canTrade=n>=4;
+  return(
+    <div style={{position:"absolute",inset:0,zIndex:990,background:"rgba(0,0,0,.78)",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+      <div className="slide-up-panel" style={{background:"#111",borderRadius:"22px 22px 0 0",maxHeight:"92%",display:"flex",flexDirection:"column"}}>
+        <div style={{display:"flex",justifyContent:"center",padding:"12px 0 4px"}}>
+          <div style={{width:36,height:4,borderRadius:2,background:DARK2}}/>
         </div>
-        <div style={{ padding:"8px 20px 14px", borderBottom:`1px solid ${DARK}` }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-            <DAvatar size={34} />
-            <div style={{ flex:1 }}>
-              <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16 }}>{t.clTitle}</div>
-              <div style={{ fontSize:12, color:MUTED }}>{t.clSub}</div>
+        <div style={{padding:"8px 20px 14px",borderBottom:`1px solid ${DARK}`}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+            <DAvatar size={34}/>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16}}>{t.clTitle}</div>
+              <div style={{fontSize:12,color:MUTED}}>{t.clSub}</div>
             </div>
-            {n > 0 && (
-              <div className="grade-in" style={{ width:52, height:52, borderRadius:14, background:`${color}22`, border:`2px solid ${color}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:20, color }}>{grade}</span>
-              </div>
-            )}
+            {n>0&&<div className="gradeIn" style={{width:52,height:52,borderRadius:14,background:`${color}22`,border:`2px solid ${color}`,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:20,color}}>{grade}</span>
+            </div>}
           </div>
-          <div style={{ height:6, background:DARK2, borderRadius:3, overflow:"hidden", marginBottom:n>0?8:0 }}>
-            <div style={{ height:"100%", width:`${pct}%`, background:color, borderRadius:3, transition:"width .3s" }} />
+          <div style={{height:6,background:DARK2,borderRadius:3,overflow:"hidden",marginBottom:n>0?8:0}}>
+            <div style={{height:"100%",width:`${pct}%`,background:color,borderRadius:3,transition:"width .3s"}}/>
           </div>
-          {/* FIX: was gradeComment(grade, lang) — now correctly DONNA.gradeComment() */}
-          {n > 0 && <div style={{ fontSize:13, color, fontWeight:600 }}>{DONNA.gradeComment(grade, lang)}</div>}
+          {n>0&&<div style={{fontSize:13,color,fontWeight:600}}>{DONNA.gradeComment(grade,lang)}</div>}
         </div>
-        <div style={{ overflowY:"auto", WebkitOverflowScrolling:"touch", flex:1, minHeight:0 }}>
-          {cl.map(item => {
-            const done = checked.has(item.id);
-            return (
-              <button key={item.id} onClick={() => { Sounds.tap(); onToggle(item.id); }}
-                style={{ width:"100%", padding:"13px 20px", background:"transparent", border:"none", borderBottom:`1px solid ${DARK}`, display:"flex", alignItems:"center", gap:13, cursor:"pointer", textAlign:"left" }}>
-                <div className={done ? "check-pop" : ""} style={{ width:26, height:26, borderRadius:"50%", flexShrink:0, border:`2px solid ${done?GREEN:DARK2}`, background:done?GREEN:"transparent", display:"flex", alignItems:"center", justifyContent:"center", transition:"all .2s" }}>
-                  {done && <span style={{ fontSize:13, color:"#fff", fontWeight:700 }}>✓</span>}
+        <div style={{overflowY:"auto",WebkitOverflowScrolling:"touch",flex:1,minHeight:0}}>
+          {cl.map(item=>{
+            const done=checked.has(item.id);
+            return(
+              <button key={item.id} onClick={()=>{Sounds.tap();onToggle(item.id);}}
+                style={{width:"100%",padding:"13px 20px",background:"transparent",border:"none",borderBottom:`1px solid ${DARK}`,display:"flex",alignItems:"center",gap:13,cursor:"pointer",textAlign:"left"}}>
+                <div className={done?"check-pop":""} style={{width:26,height:26,borderRadius:"50%",flexShrink:0,border:`2px solid ${done?GREEN:DARK2}`,background:done?GREEN:"transparent",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>
+                  {done&&<span style={{fontSize:13,color:"#fff",fontWeight:700}}>✓</span>}
                 </div>
-                <span style={{ fontSize:18, flexShrink:0 }}>{item.icon}</span>
-                <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:600, fontSize:14, color:done?"#fff":"#D1D1D6", marginBottom:1 }}>{item.label}</div>
-                  <div style={{ fontSize:12, color:MUTED, lineHeight:1.4 }}>{item.sub}</div>
+                <span style={{fontSize:18,flexShrink:0}}>{item.icon}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14,color:done?"#fff":"#D1D1D6",marginBottom:1}}>{item.label}</div>
+                  <div style={{fontSize:12,color:MUTED,lineHeight:1.4}}>{item.sub}</div>
                 </div>
               </button>
             );
           })}
         </div>
-        <div style={{ padding:"14px 20px 28px", display:"flex", flexDirection:"column", gap:10 }}>
+        <div style={{padding:"14px 20px 28px",display:"flex",flexDirection:"column",gap:10}}>
           {canTrade
-            ? <button onClick={() => { Sounds.complete(); onConfirm(grade); }}
-                style={{ width:"100%", padding:16, borderRadius:14, background:color, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16, color:n>=6?"#000":"#fff" }}>
-                {t.clCTA(grade)}
-              </button>
-            : <div style={{ width:"100%", padding:14, borderRadius:14, background:"rgba(232,37,60,.1)", border:`1px solid ${RED}44`, textAlign:"center", fontSize:14, fontWeight:600, color:RED }}>
-                {t.clDontTrade}
-              </div>
+            ?<button onClick={()=>{Sounds.complete();onConfirm(grade);}} style={{width:"100%",padding:16,borderRadius:14,background:color,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16,color:n>=6?"#000":"#fff"}}>{t.clCTA(grade)}</button>
+            :<div style={{width:"100%",padding:14,borderRadius:14,background:"rgba(232,37,60,.1)",border:`1px solid ${RED}44`,textAlign:"center",fontSize:14,fontWeight:600,color:RED}}>{t.clDontTrade}</div>
           }
-          <button onClick={onClose} style={{ width:"100%", padding:13, borderRadius:14, background:"transparent", border:`1px solid ${DARK2}`, cursor:"pointer", fontSize:14, color:MUTED }}>
-            {t.clClose}
-          </button>
+          <button onClick={onClose} style={{width:"100%",padding:13,borderRadius:14,background:"transparent",border:`1px solid ${DARK2}`,cursor:"pointer",fontSize:14,color:MUTED}}>{t.clClose}</button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   COMPONENT: LessonModal  (AI-generated, variable depth)
-═══════════════════════════════════════════════════ */
-function LessonModal({ chapter, lang, onClose, onComplete }) {
-  const t = T[lang];
-  const [data, setData]       = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(false);
-  const [phase, setPhase]     = useState("slides");
-  const [si, setSi]           = useState(0);
-  const [qi, setQi]           = useState(0);
-  const [ans, setAns]         = useState(null);
-  const [ok, setOk]           = useState(null);
-  const [score, setScore]     = useState(0);
-  const [ak, setAk]           = useState(0);
+/* ═══════════════════════════════════
+   TRADE LOG MODAL
+═══════════════════════════════════ */
+function TradeLogModal({lang,mode,activeTrade,onSave,onClose}){
+  const t=T[lang];
+  const isClose=mode==="close"&&activeTrade;
+  const [step,setStep]=useState(0);
+  const [data,setData]=useState(isClose?{...activeTrade}:{});
+  const [textVal,setTextVal]=useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true); setError(false);
-    try { const d = await generateLesson(chapter, lang); setData(d); }
-    catch(e) { setError(true); }
-    setLoading(false);
-  }, [chapter, lang]);
+  const openSteps=[
+    {key:"asset",label:t.tradeAsset,type:"text",ph:lang==="es"?"Ej: Gold, EUR/USD, NQ":"e.g. Gold, EUR/USD, NQ"},
+    {key:"direction",label:t.tradeDirection,type:"pills",opts:lang==="es"?["📈 Alcista","📉 Bajista"]:["📈 Bullish","📉 Bearish"]},
+    {key:"killZone",label:t.tradeKZ,type:"pills",opts:lang==="es"?["🌅 Londres","🗽 NY Open","🌆 NY PM","⏰ Sin KZ"]:["🌅 London","🗽 NY Open","🌆 NY PM","⏰ No KZ"]},
+    {key:"emotion",label:t.tradeEmotion,type:"pills",opts:lang==="es"?["😌 Calmado","💪 Confiado","😰 Ansioso","😤 FOMO"]:["😌 Calm","💪 Confident","😰 Anxious","😤 FOMO"]},
+    {key:"reason",label:t.tradeReason,type:"text",ph:lang==="es"?"Estructura + sesgo HTF...":"Structure + HTF bias..."},
+    {key:"risk",label:t.tradeRisk,type:"pills",opts:["1%","1.5%","2%"]},
+  ];
+  const closeSteps=[
+    {key:"result",label:t.tradeResult,type:"pills",opts:lang==="es"?["✅ Ganada","❌ Pérdida","➡️ Empate"]:["✅ Win","❌ Loss","➡️ Break Even"]},
+    {key:"rMultiple",label:t.tradeR,type:"text",ph:"e.g. 2.5R"},
+    {key:"didRight",label:t.tradeDoneRight,type:"text",ph:lang==="es"?"Seguí el plan...":"Followed the plan..."},
+    {key:"wouldChange",label:t.tradeWouldChange,type:"text",ph:lang==="es"?"Esperar la KZ...":"Wait for KZ..."},
+  ];
+  const steps=isClose?closeSteps:openSteps;
+  const cur=steps[step];
+  if(!cur)return null;
 
-  useEffect(() => { load(); }, [load]);
-
-  const slides = data?.slides || [], quiz = data?.quiz || [];
-  const total  = slides.length + quiz.length;
-  const cur    = phase === "slides" ? si : slides.length + qi;
-  const prog   = total > 0 ? cur / total * 100 : 0;
-  const slide  = slides[si], q = quiz[qi];
-  const cfg    = COMPLEXITY[chapter.level] || COMPLEXITY[1];
-  const lvlColor = LVL_COLOR[chapter.level] || RED;
-
-  const confetti = Array.from({ length: 12 }, (_, i) => ({
-    x: Math.random()*100, c:[RED,GREEN,GOLD,"#A78BFA","#06B6D4"][i%5], d:Math.random()*.8, s:6+Math.random()*8
-  }));
-
-  const handleAnswer = (a) => {
-    if (ans !== null) return;
-    const c = a === q.a;
-    setAns(a); setOk(c);
-    if (c) { Sounds.correct(); setScore(s => s+1); } else Sounds.wrong();
+  const next=(val)=>{
+    const nd={...data,[cur.key]:val};
+    setData(nd);setTextVal("");
+    if(step<steps.length-1){setStep(step+1);}
+    else{
+      const trade={
+        ...nd,
+        id:activeTrade?.id||Date.now(),
+        status:isClose?"closed":"open",
+        openedAt:activeTrade?.openedAt||Date.now(),
+        closedAt:isClose?Date.now():undefined,
+      };
+      onSave(trade);
+    }
   };
 
-  const goNext = () => {
-    setAk(k => k+1);
-    if (phase === "slides") {
-      if (si < slides.length-1) setSi(i => i+1);
-      else { setPhase("quiz"); setQi(0); setAns(null); setOk(null); }
-    } else if (qi < quiz.length-1) {
-      setQi(i => i+1); setAns(null); setOk(null);
-    } else { setPhase("done"); Sounds.complete(); }
-  };
-
-  return (
-    <div style={{ position:"absolute", inset:0, zIndex:995, background:"#000", display:"flex", flexDirection:"column" }} className="slide-in">
-      {/* Top bar */}
-      <div style={{ padding:"12px 16px 10px", display:"flex", alignItems:"center", gap:12, borderBottom:`1px solid ${DARK}`, flexShrink:0 }}>
-        <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", color:MUTED, fontSize:22, lineHeight:1 }}>✕</button>
-        <div style={{ flex:1, height:7, background:DARK2, borderRadius:4, overflow:"hidden" }}>
-          <div style={{ height:"100%", width:`${prog}%`, background:RED, borderRadius:4, transition:"width .4s" }} />
+  return(
+    <div style={{position:"absolute",inset:0,zIndex:992,background:"rgba(0,0,0,.78)",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+      <div className="slide-up-panel" style={{background:"#111",borderRadius:"22px 22px 0 0",padding:"0 0 24px"}}>
+        <div style={{display:"flex",justifyContent:"center",padding:"12px 0 4px"}}>
+          <div style={{width:36,height:4,borderRadius:2,background:DARK2}}/>
         </div>
-        {!loading && !error && (
-          <span style={{ fontSize:12, color:MUTED, fontWeight:600 }}>
-            {phase==="slides" ? `${si+1}/${slides.length}` : `Q${qi+1}/${quiz.length}`}
-          </span>
-        )}
-      </div>
-      {/* Chapter badge — shows level + variable depth */}
-      <div style={{ background:`${lvlColor}11`, borderBottom:`1px solid ${lvlColor}22`, padding:"6px 16px", display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-        <span style={{ fontSize:16 }}>{chapter.icon}</span>
-        <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:13 }}>{chapter.title}</span>
-        <span style={{ marginLeft:"auto", fontSize:11, color:MUTED, background:DARK, padding:"2px 8px", borderRadius:10 }}>
-          {LVL_EMOJI[chapter.level]} {cfg.label} · {cfg.slides} slides · {cfg.minQ}Q
-        </span>
-      </div>
-      {/* Content */}
-      <div style={{ flex:1, overflowY:"auto", WebkitOverflowScrolling:"touch", padding:16, minHeight:0 }}>
-        {loading && (
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:16 }}>
-            <DAvatar size={52} online />
-            <div style={{ fontSize:14, color:MUTED, textAlign:"center" }}>{lang==="es"?"Preparando tu lección...":"Building your lesson..."}</div>
-            <div style={{ display:"flex", gap:6 }}>
-              {[0,1,2].map(i => <div key={i} style={{ width:8, height:8, borderRadius:"50%", background:RED, animation:`dot 1.2s ease-in-out ${i*.2}s infinite` }} />)}
+        <div style={{padding:"8px 20px 16px",borderBottom:`1px solid ${DARK}`,display:"flex",alignItems:"center",gap:10}}>
+          <DAvatar size={32}/>
+          <div>
+            <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:15}}>{isClose?t.tradeClose:t.journalLog}</div>
+            <div style={{fontSize:12,color:MUTED}}>{step+1} / {steps.length}</div>
+          </div>
+          <div style={{marginLeft:"auto",display:"flex",gap:4}}>
+            {steps.map((_,i)=><div key={i} style={{width:20,height:3,borderRadius:2,background:i<=step?RED:DARK2,transition:"background .2s"}}/>)}
+          </div>
+        </div>
+        <div style={{padding:"20px 20px 8px"}}>
+          <div style={{fontSize:16,fontWeight:700,color:"#fff",marginBottom:16}}>{cur.label}</div>
+          {cur.type==="pills"?(
+            <div style={{display:"flex",flexWrap:"wrap",gap:10}}>
+              {cur.opts.map(o=>(
+                <button key={o} onClick={()=>next(o)}
+                  style={{padding:"12px 18px",borderRadius:14,background:`${BLUE}18`,border:`1.5px solid ${BLUE}55`,color:BLUE,fontSize:15,fontWeight:600,cursor:"pointer"}}>
+                  {o}
+                </button>
+              ))}
             </div>
+          ):(
+            <div style={{display:"flex",gap:10}}>
+              <input autoFocus value={textVal} onChange={e=>setTextVal(e.target.value)}
+                onKeyDown={e=>e.key==="Enter"&&textVal.trim()&&next(textVal.trim())}
+                placeholder={cur.ph||""}
+                style={{flex:1,padding:"13px 16px",borderRadius:12,background:DARK,border:`1.5px solid ${DARK2}`,color:"#fff",fontSize:15,outline:"none"}}/>
+              <button onClick={()=>textVal.trim()&&next(textVal.trim())}
+                style={{padding:"13px 20px",borderRadius:12,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>
+                {lang==="es"?"Sigue":"Next"}
+              </button>
+            </div>
+          )}
+        </div>
+        <button onClick={onClose} style={{display:"block",margin:"12px auto 0",background:"none",border:"none",cursor:"pointer",fontSize:13,color:MUTED,padding:"4px 16px"}}>
+          {lang==="es"?"Cancelar":"Cancel"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════
+   JOURNAL SCREEN
+═══════════════════════════════════ */
+function JournalScreen({trades,lang,activeTrade,onClose,onOpen}){
+  const t=T[lang];
+  const stats=getStats(trades);
+  const sorted=[...trades].sort((a,b)=>b.id-a.id);
+  const resultColor=(r)=>r==="win"?GREEN:r==="loss"?RED:MUTED;
+  const resultLabel=(r,l)=>{
+    if(l==="es")return r==="win"?"✅ Ganada":r==="loss"?"❌ Pérdida":r==="be"?"➡️ Empate":"🔵 Abierta";
+    return r==="win"?"✅ Win":r==="loss"?"❌ Loss":r==="be"?"➡️ Break Even":"🔵 Open";
+  };
+  return(
+    <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"#000",minHeight:0}}>
+      <div style={{padding:"16px 16px 12px",borderBottom:`1px solid ${DARK}`}}>
+        <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:20,marginBottom:12}}>{lang==="es"?"📓 Diario de Operaciones":"📓 Trade Journal"}</div>
+        {stats.total>0?(
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+            {[[lang==="es"?"Total":"Total",stats.total,"🔢"],[lang==="es"?"Ganadas %":"Win Rate",stats.winRate+"%","📈"],[lang==="es"?"G / P":"W / L",`${stats.wins}/${stats.losses}`,"⚖️"]].map(([lb,v,ic])=>(
+              <div key={lb} style={{background:"#111",borderRadius:12,padding:"10px 12px",textAlign:"center"}}>
+                <div style={{fontSize:18,marginBottom:4}}>{ic}</div>
+                <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:18}}>{v}</div>
+                <div style={{fontSize:11,color:MUTED}}>{lb}</div>
+              </div>
+            ))}
+          </div>
+        ):(
+          <div style={{textAlign:"center",padding:"24px 0",color:MUTED,fontSize:14}}>{t.journalEmpty}</div>
+        )}
+      </div>
+      {activeTrade&&(
+        <div onClick={()=>onOpen("close")} style={{margin:"16px 16px 0",padding:"14px 16px",background:`${GOLD}12`,border:`1.5px solid ${GOLD}55`,borderRadius:16,display:"flex",alignItems:"center",gap:12,cursor:"pointer"}}>
+          <div style={{fontSize:24}}>🔵</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:GOLD}}>{t.activeTrade}</div>
+            <div style={{fontSize:13,color:"#fff",marginTop:2}}>{activeTrade.asset} · {activeTrade.direction} · {activeTrade.killZone}</div>
+            <div style={{fontSize:12,color:MUTED,marginTop:1}}>{lang==="es"?"Abierta hace":"Open for"} {timeAgo(activeTrade.openedAt)}</div>
+          </div>
+          <div style={{background:GOLD,borderRadius:10,padding:"6px 12px",fontSize:12,fontWeight:700,color:"#000"}}>{t.tradeClose}</div>
+        </div>
+      )}
+      <div style={{padding:"16px 16px 60px"}}>
+        {sorted.map(trade=>(
+          <div key={trade.id} style={{marginBottom:12,background:"#111",borderRadius:16,overflow:"hidden",border:`1px solid ${trade.status==="open"?GOLD:resultColor(trade.result)}22`}}>
+            <div style={{padding:"14px 16px",display:"flex",alignItems:"center",gap:12}}>
+              <div style={{width:44,height:44,borderRadius:12,background:`${trade.status==="open"?GOLD:resultColor(trade.result)}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>
+                {trade.direction?.includes("Bull")||trade.direction?.includes("Alcista")?"📈":"📉"}
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14}}>{trade.asset}</div>
+                <div style={{fontSize:12,color:MUTED,marginTop:2}}>{trade.killZone} · {new Date(trade.id).toLocaleDateString()}</div>
+              </div>
+              <div style={{textAlign:"right",flexShrink:0}}>
+                <div style={{fontSize:13,fontWeight:700,color:trade.status==="open"?GOLD:resultColor(trade.result)}}>{resultLabel(trade.status==="open"?"open":trade.result,lang)}</div>
+                {trade.rMultiple&&<div style={{fontSize:12,color:MUTED,marginTop:2}}>{trade.rMultiple}</div>}
+              </div>
+            </div>
+            {trade.donnaReview&&(
+              <div style={{padding:"10px 16px 14px",borderTop:`1px solid ${DARK}`,display:"flex",gap:8,alignItems:"flex-start"}}>
+                <DAvatar size={22}/>
+                <div style={{fontSize:13,color:"#D1D1D6",lineHeight:1.55,flex:1}}>{trade.donnaReview}</div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════
+   LESSON MODAL
+═══════════════════════════════════ */
+function LessonModal({chapter,lang,onClose,onComplete}){
+  const t=T[lang];
+  const[data,setData]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[error,setError]=useState(false);
+  const[phase,setPhase]=useState("slides");
+  const[si,setSi]=useState(0);
+  const[qi,setQi]=useState(0);
+  const[ans,setAns]=useState(null);
+  const[ok,setOk]=useState(null);
+  const[score,setScore]=useState(0);
+  const[ak,setAk]=useState(0);
+  const cfg=COMPLEXITY[chapter.level]||COMPLEXITY[1];
+
+  const load=useCallback(async()=>{
+    setLoading(true);setError(false);
+    try{const d=await generateLesson(chapter,lang);setData(d);}
+    catch(e){setError(true);}
+    setLoading(false);
+  },[chapter,lang]);
+
+  useEffect(()=>{load();},[load]);
+
+  const slides=data?.slides||[],quiz=data?.quiz||[];
+  const total=slides.length+quiz.length;
+  const cur=phase==="slides"?si:slides.length+qi;
+  const prog=total>0?cur/total*100:0;
+  const slide=slides[si],q=quiz[qi];
+  const confetti=Array.from({length:12},(_,i)=>({x:Math.random()*100,c:[RED,GREEN,GOLD,"#A78BFA","#06B6D4"][i%5],d:Math.random()*.8,s:6+Math.random()*8}));
+
+  const handleAnswer=(a)=>{
+    if(ans!==null)return;
+    const c=a===q.a;setAns(a);setOk(c);
+    if(c){Sounds.correct();setScore(s=>s+1);}else Sounds.wrong();
+  };
+
+  const goNext=()=>{
+    setAk(k=>k+1);
+    if(phase==="slides"){
+      if(si<slides.length-1)setSi(i=>i+1);
+      else{setPhase("quiz");setQi(0);setAns(null);setOk(null);}
+    }else if(qi<quiz.length-1){setQi(i=>i+1);setAns(null);setOk(null);}
+    else{setPhase("done");Sounds.complete();}
+  };
+
+  return(
+    <div style={{position:"absolute",inset:0,zIndex:995,background:"#000",display:"flex",flexDirection:"column"}} className="slide-in">
+      <div style={{padding:"12px 16px 10px",display:"flex",alignItems:"center",gap:12,borderBottom:`1px solid ${DARK}`,flexShrink:0}}>
+        <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",color:MUTED,fontSize:22,lineHeight:1}}>✕</button>
+        <div style={{flex:1,height:7,background:DARK2,borderRadius:4,overflow:"hidden"}}>
+          <div style={{height:"100%",width:`${prog}%`,background:cfg.color||RED,borderRadius:4,transition:"width .4s"}}/>
+        </div>
+        {!loading&&!error&&<span style={{fontSize:12,color:MUTED,fontWeight:600}}>{phase==="slides"?`${si+1}/${slides.length}`:`Q${qi+1}/${quiz.length}`}</span>}
+      </div>
+      <div style={{background:`${cfg.color||RED}11`,borderBottom:`1px solid ${cfg.color||RED}22`,padding:"6px 16px",display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+        <span style={{fontSize:16}}>{chapter.icon}</span>
+        <span style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13}}>{chapter.title}</span>
+        <span style={{marginLeft:"auto",fontSize:11,color:MUTED,background:DARK,padding:"2px 8px",borderRadius:10}}>{cfg.emoji} {cfg.label} · {cfg.slides}s · {cfg.minQ}Q</span>
+      </div>
+      <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:16,minHeight:0}}>
+        {loading&&(
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:16}}>
+            <DAvatar size={52} online/>
+            <div style={{fontSize:14,color:MUTED,textAlign:"center"}}>{lang==="es"?"Preparando tu lección...":"Building your lesson..."}</div>
+            <div style={{display:"flex",gap:6}}>{[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:RED,animation:`dot 1.2s ease-in-out ${i*.2}s infinite`}}/>)}</div>
           </div>
         )}
-        {error && (
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", gap:16 }}>
-            <div style={{ fontSize:40 }}>⚠️</div>
-            <div style={{ fontSize:14, color:MUTED, textAlign:"center" }}>{lang==="es"?"No se pudo cargar. Toca para reintentar.":"Couldn't load. Tap to retry."}</div>
-            <button onClick={load} style={{ padding:"12px 24px", borderRadius:12, background:RED, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:14, color:"#fff" }}>Retry</button>
+        {error&&(
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",gap:16}}>
+            <div style={{fontSize:40}}>⚠️</div>
+            <div style={{fontSize:14,color:MUTED,textAlign:"center"}}>{lang==="es"?"No se pudo cargar. Comprueba que la API esté configurada.":"Couldn't load lesson. Make sure the API is configured."}</div>
+            <button onClick={load} style={{padding:"12px 24px",borderRadius:12,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>Retry</button>
           </div>
         )}
-        {!loading && !error && data && (
+        {!loading&&!error&&data&&(
           <div key={ak} className="fade-up">
-            {/* SLIDE PHASE */}
-            {phase==="slides" && slide && (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <div style={{ display:"flex", alignItems:"flex-end", gap:10 }}>
-                  <DAvatar size={46} online />
-                  <div style={{ background:DARK, border:`1px solid ${DARK2}`, borderRadius:"18px 18px 18px 4px", padding:"12px 14px", flex:1, fontSize:14, lineHeight:1.65, color:"#D1D1D6" }}>
-                    {slide.donna || slide.d}
-                  </div>
+            {phase==="slides"&&slide&&(
+              <div style={{display:"flex",flexDirection:"column",gap:14}}>
+                <div style={{display:"flex",alignItems:"flex-end",gap:10}}>
+                  <DAvatar size={46} online/>
+                  <div style={{background:DARK,border:`1px solid ${DARK2}`,borderRadius:"18px 18px 18px 4px",padding:"12px 14px",flex:1,fontSize:14,lineHeight:1.65,color:"#D1D1D6"}}>{slide.donna||slide.d}</div>
                 </div>
-                <div style={{ background:"#111", border:`1px solid ${DARK2}`, borderRadius:20, padding:22 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
-                    <span style={{ fontSize:28 }}>{slide.icon}</span>
-                    <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:18, color:"#fff" }}>{slide.title||slide.t}</h3>
+                <div style={{background:"#111",border:`1px solid ${DARK2}`,borderRadius:20,padding:22}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+                    <span style={{fontSize:28}}>{slide.icon}</span>
+                    <h3 style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:18,color:"#fff"}}>{slide.title||slide.t}</h3>
                   </div>
-                  <p style={{ fontSize:15, color:"#D1D1D6", lineHeight:1.7 }}>{slide.body||slide.b}</p>
+                  <p style={{fontSize:15,color:"#D1D1D6",lineHeight:1.7}}>{slide.body||slide.b}</p>
                 </div>
               </div>
             )}
-            {/* QUIZ PHASE */}
-            {phase==="quiz" && q && (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }} className={ans!==null?(ok?"correct-flash":"wrong-shake"):""}>
-                <div style={{ background:"#111", borderRadius:16, padding:16, border:`1px solid ${DARK2}` }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:RED, letterSpacing:2.5, marginBottom:10 }}>{t.quizTitle}</div>
-                  <p style={{ fontSize:15, fontWeight:600, lineHeight:1.6, color:"#fff" }}>{q.q}</p>
+            {phase==="quiz"&&q&&(
+              <div style={{display:"flex",flexDirection:"column",gap:14}} className={ans!==null?(ok?"correct-flash":"wrong-shake"):""}>
+                <div style={{background:"#111",borderRadius:16,padding:16,border:`1px solid ${DARK2}`}}>
+                  <div style={{fontSize:10,fontWeight:700,color:RED,letterSpacing:2.5,marginBottom:10}}>{t.quizTitle}</div>
+                  <p style={{fontSize:15,fontWeight:600,lineHeight:1.6,color:"#fff"}}>{q.q}</p>
                 </div>
-                {q.type==="tf" ? (
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-                    {[{val:true,label:"TRUE",c:GREEN},{val:false,label:"FALSE",c:RED}].map(opt => {
-                      const sel=ans===opt.val, ir=opt.val===q.a;
-                      const bg=ans!==null?(ir?"rgba(48,209,88,.14)":sel?"rgba(232,37,60,.14)":"transparent"):"transparent";
-                      const br=ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2;
-                      return (
-                        <button key={String(opt.val)} onClick={() => handleAnswer(opt.val)}
-                          style={{ padding:"20px 12px", borderRadius:16, background:bg, border:`2px solid ${br}`, cursor:ans!==null?"default":"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:8 }}>
-                          <div style={{ width:44, height:44, borderRadius:13, background:ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>
+                {q.type==="tf"?(
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                    {[{val:true,label:"TRUE",c:GREEN},{val:false,label:"FALSE",c:RED}].map(opt=>{
+                      const sel=ans===opt.val,ir=opt.val===q.a;
+                      return(
+                        <button key={String(opt.val)} onClick={()=>handleAnswer(opt.val)}
+                          style={{padding:"20px 12px",borderRadius:16,background:ans!==null?(ir?"rgba(48,209,88,.14)":sel?"rgba(232,37,60,.14)":"transparent"):"transparent",border:`2px solid ${ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2}`,cursor:ans!==null?"default":"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8}}>
+                          <div style={{width:44,height:44,borderRadius:13,background:ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>
                             {ans!==null&&ir?"✓":ans===opt.val&&!ir?"✗":opt.val?"✓":"✗"}
                           </div>
-                          <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:18, color:ans!==null?(ir?GREEN:sel?RED:"#fff"):opt.c }}>{opt.label}</span>
+                          <span style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:18,color:ans!==null?(ir?GREEN:sel?RED:"#fff"):opt.c}}>{opt.label}</span>
                         </button>
                       );
                     })}
                   </div>
-                ) : (
-                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                    {(q.opts||[]).map((opt,i) => {
-                      const sel=ans===i, ir=i===q.a;
-                      const bg=ans!==null?(ir?"rgba(48,209,88,.13)":sel?"rgba(232,37,60,.13)":"transparent"):"transparent";
-                      const br=ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2;
-                      return (
-                        <button key={i} onClick={() => handleAnswer(i)}
-                          style={{ padding:"13px 15px", borderRadius:14, background:bg, border:`2px solid ${br}`, cursor:ans!==null?"default":"pointer", display:"flex", alignItems:"center", gap:12, textAlign:"left", opacity:ans!==null&&!ir&&!sel?.4:1 }}>
-                          <div style={{ width:30, height:30, borderRadius:9, background:ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:13, color:"#fff", flexShrink:0 }}>
+                ):(
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    {(q.opts||[]).map((opt,i)=>{
+                      const sel=ans===i,ir=i===q.a;
+                      return(
+                        <button key={i} onClick={()=>handleAnswer(i)}
+                          style={{padding:"13px 15px",borderRadius:14,background:ans!==null?(ir?"rgba(48,209,88,.13)":sel?"rgba(232,37,60,.13)":"transparent"):"transparent",border:`2px solid ${ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2}`,cursor:ans!==null?"default":"pointer",display:"flex",alignItems:"center",gap:12,textAlign:"left",opacity:ans!==null&&!ir&&!sel?.4:1}}>
+                          <div style={{width:30,height:30,borderRadius:9,background:ans!==null?(ir?GREEN:sel?RED:DARK2):DARK2,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:13,color:"#fff",flexShrink:0}}>
                             {ans!==null&&ir?"✓":ans===i&&!ir?"✗":String.fromCharCode(65+i)}
                           </div>
-                          <span style={{ fontSize:14, color:"#fff", fontWeight:500 }}>{opt}</span>
+                          <span style={{fontSize:14,color:"#fff",fontWeight:500}}>{opt}</span>
                         </button>
                       );
                     })}
                   </div>
                 )}
-                {ans !== null && (
-                  <div className="fade-up" style={{ background:ok?"rgba(48,209,88,.1)":"rgba(232,37,60,.1)", border:`1px solid ${ok?GREEN:RED}44`, borderRadius:14, padding:14 }}>
-                    <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:13, color:ok?GREEN:RED, marginBottom:6 }}>
-                      {ok?(lang==="es"?"Exacto.":"Exactly."):(lang==="es"?"No del todo:":"Not quite:")}
-                    </div>
-                    <p style={{ fontSize:13, color:"#D1D1D6", lineHeight:1.65 }}>{q.exp}</p>
+                {ans!==null&&(
+                  <div className="fade-up" style={{background:ok?"rgba(48,209,88,.1)":"rgba(232,37,60,.1)",border:`1px solid ${ok?GREEN:RED}44`,borderRadius:14,padding:14}}>
+                    <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13,color:ok?GREEN:RED,marginBottom:6}}>{ok?(lang==="es"?"Exacto.":"Exactly."):(lang==="es"?"No del todo:":"Not quite:")}</div>
+                    <p style={{fontSize:13,color:"#D1D1D6",lineHeight:1.65}}>{q.exp}</p>
                   </div>
                 )}
               </div>
             )}
-            {/* DONE SCREEN */}
-            {phase==="done" && (
-              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 16px", textAlign:"center", position:"relative", overflow:"hidden", minHeight:300 }}>
-                {confetti.map((c,i) => <div key={i} style={{ position:"absolute", top:"-10%", left:`${c.x}%`, width:c.s, height:c.s, background:c.c, borderRadius:2, animation:`confetti 2s ease ${c.d}s both` }} />)}
-                <div className="celebrate" style={{ fontSize:52, marginBottom:16 }}>🏆</div>
-                <h2 style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:24, marginBottom:8 }}>{t.chDone}</h2>
-                <p style={{ color:MUTED, fontSize:15, marginBottom:8 }}><strong style={{ color:"#fff" }}>{chapter.title}</strong></p>
-                <div style={{ padding:"10px 20px", borderRadius:20, background:`rgba(232,37,60,.12)`, border:`1px solid ${RED}44`, fontSize:14, color:RED, fontWeight:700, marginBottom:24 }}>
-                  {t.chScore(score, quiz.length)}
-                </div>
-                <button onClick={() => onComplete(chapter.id)}
-                  style={{ padding:"16px 48px", borderRadius:14, background:RED, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:17, color:"#fff" }}>
-                  {lang==="es"?"Continuar →":"Continue →"}
-                </button>
+            {phase==="done"&&(
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"32px 16px",textAlign:"center",position:"relative",overflow:"hidden",minHeight:300}}>
+                {confetti.map((c,i)=><div key={i} style={{position:"absolute",top:"-10%",left:`${c.x}%`,width:c.s,height:c.s,background:c.c,borderRadius:2,animation:`confetti 2s ease ${c.d}s both`}}/>)}
+                <div className="celebrate" style={{fontSize:52,marginBottom:16}}>🏆</div>
+                <h2 style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:24,marginBottom:8}}>{t.chDone}</h2>
+                <p style={{color:MUTED,fontSize:15,marginBottom:8}}><strong style={{color:"#fff"}}>{chapter.title}</strong></p>
+                <div style={{padding:"10px 20px",borderRadius:20,background:`rgba(232,37,60,.12)`,border:`1px solid ${RED}44`,fontSize:14,color:RED,fontWeight:700,marginBottom:24}}>{t.chScore(score,quiz.length)}</div>
+                <button onClick={()=>onComplete(chapter.id)} style={{padding:"16px 48px",borderRadius:14,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:17,color:"#fff"}}>{lang==="es"?"Continuar →":"Continue →"}</button>
               </div>
             )}
           </div>
         )}
       </div>
-      {/* Bottom CTA */}
-      {!loading && !error && phase!=="done" && (
-        <div style={{ padding:"12px 16px 20px", borderTop:`1px solid ${DARK}`, flexShrink:0 }}>
+      {!loading&&!error&&phase!=="done"&&(
+        <div style={{padding:"12px 16px 20px",borderTop:`1px solid ${DARK}`,flexShrink:0}}>
           {phase==="slides"
-            ? <button onClick={goNext} style={{ width:"100%", padding:15, borderRadius:14, background:RED, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16, color:"#fff" }}>
-                {si<slides.length-1?t.lessonContinue:t.lessonStart}
-              </button>
-            : ans!==null&&<button onClick={goNext} style={{ width:"100%", padding:15, borderRadius:14, background:ok?GREEN:RED, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16, color:ok?"#000":"#fff" }}>
-                {qi<quiz.length-1?t.nextQ:t.finishCh}
-              </button>
+            ?<button onClick={goNext} style={{width:"100%",padding:15,borderRadius:14,background:cfg.color||RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16,color:"#fff"}}>{si<slides.length-1?t.lessonContinue:t.lessonStart}</button>
+            :ans!==null&&<button onClick={goNext} style={{width:"100%",padding:15,borderRadius:14,background:ok?GREEN:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16,color:ok?"#000":"#fff"}}>{qi<quiz.length-1?t.nextQ:t.finishCh}</button>
           }
         </div>
       )}
@@ -633,94 +805,69 @@ function LessonModal({ chapter, lang, onClose, onComplete }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   COMPONENT: AcademyScreen
-   FIX: removed L[ch.id] → now uses COMPLEXITY[ch.level]
-═══════════════════════════════════════════════════ */
-function AcademyScreen({ profile, completed, onOpen }) {
-  const lang = profile.lang || "en";
-  const xp   = completed.size * 50;
-
-  return (
-    <div style={{ flex:1, overflowY:"auto", WebkitOverflowScrolling:"touch", background:"#000", minHeight:0 }}>
-      {/* Header */}
-      <div style={{ padding:"16px 16px 12px", borderBottom:`1px solid ${DARK}` }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
+/* ═══════════════════════════════════
+   ACADEMY SCREEN
+═══════════════════════════════════ */
+function AcademyScreen({profile,completed,onOpen}){
+  const lang=profile.lang||"en";
+  const xp=completed.size*50;
+  return(
+    <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",background:"#000",minHeight:0}}>
+      <div style={{padding:"16px 16px 12px",borderBottom:`1px solid ${DARK}`}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
           <div>
-            <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:20 }}>CHRONOS Academy</div>
-            <div style={{ fontSize:13, color:MUTED, marginTop:2 }}>{completed.size} / 22 {lang==="es"?"completados":"completed"}</div>
+            <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:20}}>CHRONOS Academy</div>
+            <div style={{fontSize:13,color:MUTED,marginTop:2}}>{completed.size} / 22 {lang==="es"?"completados":"completed"}</div>
           </div>
-          <div style={{ display:"flex", gap:16 }}>
-            {[["🔥",0,"STREAK"],["⚡",xp,"XP"],["🏆",Math.floor(completed.size/3)+1,"LEVEL"]].map(([ic,v,lb]) => (
-              <div key={lb} style={{ textAlign:"center" }}>
-                <div style={{ fontSize:18 }}>{ic}</div>
-                <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:16 }}>{v}</div>
-                <div style={{ fontSize:10, color:MUTED }}>{lb}</div>
+          <div style={{display:"flex",gap:14}}>
+            {[["🔥",0,"STREAK"],["⚡",xp,"XP"],["🏆",Math.floor(completed.size/3)+1,"LVL"]].map(([ic,v,lb])=>(
+              <div key={lb} style={{textAlign:"center"}}>
+                <div style={{fontSize:18}}>{ic}</div>
+                <div style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:16}}>{v}</div>
+                <div style={{fontSize:10,color:MUTED}}>{lb}</div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ background:"rgba(245,158,11,.1)", border:"1px solid rgba(245,158,11,.2)", borderRadius:14, padding:"12px 14px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <span style={{ fontSize:26 }}>🔥</span>
-            <div>
-              <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:14 }}>{lang==="es"?"Racha Diaria":"Daily Streak"}</div>
-              <div style={{ fontSize:12, color:MUTED }}>{lang==="es"?"Estudia un capítulo hoy":"Study a chapter today to keep it"}</div>
-            </div>
-          </div>
-          <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:28, color:GOLD }}>0</div>
-        </div>
-      </div>
-      {/* Learning Path */}
-      <div style={{ padding:"20px 16px 50px" }}>
-        <div style={{ fontSize:11, fontWeight:700, color:MUTED, letterSpacing:2, textAlign:"center", marginBottom:16 }}>
-          {lang==="es"?"RUTA DE APRENDIZAJE":"LEARNING PATH"}
-        </div>
-        {/* Level legend */}
-        <div style={{ display:"flex", gap:8, justifyContent:"center", marginBottom:20 }}>
-          {[1,2,3].map(lv => {
-            const cfg = COMPLEXITY[lv];
-            return (
-              <div key={lv} style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 10px", borderRadius:20, background:`${LVL_COLOR[lv]}15`, border:`1px solid ${LVL_COLOR[lv]}33` }}>
-                <span style={{ fontSize:12 }}>{LVL_EMOJI[lv]}</span>
-                <span style={{ fontSize:10, fontWeight:700, color:LVL_COLOR[lv] }}>{cfg.label}</span>
-                <span style={{ fontSize:10, color:MUTED }}>{cfg.slides}s</span>
+        <div style={{display:"flex",gap:8,justifyContent:"center"}}>
+          {[1,2,3].map(lv=>{
+            const c=COMPLEXITY[lv];
+            return(
+              <div key={lv} style={{display:"flex",alignItems:"center",gap:4,padding:"4px 10px",borderRadius:20,background:`${c.color}15`,border:`1px solid ${c.color}33`}}>
+                <span style={{fontSize:12}}>{c.emoji}</span>
+                <span style={{fontSize:10,fontWeight:700,color:c.color}}>{c.label}</span>
+                <span style={{fontSize:10,color:MUTED}}>{c.slides}s</span>
               </div>
             );
           })}
         </div>
-        {/* Chapter cards */}
-        {CHAPTERS.map((ch, i) => {
-          const done    = completed.has(ch.id);
-          const current = !done && (i===0 || completed.has(CHAPTERS[i-1]?.id));
-          const locked  = !done && !current;
-          const isLeft  = i % 2 === 0;
-          const bc      = done ? RED : current ? RED : DARK2;
-          // FIX: was L[ch.id]?.quiz?.length — now uses COMPLEXITY config
-          const cfg     = COMPLEXITY[ch.level] || COMPLEXITY[1];
-          const lc      = LVL_COLOR[ch.level] || RED;
-
-          return (
-            <div key={ch.id} style={{ display:"flex", flexDirection:"column", alignItems:isLeft?"flex-start":"flex-end" }}>
-              {i > 0 && (
-                <div style={{ width:2.5, height:22, background:completed.has(CHAPTERS[i-1]?.id)?RED:DARK2, marginLeft:isLeft?"22%":"auto", marginRight:!isLeft?"22%":"auto", transition:"background .3s" }} />
-              )}
-              <div onClick={() => !locked && onOpen(ch)}
-                className={current?"pulse":""}
-                style={{ width:"74%", padding:"13px 14px", borderRadius:18, background:current?"rgba(232,37,60,.07)":done?"rgba(232,37,60,.06)":"#111", border:`1.5px solid ${bc}`, display:"flex", alignItems:"center", gap:12, opacity:locked?.38:1, cursor:locked?"default":"pointer" }}>
-                <div style={{ width:48, height:48, borderRadius:14, flexShrink:0, background:done?RED:current?"rgba(232,37,60,.15)":DARK, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>
+      </div>
+      <div style={{padding:"20px 16px 60px"}}>
+        <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:2,textAlign:"center",marginBottom:20}}>{lang==="es"?"RUTA DE APRENDIZAJE":"LEARNING PATH"}</div>
+        {CHAPTERS.map((ch,i)=>{
+          const done=completed.has(ch.id);
+          const current=!done&&(i===0||completed.has(CHAPTERS[i-1]?.id));
+          const locked=!done&&!current;
+          const isLeft=i%2===0;
+          const bc=done?RED:current?RED:DARK2;
+          const cfg=COMPLEXITY[ch.level]||COMPLEXITY[1];
+          return(
+            <div key={ch.id} style={{display:"flex",flexDirection:"column",alignItems:isLeft?"flex-start":"flex-end"}}>
+              {i>0&&<div style={{width:2.5,height:22,background:completed.has(CHAPTERS[i-1]?.id)?RED:DARK2,marginLeft:isLeft?"22%":"auto",marginRight:!isLeft?"22%":"auto",transition:"background .3s"}}/>}
+              <div onClick={()=>!locked&&onOpen(ch)} className={current?"pulse":""}
+                style={{width:"74%",padding:"13px 14px",borderRadius:18,background:current?"rgba(232,37,60,.07)":done?"rgba(232,37,60,.06)":"#111",border:`1.5px solid ${bc}`,display:"flex",alignItems:"center",gap:12,opacity:locked?.38:1,cursor:locked?"default":"pointer"}}>
+                <div style={{width:48,height:48,borderRadius:14,flexShrink:0,background:done?RED:current?"rgba(232,37,60,.15)":DARK,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>
                   {locked?"🔒":done?"✅":ch.icon}
                 </div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:10, fontWeight:700, color:current||done?RED:MUTED, letterSpacing:1.5 }}>CH {String(ch.id).padStart(2,"0")}</div>
-                  <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:13, color:locked?MUTED:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", marginTop:1 }}>{ch.title}</div>
-                  <div style={{ fontSize:12, color:MUTED, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", marginTop:2 }}>{ch.sub}</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:10,fontWeight:700,color:current||done?RED:MUTED,letterSpacing:1.5}}>CH {String(ch.id).padStart(2,"0")}</div>
+                  <div style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:13,color:locked?MUTED:"#fff",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:1}}>{ch.title}</div>
+                  <div style={{fontSize:12,color:MUTED,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginTop:2}}>{ch.sub}</div>
                 </div>
-                <div style={{ flexShrink:0, display:"flex", flexDirection:"column", gap:3, alignItems:"flex-end" }}>
-                  {current && <div style={{ background:RED, borderRadius:8, padding:"3px 8px", fontSize:12, fontWeight:700, color:"#fff" }}>▶</div>}
-                  {/* Shows correct slide count per level */}
-                  <div style={{ background:`${lc}20`, border:`1px solid ${lc}44`, borderRadius:8, padding:"3px 8px", fontSize:11, color:lc, fontWeight:700 }}>{cfg.slides}s</div>
-                  <div style={{ background:DARK, borderRadius:8, padding:"3px 8px", fontSize:11, color:MUTED }}>{cfg.minQ}Q</div>
+                <div style={{flexShrink:0,display:"flex",flexDirection:"column",gap:3,alignItems:"flex-end"}}>
+                  {current&&<div style={{background:RED,borderRadius:8,padding:"3px 8px",fontSize:12,fontWeight:700,color:"#fff"}}>▶</div>}
+                  <div style={{background:`${cfg.color}20`,border:`1px solid ${cfg.color}44`,borderRadius:8,padding:"3px 8px",fontSize:11,color:cfg.color,fontWeight:700}}>{cfg.slides}s</div>
+                  <div style={{background:DARK,borderRadius:8,padding:"3px 8px",fontSize:11,color:MUTED}}>{cfg.minQ}Q</div>
                 </div>
               </div>
             </div>
@@ -731,254 +878,335 @@ function AcademyScreen({ profile, completed, onOpen }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   COMPONENT: Paywall
-═══════════════════════════════════════════════════ */
-function Paywall({ lang, onClose }) {
-  const t = T[lang];
-  return (
-    <div style={{ position:"absolute", inset:0, zIndex:980, background:"#000", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 20px", gap:20 }}>
-      <CandleIcon />
-      <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:24, textAlign:"center", lineHeight:1.3 }}>{t.paywallTitle}</div>
-      <div style={{ fontSize:14, color:MUTED, textAlign:"center", lineHeight:1.7, maxWidth:300 }}>{t.paywallSub}</div>
-      <button style={{ width:"100%", maxWidth:340, padding:17, borderRadius:14, background:RED, border:"none", cursor:"pointer", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:17, color:"#fff" }}>
-        {t.upgrade}
-      </button>
-      <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", fontSize:14, color:MUTED, padding:"8px 0" }}>{t.later}</button>
+/* ═══════════════════════════════════
+   PAYWALL
+═══════════════════════════════════ */
+function Paywall({lang,onClose}){
+  const t=T[lang];
+  return(
+    <div style={{position:"absolute",inset:0,zIndex:980,background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px",gap:20}}>
+      <CandleIcon/>
+      <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:24,textAlign:"center",lineHeight:1.3}}>{t.paywallTitle}</div>
+      <div style={{fontSize:14,color:MUTED,textAlign:"center",lineHeight:1.7,maxWidth:300}}>{t.paywallSub}</div>
+      <button style={{width:"100%",maxWidth:340,padding:17,borderRadius:14,background:RED,border:"none",cursor:"pointer",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:17,color:"#fff"}}>{t.upgrade}</button>
+      <button onClick={onClose} style={{background:"none",border:"none",cursor:"pointer",fontSize:14,color:MUTED,padding:"8px 0"}}>{t.later}</button>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════
+/* ═══════════════════════════════════
    MAIN APP
-═══════════════════════════════════════════════════ */
-function App() {
-  const [phase, setPhase]         = useState("onboard");
-  const [nameInput, setName]      = useState("");
-  const [selLang, setSelLang]     = useState("en");
-  const [selMode, setSelMode]     = useState(null);
-  const [profile, setProfile]     = useState({});
-  const [tab, setTab]             = useState("chat");
-  const [msgs, setMsgs]           = useState([]);
-  const [input, setInput]         = useState("");
-  const [loading, setLoading]     = useState(false);
-  const [imgData, setImgData]     = useState(null);
-  const [imgPreview, setImgPrev]  = useState(null);
-  const [pqStep, setPqStep]       = useState(0);
-  const [showCL, setShowCL]       = useState(false);
-  const [clChecked, setClChecked] = useState(new Set());
-  const [flowState, setFlow]      = useState(null);
-  const [activeJ, setActiveJ]     = useState(null);
-  const [journal, setJournal]     = useState([]);
-  const [stats, setStats]         = useState({ total:0, wins:0, losses:0, be:0, bestSession:null, worstEmotion:null });
-  const [notif, setNotif]         = useState(null);
-  const [completedCh, setCompletedCh] = useState(new Set());
-  const [openChapter, setOpenChapter] = useState(null);
-  const [apiError, setApiError]   = useState(null);
-  const [msgCount, setMsgCount]   = useState(0);
-  const [showPaywall, setShowPaywall] = useState(false);
+═══════════════════════════════════ */
+function App(){
+  const[phase,setPhase]=useState("onboard");
+  const[nameInput,setName]=useState("");
+  const[selLang,setSelLang]=useState("en");
+  const[selMode,setSelMode]=useState(null);
+  const[profile,setProfile]=useState({});
+  const[tab,setTab]=useState("chat");
+  const[msgs,setMsgs]=useState([]);
+  const[input,setInput]=useState("");
+  const[loading,setLoading]=useState(false);
+  const[imgData,setImgData]=useState(null);
+  const[imgPreview,setImgPrev]=useState(null);
+  const[pqStep,setPqStep]=useState(0);
+  const[pills,setPills]=useState([]);
+  const[showCL,setShowCL]=useState(false);
+  const[clChecked,setClChecked]=useState(new Set());
+  const[trades,setTrades]=useState(()=>{try{const r=localStorage.getItem("donna_trades");return r?JSON.parse(r):[];}catch{return[];}});
+  const[activeTrade,setActiveTrade]=useState(()=>{try{const r=localStorage.getItem("donna_active_trade");return r?JSON.parse(r):null;}catch{return null;}});
+  const[showTradeLog,setShowTradeLog]=useState(false);
+  const[tradeLogMode,setTradeLogMode]=useState("open");
+  const[completedCh,setCompletedCh]=useState(new Set());
+  const[openChapter,setOpenChapter]=useState(null);
+  const[apiError,setApiError]=useState(null);
+  const[msgCount,setMsgCount]=useState(0);
+  const[showPaywall,setShowPaywall]=useState(false);
+  const[notif,setNotif]=useState(null);
 
-  const fileRef   = useRef(null);
-  const bottomRef = useRef(null);
-  const inputRef  = useRef(null);
-  const notifRef  = useRef(null);
+  const fileRef=useRef(null);
+  const bottomRef=useRef(null);
+  const inputRef=useRef(null);
+  const notifRef=useRef(null);
 
-  const t    = T[profile.lang || selLang];
-  const lang = profile.lang || selLang;
+  const t=T[profile.lang||selLang];
+  const lang=profile.lang||selLang;
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs, loading]);
+  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[msgs,loading]);
+  useEffect(()=>{try{localStorage.setItem("donna_trades",JSON.stringify(trades));}catch(e){}},[trades]);
+  useEffect(()=>{try{if(activeTrade)localStorage.setItem("donna_active_trade",JSON.stringify(activeTrade));else localStorage.removeItem("donna_active_trade");}catch(e){}},[activeTrade]);
 
-  const showNotif = (msg) => {
-    setNotif(msg); clearTimeout(notifRef.current);
-    notifRef.current = setTimeout(() => setNotif(null), 4800);
-  };
+  const showNotif=(msg)=>{setNotif(msg);clearTimeout(notifRef.current);notifRef.current=setTimeout(()=>setNotif(null),5000);};
 
-  const addMsg = useCallback((role, text, extra = {}) => {
-    setMsgs(p => [...p, { role, text, id: Date.now()+Math.random(), ...extra }]);
-  }, []);
+  const addMsg=useCallback((role,text,extra={})=>{
+    setMsgs(p=>[...p,{role,text,id:Date.now()+Math.random(),...extra}]);
+  },[]);
 
-  const startApp = () => {
-    if (!nameInput.trim() || !selMode) return;
-    const p = { name: nameInput.trim(), lang: selLang, mode: selMode };
-    setProfile(p); setPhase("main");
-    if (selMode === "advanced") {
-      addMsg("donna", p.lang==="es"
-        ? "La mayoría de los traders pierden porque siguen reglas que alguien más les vendió. Tú ya sabes que hay algo más detrás de cómo se mueve el precio.\n\nSoy Donna. No te digo qué operar. Te hago las preguntas que preferirías saltarte."
-        : "Most traders lose because they follow rules someone else sold them. You already know there's something more behind how price moves.\n\nI'm Donna. I don't tell you what to trade. I ask the questions you'd rather skip.");
+  const setContextPills=(ps)=>setPills(ps||[]);
+
+  const DEFAULT_PILLS=lang==="es"
+    ?["✅ Listo para operar","📊 Analiza mi gráfico","📝 Registrar operación","🎓 ¿Por dónde empiezo?"]
+    :["✅ Ready to trade","📊 Analyze my chart","📝 Log a trade","🎓 Where do I start?"];
+
+  /* ── ONBOARDING ── */
+  const startApp=()=>{
+    if(!nameInput.trim()||!selMode)return;
+    const p={name:nameInput.trim(),lang:selLang,mode:selMode};
+    setProfile(p);setPhase("main");
+
+    if(selMode==="advanced"){
+      const msg=p.lang==="es"
+        ?`${p.name}. Sin rodeos.
+
+Sé que ya sabes que el precio se mueve por dos razones. Lo que yo hago es la parte de disciplina — checklist antes de cada entrada, diario después de cada operación, y revisión de patrones cuando estás perdiendo.
+
+Funciones disponibles:
+📊 Analizo tus gráficos con CRT
+✅ Checklist pre-operación de 8 puntos
+📝 Diario de operaciones con seguimiento
+🎓 Academia completa de 22 capítulos
+🎤 Habla conmigo — activa el micrófono
+
+Soy tu socia de accountability. ¿Qué tienes en el radar?`
+        :`${p.name}. Let's skip the tour.
+
+You already know price moves for two reasons. What I'm here for is the discipline side — checklist before every entry, trade log after every trade, pattern review when you're losing.
+
+What Donna does:
+📊 Reads your charts with CRT
+✅ 8-point pre-trade checklist
+📝 Trade journal with accountability
+🎓 Full 22-chapter academy
+🎤 Voice input — tap the mic
+
+I'm your accountability partner. Send me a setup or tell me what you're watching.`;
+      addMsg("donna",msg);
       setPqStep(1);
-      setTimeout(() => addMsg("donna", p.lang==="es"?"¿Cuál es tu vela principal?":"What's your main candle?"), 900);
-    } else {
-      addMsg("donna", p.lang==="es"
-        ? "La mayoría cree que el mercado es impredecible. No lo es.\n\nTiene una lógica — y yo te la enseño desde cero. Soy Donna."
-        : "Most people think the market is unpredictable. It isn't.\n\nIt has a logic — and I'll teach you to see it from scratch. I'm Donna.");
+      setTimeout(()=>{
+        const q=p.lang==="es"?"¿Cuál es tu vela principal de trabajo?":"What's your main working candle?";
+        addMsg("donna",q);
+        setContextPills(p.lang==="es"?["📅 Diaria","🕓 4H","⏰ 1H","🌊 Las combino"]:["📅 Daily","🕓 4H","⏰ 1H","🌊 I combine them"]);
+      },1000);
+    }else{
+      const msg=p.lang==="es"
+        ?`¡Hola ${p.name}! 👋 Soy Donna, tu mentora de trading CRT.
+
+Si estás aquí, quizás alguien te habló del mercado, o viste que otros generaban dinero, o simplemente quieres entender cómo funciona todo esto. Sea cual sea la razón — estás en el lugar correcto.
+
+Estoy aquí para enseñarte desde cero. Sin jerga confusa. Sin pasos saltados.
+
+Aquí está lo que puedo hacer por ti:
+📊 Analizo tus gráficos — mándame una captura y te explico todo
+✅ Checklist pre-operación — antes de cada trade, lo revisamos juntos
+📝 Diario de operaciones — registra cada trade y yo lo recuerdo
+🎓 Academia completa — 22 capítulos de teoría CRT
+🎤 Habla conmigo — toca el micrófono para hablar
+
+Empecemos con lo más importante:` 
+        :`Hey ${p.name}! 👋 I'm Donna, your CRT trading mentor.
+
+If you're here, maybe someone told you about trading, or you saw others making money, or you just want to understand how markets actually work. Whatever brought you — you're in the right place.
+
+I'm here to teach you from zero. No confusing jargon. No skipped steps.
+
+Here's what I can do for you:
+📊 Chart analysis — send me a screenshot and I'll explain everything
+✅ Pre-trade checklist — before every trade, we check it together
+📝 Trade journal — log every trade and I remember it
+🎓 Full academy — 22 chapters of CRT from beginner to advanced
+🎤 Voice input — tap the mic to talk to me
+
+Let's start with the most important thing:`;
+      addMsg("donna",msg);
       setPqStep(1);
-      setTimeout(() => addMsg("donna", p.lang==="es"?"¿Qué te trajo hasta aquí?":"What brought you here?"), 900);
+      setTimeout(()=>{
+        const q=p.lang==="es"?"¿Qué te trajo hasta aquí? ¿Por qué quieres aprender a operar?":"What brought you here? Why do you want to learn trading?";
+        addMsg("donna",q);
+        setContextPills(p.lang==="es"
+          ?["🎯 Libertad financiera","👀 Vi a otros hacerlo","💡 Perdí dinero y quiero entender","❤️ Más para mi familia","🤔 Pura curiosidad"]
+          :["🎯 Financial freedom","👀 I saw others doing it","💡 I lost money","❤️ More for my family","🤔 Pure curiosity"]);
+      },1000);
     }
   };
 
-  const getPQPills = (step, mode, lang) => {
-    const es = lang==="es", adv = mode==="advanced";
-    if (step===1) return adv
-      ? (es?["📅 Vela diaria","🕓 Vela de 4H","⏰ Vela de 1H","🌊 Las mezclo todas"]:["📅 Daily candle","🕓 4H candle","⏰ 1H candle","🌊 I mix them all"])
-      : (es?["🎯 Libertad financiera","👀 Vi a otros hacerlo","💡 Perdí dinero","❤️ Más para mi familia","🤔 Curiosidad"]:["🎯 Financial freedom","👀 I saw others doing it","💡 I lost money","❤️ More for my family","🤔 Pure curiosity"]);
-    if (step===2) return adv
-      ? (es?["📊 Top-down desde HTF","📍 Encuentro nivel y espero","⚡ Reacciono a lo que veo","🔄 Construyendo proceso"]:["📊 Top-down from HTF","📍 I find a level and wait","⚡ I react to what I see","🔄 Still building my process"])
-      : (es?["Nunca en mi vida","Los he visto pero confunden","He intentado leerlos","Los miro pero no entiendo"]:["Never in my life","I've seen them but they confuse me","I've tried reading them","I look but don't understand"]);
-    return null;
-  };
-
-  const handlePQ = (pill) => {
-    const step=pqStep, p=profile, adv=p.mode==="advanced";
-    addMsg("user", pill);
-    if (step===1) {
-      setProfile(pr => adv?{...pr,candle:pill}:{...pr,inspiration:pill});
+  /* ── PROFILE Q FLOW ── */
+  const handlePQ=(pill)=>{
+    const p=profile,adv=p.mode==="advanced";
+    addMsg("user",pill);
+    if(pqStep===1){
+      setProfile(pr=>adv?{...pr,candle:pill}:{...pr,inspiration:pill});
       setPqStep(2);
-      setTimeout(() => addMsg("donna", adv
-        ? (p.lang==="es"?"¿Y cuál es tu proceso antes de entrar?":"And what's your process before entering?")
-        : (p.lang==="es"?"Me alegra que estés aquí. ¿Alguna vez has abierto un gráfico de trading?":"I'm glad you're here. Have you ever actually looked at a trading chart before?")), 400);
-    } else if (step===2) {
-      setProfile(pr => adv?{...pr,process:pill}:{...pr,chartExp:pill});
+      if(adv){
+        setTimeout(()=>{
+          const q=p.lang==="es"?"¿Y cuál es tu proceso antes de entrar a una operación?":"And what's your process before entering a trade?";
+          addMsg("donna",q);
+          setContextPills(p.lang==="es"
+            ?["📊 Top-down desde HTF","📍 Encuentro nivel y espero","⚡ Reacciono a lo que veo","🔄 Aún lo estoy construyendo"]
+            :["📊 Top-down from HTF","📍 I find a level and wait","⚡ I react to what I see","🔄 Still building my process"]);
+        },400);
+      }else{
+        setTimeout(()=>{
+          const q=p.lang==="es"?"¿Alguna vez has abierto un gráfico de trading antes?":"Have you ever actually looked at a trading chart before?";
+          addMsg("donna",q);
+          setContextPills(p.lang==="es"
+            ?["Nunca en mi vida","Los he visto pero confunden","He intentado leerlos","Los miro y no entiendo"]
+            :["Never in my life","I've seen them but they confuse me","I tried reading them","I look but don't understand"]);
+        },400);
+      }
+    }else if(pqStep===2){
+      setProfile(pr=>adv?{...pr,process:pill}:{...pr,chartExp:pill});
       setPqStep(0);
-      setTimeout(() => addMsg("donna", adv
-        ? (p.lang==="es"?"Anotado. Mándame setups, adjunta gráficos, pasa el checklist antes de cada entrada. ¿Qué tienes en el radar?":"Noted. Send me setups, attach charts, run the checklist before every entry. What's on the radar?")
-        : (p.lang==="es"?"Perfecto. Empieza por la Academia — Capítulo 1. No te saltes nada. Cada pieza construye sobre la anterior.":"Perfect. Start in the Academy — Chapter 1. Don't skip anything. Each piece builds on the last.")), 500);
+      setTimeout(()=>{
+        const reply=adv
+          ?(p.lang==="es"?"Anotado. Mándame setups, adjunta gráficos, pasa el checklist antes de cada entrada. ¿Qué tienes en el radar?":"Noted. Send me setups, attach charts, run the checklist before every entry. What's on the radar?")
+          :(p.lang==="es"?"Perfecto. La mejor forma de empezar es por la Academia — Capítulo 1. No te saltes nada. Cada pieza construye sobre la anterior. ¿Quieres empezar ahora?":"Perfect. The best way to start is the Academy — Chapter 1. Don't skip anything. Each piece builds on the last. Want to start now?");
+        addMsg("donna",reply);
+        setContextPills(adv
+          ?(p.lang==="es"?["📊 Te mando un setup","✅ Abrir checklist","📝 Registrar operación","🎓 Ver academia"]:["📊 Send you a setup","✅ Open checklist","📝 Log a trade","🎓 View academy"])
+          :(p.lang==="es"?["🎓 Ir a la Academia","💬 Tengo preguntas","📊 Muéstrame un gráfico"]:["🎓 Go to Academy","💬 I have questions","📊 Show me a chart"]));
+      },500);
     }
   };
 
-  const handleFlowPill = (pill) => {
-    if (flowState==="jb-2") { setActiveJ(p=>({...p,direction:pill})); setFlow("jb-3"); setTimeout(()=>addMsg("donna",lang==="es"?"¿Por qué esta entrada? Una sola frase.":"Why this entry? One sentence."),300); return; }
-    if (flowState==="jb-4") { setActiveJ(p=>({...p,feeling:pill})); setFlow("jb-5"); setTimeout(()=>addMsg("donna",lang==="es"?"¿En qué sesión?":"Which session?"),300); return; }
-    if (flowState==="jb-5") { const e={...activeJ,session:pill,status:"open",ts:Date.now()}; setActiveJ(e); setJournal(p=>[...p,e]); setFlow(null); setTimeout(()=>addMsg("donna",lang==="es"?`📝 Registrado — ${pill}.`:`📝 Logged — ${pill} session.`),300); return; }
-    if (flowState==="jd-1") { setActiveJ(p=>({...p,hit50:pill.includes("Yes")||pill.includes("Sí")})); setFlow("jd-2"); setTimeout(()=>addMsg("donna",lang==="es"?"¿Quisiste mover el stop?":"Did you want to move your stop?"),300); return; }
-    if (flowState==="jd-2") { const m=pill.startsWith("No"); setActiveJ(p=>({...p,movedStop:!m})); setFlow(null); setTimeout(()=>addMsg("donna",m?(lang==="es"?"Bien. Stop fijo. El mercado que trabaje.":"Good. Fixed stop. Let the market do its job."):(lang==="es"?"Anotado. Mover el stop = abrir la puerta a las pérdidas.":"Noted. Moving your stop is how good trades become losses.")),300); return; }
-    if (flowState==="ja-1") { const r=pill.includes("Win")||pill.includes("Ganada")?"win":pill.includes("Loss")||pill.includes("Pérdida")?"loss":"be"; setActiveJ(p=>({...p,result:r})); setStats(p=>({...p,total:p.total+1,wins:p.wins+(r==="win"?1:0),losses:p.losses+(r==="loss"?1:0),be:p.be+(r==="be"?1:0)})); setFlow("ja-2"); setTimeout(()=>addMsg("donna",lang==="es"?"¿Ratio R?":"R multiple?"),300); return; }
-  };
-
-  const handleJournalText = (text) => {
-    if (flowState==="jb-1") { setActiveJ({asset:text}); setFlow("jb-2"); setTimeout(()=>addMsg("donna",lang==="es"?"¿Dirección?":"Direction?"),300); return true; }
-    if (flowState==="jb-3") { setActiveJ(p=>({...p,reason:text})); setFlow("jb-4"); setTimeout(()=>addMsg("donna",lang==="es"?"¿Cómo te sientes?":"How are you feeling?"),300); return true; }
-    if (flowState==="ja-2") { setActiveJ(p=>({...p,rMultiple:text})); setFlow("ja-3"); setTimeout(()=>addMsg("donna",lang==="es"?"Una cosa que hiciste bien.":"One thing you did right."),300); return true; }
-    if (flowState==="ja-3") { setActiveJ(p=>({...p,didRight:text})); setFlow("ja-4"); setTimeout(()=>addMsg("donna",lang==="es"?"Una cosa que cambiarías.":"One thing you'd change."),300); return true; }
-    if (flowState==="ja-4") { const e={...activeJ,wouldChange:text,status:"closed"}; setJournal(p=>p.map(j=>j.ts===e.ts?e:j)); setActiveJ(null); setFlow(null); return false; }
-    return false;
-  };
-
-  const sendMessage = async (text, img = null) => {
-    if (!text?.trim() && !img || loading) return;
-    if (msgCount >= FREE_MSG_LIMIT) { setShowPaywall(true); return; }
-    const userText = text?.trim() || (lang==="es"?"[Gráfico adjunto]":"[Chart attached]");
-    if (text?.trim() && handleJournalText(text.trim())) { addMsg("user", text.trim()); setInput(""); return; }
-    addMsg("user", userText, img?{img}:{});
-    setInput(""); setImgData(null); setImgPrev(null); setLoading(true); setApiError(null); setMsgCount(c=>c+1);
-    try {
-      const sys = buildPrompt(profile, stats);
-      const history = msgs.slice(-14).map(m => {
-        if (m.role==="donna") return { role:"assistant", content:m.text };
-        if (m.img) { const b64=m.img.split(",")[1], mime=m.img.split(";")[0].split(":")[1]; return { role:"user", content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:m.text||(lang==="es"?"Analiza con CRT.":"Analyze with CRT.")}] }; }
-        return { role:"user", content:m.text };
+  /* ── TRADE LOG ── */
+  const handleTradeSave=async(trade)=>{
+    setShowTradeLog(false);
+    const isClose=trade.status==="closed";
+    if(isClose){
+      setActiveTrade(null);
+      setTrades(prev=>prev.map(t=>t.id===trade.id?trade:t));
+      // Donna reviews the closed trade
+      const review=DONNA.tradeReview(trade,trades,lang);
+      addMsg("donna",review);
+      setContextPills(DEFAULT_PILLS);
+      showNotif(lang==="es"?"Operación cerrada. Donna la revisó.":"Trade closed. Donna reviewed it.");
+    }else{
+      setActiveTrade(trade);
+      setTrades(prev=>{
+        const exists=prev.find(t=>t.id===trade.id);
+        return exists?prev.map(t=>t.id===trade.id?trade:t):[...prev,trade];
       });
-      const cur = img ? [{type:"image",source:{type:"base64",media_type:img.split(";")[0].split(":")[1],data:img.split(",")[1]}},{type:"text",text:userText}] : userText;
-      history.push({ role:"user", content:cur });
-      const res = await fetch("/api/chat", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:800, system:sys, messages:history }) });
-      if (!res.ok) { const ed=await res.json().catch(()=>({})); throw new Error(ed.error?.message||`API ${res.status}`); }
-      const data  = await res.json();
-      const reply = data.content?.[0]?.text;
-      if (!reply) throw new Error("Empty response");
-      addMsg("donna", reply);
-    } catch(e) { setApiError(e.message); addMsg("donna", DONNA.fallback(lang, profile.mode)); }
+      const reply=lang==="es"
+        ?`${trade.asset} ${trade.direction} registrado. ${trade.killZone} kill zone. Stop fijo — no lo muevas. Primera toma al 50%. Voy a estar pendiente.`
+        :`${trade.asset} ${trade.direction} logged. ${trade.killZone} kill zone. Stop is fixed — don't touch it. First take at 50%. I'll be checking in on you.`;
+      addMsg("donna",reply);
+      setContextPills(lang==="es"
+        ?["✅ Checklist completo","📊 El mercado se movió","❌ Salí de la operación"]
+        :["✅ Checklist complete","📊 Market moved","❌ I exited the trade"]);
+    }
+  };
+
+  /* ── SEND MESSAGE ── */
+  const sendMessage=async(text,img=null)=>{
+    if(!text?.trim()&&!img||loading)return;
+    if(msgCount>=FREE){setShowPaywall(true);return;}
+    const userText=text?.trim()||(lang==="es"?"[Gráfico adjunto]":"[Chart attached]");
+    addMsg("user",userText,img?{img}:{});
+    setInput("");setImgData(null);setImgPrev(null);
+    setLoading(true);setApiError(null);setMsgCount(c=>c+1);
+    setContextPills([]);
+    try{
+      const sys=buildPrompt(profile,trades,activeTrade);
+      const history=msgs.slice(-14).map(m=>{
+        if(m.role==="donna")return{role:"assistant",content:m.text};
+        if(m.img){const b64=m.img.split(",")[1],mime=m.img.split(";")[0].split(":")[1];return{role:"user",content:[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:m.text||(lang==="es"?"Analiza con CRT.":"Analyze with CRT.")}]};}
+        return{role:"user",content:m.text};
+      });
+      const cur=img?[{type:"image",source:{type:"base64",media_type:img.split(";")[0].split(":")[1],data:img.split(",")[1]}},{type:"text",text:userText}]:userText;
+      history.push({role:"user",content:cur});
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:sys,messages:history})});
+      if(!res.ok){const ed=await res.json().catch(()=>({}));throw new Error(ed.error?.message||`API ${res.status}`);}
+      const data=await res.json();
+      const reply=data.content?.[0]?.text;
+      if(!reply)throw new Error("Empty response");
+      addMsg("donna",reply);
+      setContextPills(DEFAULT_PILLS);
+    }catch(e){
+      setApiError(e.message);
+      addMsg("donna",DONNA.fallback(lang,profile.mode));
+      setContextPills(DEFAULT_PILLS);
+    }
     setLoading(false);
   };
 
-  const handleSend = () => { imgData ? sendMessage(input, imgData) : sendMessage(input); };
+  const handleSend=()=>{imgData?sendMessage(input,imgData):sendMessage(input);};
 
-  const triggerChecklist = () => { setClChecked(new Set()); setShowCL(true); };
-
-  // FIX: was gradeComment(grade, lang) — now correctly DONNA.gradeComment()
-  const onCLConfirm = (grade) => {
-    setShowCL(false); setFlow("jb-1");
-    addMsg("donna", lang==="es"
-      ? `${grade} — ${DONNA.gradeComment(grade, lang)}\n\nVamos a registrarlo. ¿Qué activo es?`
-      : `${grade} — ${DONNA.gradeComment(grade, lang)}\n\nLet's log it. What's the asset?`);
-  };
-
-  const getFlowPills = (fs) => {
-    const es = lang==="es";
-    if (fs==="jb-2") return es?["📈 Alcista","📉 Bajista"]:["📈 Bullish","📉 Bearish"];
-    if (fs==="jb-4") return es?["😌 Calmado","💪 Confiado","😰 Ansioso","😤 FOMO"]:["😌 Calm","💪 Confident","😰 Anxious","😤 FOMO"];
-    if (fs==="jb-5") return es?["🌅 Londres","🗽 NY Open","🌆 NY PM","⏰ Sin KZ"]:["🌅 London","🗽 NY Open","🌆 NY PM","⏰ No KZ"];
-    if (fs==="jd-1") return es?["✅ Sí, tocó","⏳ Aún no"]:["✅ Yes, hit it","⏳ Not yet"];
-    if (fs==="jd-2") return es?["No 💪","Sí... 😬"]:["No 💪","Yes... 😬"];
-    if (fs==="ja-1") return es?["✅ Ganada","❌ Pérdida","➡️ Empate"]:["✅ Win","❌ Loss","➡️ Break Even"];
-    return null;
-  };
-
-  const pqPills     = pqStep > 0 ? getPQPills(pqStep, profile.mode, lang) : null;
-  const flowPills   = getFlowPills(flowState);
-  const activePills = pqPills || flowPills;
-  const defaultPills = !activePills && pqStep===0
-    ? (lang==="es"?["¿Listo para operar?","Turtle Soup","Model 1","Revisar última operación"]:["Ready to trade?","Turtle Soup","Model 1","Review my last trade"])
-    : null;
-  const displayPills = activePills || defaultPills;
-
-  const handlePillTap = (pill) => {
-    if ((pill==="Ready to trade?"||pill==="¿Listo para operar?") && pqStep===0) { triggerChecklist(); return; }
-    if (pqStep>0) { handlePQ(pill); return; }
-    if (flowState) { handleFlowPill(pill); return; }
+  const handlePillTap=(pill)=>{
+    if(pqStep>0){handlePQ(pill);return;}
+    if(pill==="✅ Ready to trade"||pill==="✅ Listo para operar"){setClChecked(new Set());setShowCL(true);return;}
+    if(pill==="📝 Log a trade"||pill==="📝 Registrar operación"){setTradeLogMode("open");setShowTradeLog(true);return;}
+    if(pill==="🎓 Go to Academy"||pill==="🎓 Ver academia"||pill==="🎓 Ir a la Academia"){setTab("academy");return;}
     sendMessage(pill);
   };
 
-  const msgsLeft = FREE_MSG_LIMIT - msgCount;
+  const onCLConfirm=(grade)=>{
+    setShowCL(false);
+    addMsg("donna",lang==="es"
+      ?`${grade} — ${DONNA.gradeComment(grade,lang)}
 
-  /* ── ONBOARDING ── */
-  if (phase==="onboard") {
-    const tO = T[selLang];
-    return (
+¿Quieres registrar esta operación ahora?`
+      :`${grade} — ${DONNA.gradeComment(grade,lang)}
+
+Want to log this trade now?`);
+    setContextPills(lang==="es"?["📝 Sí, registrar","💬 Hazme una pregunta"]:["📝 Yes, log it","💬 Ask me something"]);
+    if(pill==="📝 Sí, registrar"||pill==="📝 Yes, log it"){setTradeLogMode("open");setShowTradeLog(true);}
+  };
+
+  const msgsLeft=FREE-msgCount;
+  const displayPills=pills.length>0?pills:pqStep===0?DEFAULT_PILLS:[];
+
+  /* ── ONBOARDING SCREEN ── */
+  if(phase==="onboard"){
+    const tO=T[selLang];
+    return(
       <>
         <style>{CSS}</style>
-        <div style={{ width:"100%", height:"100vh", background:"#000", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 20px", maxWidth:430, margin:"0 auto", overflowY:"auto" }}>
-          <div className="fade-up" style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10, marginBottom:28 }}>
-            <CandleIcon />
-            <h1 style={{ fontFamily:"'Sora',sans-serif", fontWeight:900, fontSize:32, letterSpacing:-.5 }}>Meet Donna.</h1>
-            <p style={{ fontSize:14, color:MUTED, textAlign:"center" }}>{tO.tagline}</p>
+        <div style={{width:"100%",height:"100vh",background:"#000",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px",maxWidth:430,margin:"0 auto",overflowY:"auto"}}>
+          <div className="fade-up" style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,marginBottom:28}}>
+            <CandleIcon/>
+            <h1 style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:32,letterSpacing:-.5}}>Meet Donna.</h1>
+            <p style={{fontSize:14,color:MUTED,textAlign:"center"}}>{tO.tagline||"Your CRT trading mentor. 10 free messages."}</p>
           </div>
-          <div className="fade-up" style={{ width:"100%", display:"flex", flexDirection:"column", gap:18 }}>
+          <div className="fade-up" style={{width:"100%",display:"flex",flexDirection:"column",gap:18}}>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:MUTED, letterSpacing:1.2, marginBottom:8 }}>{tO.nameLabel}</div>
-              <input autoFocus value={nameInput} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==="Enter"&&nameInput.trim()&&selMode&&startApp()} placeholder={tO.namePH}
-                style={{ width:"100%", padding:"14px 16px", borderRadius:12, background:DARK, border:`1.5px solid ${nameInput.trim()?"rgba(232,37,60,.6)":"transparent"}`, color:"#fff", fontSize:16, outline:"none", transition:"border-color .2s" }} />
+              <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:1.2,marginBottom:8}}>{tO.nameLabel}</div>
+              <input autoFocus value={nameInput} onChange={e=>setName(e.target.value)}
+                onKeyDown={e=>e.key==="Enter"&&nameInput.trim()&&selMode&&startApp()}
+                placeholder={tO.namePH}
+                style={{width:"100%",padding:"14px 16px",borderRadius:12,background:DARK,border:`1.5px solid ${nameInput.trim()?"rgba(232,37,60,.6)":"transparent"}`,color:"#fff",fontSize:16,outline:"none",transition:"border-color .2s"}}/>
             </div>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:MUTED, letterSpacing:1.2, marginBottom:8 }}>{tO.langLabel}</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                {[{code:"en",flag:"🇺🇸",label:"English"},{code:"es",flag:"🇪🇸",label:"Español"}].map(l => (
+              <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:1.2,marginBottom:8}}>{tO.langLabel}</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                {[{code:"en",Flag:FlagUS,label:"English"},{code:"es",Flag:FlagES,label:"Español"}].map(l=>(
                   <button key={l.code} onClick={()=>setSelLang(l.code)}
-                    style={{ padding:"16px 12px", borderRadius:12, background:selLang===l.code?"rgba(232,37,60,.12)":DARK, border:`1.5px solid ${selLang===l.code?RED:"transparent"}`, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"all .2s" }}>
-                    <span style={{ fontSize:28 }}>{l.flag}</span>
-                    <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:14, color:"#fff" }}>{l.label}</span>
+                    style={{padding:"16px 12px",borderRadius:12,background:selLang===l.code?"rgba(232,37,60,.12)":DARK,border:`1.5px solid ${selLang===l.code?RED:"transparent"}`,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8,transition:"all .2s"}}>
+                    <l.Flag w={48} h={32}/>
+                    <span style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>{l.label}</span>
                   </button>
                 ))}
               </div>
             </div>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:MUTED, letterSpacing:1.2, marginBottom:8 }}>{tO.modeLabel}</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                {[{key:"beginner",icon:"📚",label:tO.beg,sub:tO.begSub},{key:"advanced",icon:"⚡",label:tO.adv,sub:tO.advSub}].map(m => (
+              <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:1.2,marginBottom:8}}>{tO.modeLabel}</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                {[{key:"beginner",icon:"📚",label:tO.beg,sub:tO.begSub,desc:lang==="es"?"Empezamos desde cero":"We start from zero"},{key:"advanced",icon:"⚡",label:tO.adv,sub:tO.advSub,desc:lang==="es"?"Directo al grano":"Straight to the point"}].map(m=>(
                   <button key={m.key} onClick={()=>setSelMode(m.key)}
-                    style={{ padding:"16px 12px", borderRadius:12, background:selMode===m.key?"rgba(232,37,60,.12)":DARK, border:`1.5px solid ${selMode===m.key?RED:"transparent"}`, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"all .2s" }}>
-                    <span style={{ fontSize:26 }}>{m.icon}</span>
-                    <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:14, color:"#fff" }}>{m.label}</span>
-                    <span style={{ fontSize:12, color:MUTED }}>{m.sub}</span>
+                    style={{padding:"16px 12px",borderRadius:12,background:selMode===m.key?"rgba(232,37,60,.12)":DARK,border:`1.5px solid ${selMode===m.key?RED:"transparent"}`,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:6,transition:"all .2s"}}>
+                    <span style={{fontSize:28}}>{m.icon}</span>
+                    <span style={{fontFamily:"'Sora',sans-serif",fontWeight:700,fontSize:14,color:"#fff"}}>{m.label}</span>
+                    <span style={{fontSize:11,color:MUTED,textAlign:"center"}}>{m.sub}</span>
                   </button>
                 ))}
               </div>
             </div>
             <button onClick={startApp} disabled={!nameInput.trim()||!selMode}
-              style={{ width:"100%", padding:17, borderRadius:14, background:nameInput.trim()&&selMode?RED:"#2C2C2E", border:"none", cursor:nameInput.trim()&&selMode?"pointer":"not-allowed", fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:17, color:"#fff", transition:"background .25s", marginTop:4 }}>
+              style={{width:"100%",padding:17,borderRadius:14,background:nameInput.trim()&&selMode?RED:"#2C2C2E",border:"none",cursor:nameInput.trim()&&selMode?"pointer":"not-allowed",fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:17,color:"#fff",transition:"background .25s",marginTop:4}}>
               {tO.start}
             </button>
-            <div style={{ textAlign:"center", display:"flex", flexDirection:"column", gap:4 }}>
-              <span style={{ fontSize:12, color:"#48484A" }}>{tO.disclaimer}</span>
-              <span style={{ fontSize:12, color:"#48484A" }}>{tO.privacy}</span>
+            <div style={{textAlign:"center",display:"flex",flexDirection:"column",gap:4}}>
+              <span style={{fontSize:12,color:"#48484A"}}>{tO.disclaimer}</span>
+              <span style={{fontSize:12,color:"#48484A"}}>{tO.privacy}</span>
             </div>
           </div>
         </div>
@@ -987,146 +1215,157 @@ function App() {
   }
 
   /* ── MAIN APP ── */
-  return (
+  return(
     <>
       <style>{CSS}</style>
-      <div style={{ width:"100%", height:"100vh", background:"#000", display:"flex", flexDirection:"column", maxWidth:430, margin:"0 auto", position:"relative", overflow:"hidden" }}>
+      <div style={{width:"100%",height:"100vh",background:"#000",display:"flex",flexDirection:"column",maxWidth:430,margin:"0 auto",position:"relative",overflow:"hidden"}}>
 
-        {openChapter && (
-          <LessonModal chapter={openChapter} lang={lang} onClose={()=>setOpenChapter(null)}
-            onComplete={(id) => {
-              setCompletedCh(p=>new Set([...p,id]));
-              const chTitle = CHAPTERS.find(c=>c.id===id)?.title;
-              setOpenChapter(null);
-              setTimeout(()=>showNotif(lang==="es"?`${chTitle} completado.`:`${chTitle} complete.`), 300);
-            }} />
-        )}
+        {/* Modals */}
+        {openChapter&&<LessonModal chapter={openChapter} lang={lang} onClose={()=>setOpenChapter(null)}
+          onComplete={(id)=>{setCompletedCh(p=>new Set([...p,id]));setOpenChapter(null);showNotif(lang==="es"?`${CHAPTERS.find(c=>c.id===id)?.title} completado.`:`${CHAPTERS.find(c=>c.id===id)?.title} complete.`);}}/>}
+        {showPaywall&&<Paywall lang={lang} onClose={()=>setShowPaywall(false)}/>}
+        {showCL&&<ChecklistModal lang={lang} checked={clChecked}
+          onToggle={(id)=>setClChecked(p=>{const n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;})}
+          onConfirm={onCLConfirm} onClose={()=>setShowCL(false)}/>}
+        {showTradeLog&&<TradeLogModal lang={lang} mode={tradeLogMode} activeTrade={activeTrade} onSave={handleTradeSave} onClose={()=>setShowTradeLog(false)}/>}
 
-        {showPaywall && <Paywall lang={lang} onClose={()=>setShowPaywall(false)} />}
-
-        {notif && (
-          <div style={{ position:"absolute", top:0, left:0, right:0, zIndex:999, background:"rgba(28,28,30,.96)", backdropFilter:"blur(14px)", borderBottom:`1px solid ${DARK}`, padding:"12px 16px", display:"flex", alignItems:"center", gap:10, animation:"notifDrop 4.8s ease forwards", cursor:"pointer" }}>
-            <DAvatar size={32} />
-            <div>
-              <div style={{ fontSize:12, fontWeight:700, color:RED }}>Donna</div>
-              <div style={{ fontSize:13 }}>{notif}</div>
-            </div>
+        {/* Toast */}
+        {notif&&<div style={{position:"absolute",top:0,left:0,right:0,zIndex:999,background:"rgba(28,28,30,.96)",backdropFilter:"blur(14px)",borderBottom:`1px solid ${DARK}`,padding:"12px 16px",display:"flex",alignItems:"center",gap:10,animation:"notifDrop 5s ease forwards",cursor:"pointer"}}>
+          <DAvatar size={32}/>
+          <div>
+            <div style={{fontSize:12,fontWeight:700,color:RED}}>Donna</div>
+            <div style={{fontSize:13}}>{notif}</div>
           </div>
-        )}
+        </div>}
 
-        {showCL && (
-          <ChecklistModal lang={lang} checked={clChecked}
-            onToggle={(id)=>setClChecked(p=>{const n=new Set(p);n.has(id)?n.delete(id):n.add(id);return n;})}
-            onConfirm={onCLConfirm} onClose={()=>setShowCL(false)} />
-        )}
-
-        {/* Nav */}
-        <div style={{ padding:"12px 16px 10px", display:"flex", alignItems:"center", justifyContent:"space-between", borderBottom:`1px solid ${DARK}`, flexShrink:0 }}>
-          <div style={{ fontSize:12, color:MUTED, width:76 }}>{profile.mode==="advanced"?t.advMode:t.begMode}</div>
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-            <DAvatar size={36} online={tab==="chat"} />
-            <span style={{ fontFamily:"'Sora',sans-serif", fontWeight:800, fontSize:14 }}>Donna</span>
+        {/* Header */}
+        <div style={{padding:"10px 16px 8px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${DARK}`,flexShrink:0}}>
+          <div style={{fontSize:11,color:MUTED,width:72}}>{profile.mode==="advanced"?t.advMode:t.begMode}</div>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+            <DAvatar size={34} online={tab==="chat"}/>
+            <span style={{fontFamily:"'Sora',sans-serif",fontWeight:800,fontSize:13}}>Donna</span>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ display:"flex", background:DARK, borderRadius:20, padding:3 }}>
-              {["beginner","advanced"].map(m => (
-                <button key={m} onClick={()=>setProfile(p=>({...p,mode:m}))}
-                  style={{ padding:"4px 9px", borderRadius:16, border:"none", cursor:"pointer", background:profile.mode===m?RED:"transparent", color:profile.mode===m?"#fff":MUTED, fontSize:11, fontWeight:700 }}>
-                  {m==="beginner"?"BEG":"ADV"}
-                </button>
-              ))}
-            </div>
-            {tab==="chat" && (
-              <button onClick={()=>{
-                if(activeJ){setFlow("jd-1");addMsg("donna",lang==="es"?"¿Tocó el 50%?":"Did it hit the 50%?");}
-                else{setFlow("jb-1");addMsg("donna",lang==="es"?"Vamos a registrar. ¿Qué activo es?":"Let's log it. What's the asset?");}
-              }} style={{ width:32, height:32, borderRadius:"50%", background:DARK, border:"none", cursor:"pointer", color:"#fff", fontSize:20, display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>+</button>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            {activeTrade&&tab==="chat"&&(
+              <button onClick={()=>{setTradeLogMode("close");setShowTradeLog(true);}}
+                style={{padding:"5px 10px",borderRadius:20,background:`${GOLD}22`,border:`1px solid ${GOLD}66`,cursor:"pointer",fontSize:11,fontWeight:700,color:GOLD}}>
+                🔵 {t.checkIn}
+              </button>
             )}
+            <button onClick={()=>{if(activeTrade){setTradeLogMode("close");setShowTradeLog(true);}else{setTradeLogMode("open");setShowTradeLog(true);}}}
+              style={{width:30,height:30,borderRadius:"50%",background:activeTrade?`${GOLD}33`:DARK,border:activeTrade?`1px solid ${GOLD}66`:"none",cursor:"pointer",color:activeTrade?GOLD:"#fff",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>
+              {activeTrade?"⏺":"＋"}
+            </button>
           </div>
         </div>
 
         {/* Trial banner */}
-        {msgsLeft <= 5 && msgsLeft > 0 && (
-          <div style={{ background:`${RED}15`, borderBottom:`1px solid ${RED}33`, padding:"6px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-            <span style={{ fontSize:12, color:RED, fontWeight:600 }}>{t.trialLeft(msgsLeft)}</span>
+        {msgsLeft<=5&&msgsLeft>0&&(
+          <div style={{background:`${RED}15`,borderBottom:`1px solid ${RED}33`,padding:"5px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+            <span style={{fontSize:12,color:RED,fontWeight:600}}>{t.trialLeft(msgsLeft)}</span>
+          </div>
+        )}
+
+        {/* Active trade banner */}
+        {activeTrade&&tab==="chat"&&(
+          <div style={{background:`${GOLD}0F`,borderBottom:`1px solid ${GOLD}33`,padding:"8px 16px",display:"flex",alignItems:"center",gap:10,flexShrink:0,cursor:"pointer"}} onClick={()=>{setTradeLogMode("close");setShowTradeLog(true);}}>
+            <div style={{width:8,height:8,borderRadius:"50%",background:GOLD,animation:"pulse 2s ease-in-out infinite",flexShrink:0}}/>
+            <div style={{flex:1}}>
+              <span style={{fontSize:12,fontWeight:700,color:GOLD}}>{t.activeTrade}: </span>
+              <span style={{fontSize:12,color:"#fff"}}>{activeTrade.asset} · {activeTrade.direction} · {activeTrade.killZone}</span>
+            </div>
+            <span style={{fontSize:11,color:MUTED}}>{timeAgo(activeTrade.openedAt)}</span>
           </div>
         )}
 
         {/* Content */}
-        <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column", minHeight:0 }}>
-          {tab==="chat" && (
-            <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minHeight:0 }}>
-              <div style={{ flex:1, overflowY:"auto", WebkitOverflowScrolling:"touch", padding:"10px 14px", display:"flex", flexDirection:"column", minHeight:0 }}>
-                {msgs.map(m => (
-                  <div key={m.id} className="msg-in" style={{ display:"flex", flexDirection:m.role==="donna"?"row":"row-reverse", alignItems:"flex-end", gap:7, marginBottom:10 }}>
-                    {m.role==="donna" && <DAvatar size={26} />}
-                    <div style={{ maxWidth:"80%", display:"flex", flexDirection:"column", gap:3, alignItems:m.role==="donna"?"flex-start":"flex-end" }}>
-                      {m.img && <img src={m.img} alt="" style={{ maxWidth:"100%", borderRadius:14, maxHeight:170, objectFit:"cover", border:`1px solid ${DARK}` }} />}
-                      {m.text && (
-                        <div style={{ padding:"10px 13px", borderRadius:m.role==="donna"?"18px 18px 18px 4px":"18px 18px 4px 18px", background:m.role==="donna"?DARK:"#0A84FF", color:"#fff", fontSize:15, lineHeight:1.58, whiteSpace:"pre-wrap", fontWeight:m.role==="user"?500:400 }}>
+        <div style={{flex:1,overflow:"hidden",display:"flex",flexDirection:"column",minHeight:0}}>
+
+          {/* CHAT TAB */}
+          {tab==="chat"&&(
+            <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minHeight:0}}>
+              <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"10px 14px",display:"flex",flexDirection:"column",minHeight:0}}>
+                {msgs.map(m=>(
+                  <div key={m.id} className="msg-in" style={{display:"flex",flexDirection:m.role==="donna"?"row":"row-reverse",alignItems:"flex-end",gap:7,marginBottom:10}}>
+                    {m.role==="donna"&&<DAvatar size={26}/>}
+                    <div style={{maxWidth:"80%",display:"flex",flexDirection:"column",gap:3,alignItems:m.role==="donna"?"flex-start":"flex-end"}}>
+                      {m.img&&<img src={m.img} alt="" style={{maxWidth:"100%",borderRadius:14,maxHeight:180,objectFit:"cover",border:`1px solid ${DARK}`}}/>}
+                      {m.text&&(
+                        <div style={{padding:"10px 13px",borderRadius:m.role==="donna"?"18px 18px 18px 4px":"18px 18px 4px 18px",background:m.role==="donna"?DARK:"#0A84FF",color:"#fff",fontSize:15,lineHeight:1.58,whiteSpace:"pre-wrap",fontWeight:m.role==="user"?500:400}}>
                           {m.text.split(/(\*\*.*?\*\*)/).map((p,i)=>p.startsWith("**")?<strong key={i}>{p.slice(2,-2)}</strong>:p)}
                         </div>
                       )}
-                      <div style={{ fontSize:11, color:"#48484A", padding:"0 3px" }}>
-                        {new Date(m.id).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
-                      </div>
+                      <div style={{fontSize:11,color:"#48484A",padding:"0 3px"}}>{new Date(m.id).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</div>
                     </div>
                   </div>
                 ))}
-                {loading && (
-                  <div className="msg-in" style={{ display:"flex", alignItems:"flex-end", gap:7, marginBottom:10 }}>
-                    <DAvatar size={26} />
-                    <div style={{ padding:"12px 16px", borderRadius:"18px 18px 18px 4px", background:DARK, display:"flex", gap:5, alignItems:"center" }}>
-                      {[0,1,2].map(i=><div key={i} style={{ width:7, height:7, borderRadius:"50%", background:MUTED, animation:`dot 1.2s ease-in-out ${i*.18}s infinite` }} />)}
+                {loading&&(
+                  <div className="msg-in" style={{display:"flex",alignItems:"flex-end",gap:7,marginBottom:10}}>
+                    <DAvatar size={26}/>
+                    <div style={{padding:"12px 16px",borderRadius:"18px 18px 18px 4px",background:DARK,display:"flex",gap:5,alignItems:"center"}}>
+                      {[0,1,2].map(i=><div key={i} style={{width:7,height:7,borderRadius:"50%",background:MUTED,animation:`dot 1.2s ease-in-out ${i*.18}s infinite`}}/>)}
                     </div>
                   </div>
                 )}
-                {apiError && (
-                  <div style={{ padding:"8px 12px", margin:"0 0 8px", background:"rgba(232,37,60,.1)", borderRadius:10, fontSize:12, color:"#FF6B6B", border:`1px solid ${RED}44` }}>
+                {apiError&&(
+                  <div style={{padding:"8px 12px",margin:"0 0 8px",background:"rgba(232,37,60,.1)",borderRadius:10,fontSize:12,color:"#FF6B6B",border:`1px solid ${RED}44`}}>
                     ⚠️ {apiError}
                   </div>
                 )}
-                <div ref={bottomRef} />
+                <div ref={bottomRef}/>
               </div>
-              {displayPills && (
-                <div style={{ padding:"0 14px 8px", display:"flex", gap:8, overflowX:"auto", flexShrink:0 }}>
-                  {displayPills.map(p=>(
-                    <button key={p} onClick={()=>handlePillTap(p)}
-                      style={{ padding:"8px 14px", borderRadius:20, whiteSpace:"nowrap", background:"transparent", border:`1px solid ${DARK2}`, color:BLUE, fontSize:14, fontWeight:500, cursor:"pointer", flexShrink:0 }}>
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {imgPreview && (
-                <div style={{ padding:"0 14px 8px", display:"flex", alignItems:"center", gap:8 }}>
-                  <div style={{ position:"relative" }}>
-                    <img src={imgPreview} alt="" style={{ height:52, borderRadius:8, border:`1px solid ${RED}66` }} />
-                    <button onClick={()=>{setImgData(null);setImgPrev(null);}} style={{ position:"absolute", top:-6, right:-6, width:18, height:18, borderRadius:"50%", background:"#EF4444", border:"none", cursor:"pointer", color:"#fff", fontSize:10, fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+
+              {/* Pills */}
+              <PillsRow pills={displayPills} onTap={handlePillTap}/>
+
+              {/* Image preview */}
+              {imgPreview&&(
+                <div style={{padding:"0 14px 8px",display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{position:"relative"}}>
+                    <img src={imgPreview} alt="" style={{height:52,borderRadius:8,border:`1px solid ${RED}66`}}/>
+                    <button onClick={()=>{setImgData(null);setImgPrev(null);}} style={{position:"absolute",top:-6,right:-6,width:18,height:18,borderRadius:"50%",background:"#EF4444",border:"none",cursor:"pointer",color:"#fff",fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
                   </div>
-                  <span style={{ fontSize:12, color:GREEN, fontWeight:600 }}>{lang==="es"?"Gráfico adjunto ✓":"Chart attached ✓"}</span>
+                  <span style={{fontSize:12,color:GREEN,fontWeight:600}}>{lang==="es"?"Gráfico adjunto ✓":"Chart attached ✓"}</span>
                 </div>
               )}
-              <div style={{ padding:"8px 12px 14px", borderTop:`1px solid ${DARK}`, display:"flex", gap:8, alignItems:"center", flexShrink:0 }}>
-                <input type="file" ref={fileRef} onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setImgData(ev.target.result);setImgPrev(ev.target.result);};r.readAsDataURL(f);e.target.value="";}} accept="image/*" style={{ display:"none" }} />
-                <button onClick={()=>fileRef.current?.click()} style={{ width:36, height:36, borderRadius:"50%", background:DARK, border:"none", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:MUTED }}>📷</button>
-                <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&handleSend()} placeholder={t.msgPH}
-                  style={{ flex:1, padding:"10px 14px", borderRadius:22, background:DARK, border:"none", color:"#fff", fontSize:15, outline:"none" }} />
+
+              {/* Input row */}
+              <div style={{padding:"8px 12px 14px",borderTop:`1px solid ${DARK}`,display:"flex",gap:8,alignItems:"center",flexShrink:0}}>
+                <input type="file" ref={fileRef} onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{setImgData(ev.target.result);setImgPrev(ev.target.result);};r.readAsDataURL(f);e.target.value="";}} accept="image/*" style={{display:"none"}}/>
+                <button onClick={()=>fileRef.current?.click()} style={{width:36,height:36,borderRadius:"50%",background:DARK2,border:"none",cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:MUTED}}>📷</button>
+                <VoiceButton onResult={(txt)=>setInput(i=>i?i+" "+txt:txt)} lang={lang}/>
+                <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+                  onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&handleSend()}
+                  placeholder={t.msgPH}
+                  style={{flex:1,padding:"10px 14px",borderRadius:22,background:DARK,border:"none",color:"#fff",fontSize:15,outline:"none"}}/>
                 <button onClick={handleSend} disabled={!input.trim()&&!imgData}
-                  style={{ width:36, height:36, borderRadius:"50%", background:input.trim()||imgData?BLUE:DARK, border:"none", cursor:"pointer", color:"#fff", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"background .2s" }}>▶</button>
+                  style={{width:36,height:36,borderRadius:"50%",background:input.trim()||imgData?BLUE:DARK,border:"none",cursor:"pointer",color:"#fff",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background .2s"}}>▶</button>
               </div>
             </div>
           )}
-          {tab==="academy" && <AcademyScreen profile={profile} completed={completedCh} onOpen={ch=>setOpenChapter(ch)} />}
+
+          {/* JOURNAL TAB */}
+          {tab==="journal"&&(
+            <JournalScreen trades={trades} lang={lang} activeTrade={activeTrade}
+              onClose={()=>setTab("chat")}
+              onOpen={(mode)=>{setTradeLogMode(mode);setShowTradeLog(true);}}/>
+          )}
+
+          {/* ACADEMY TAB */}
+          {tab==="academy"&&(
+            <AcademyScreen profile={profile} completed={completedCh} onOpen={ch=>setOpenChapter(ch)}/>
+          )}
         </div>
 
         {/* Tab Bar */}
-        <div style={{ display:"flex", borderTop:`1px solid ${DARK}`, flexShrink:0 }}>
-          {[{id:"chat",icon:"💬",label:t.tabChat},{id:"academy",icon:"📚",label:t.tabAcademy}].map(tb=>(
-            <button key={tb.id} onClick={()=>setTab(tb.id)} style={{ flex:1, padding:"10px 8px 14px", background:"transparent", border:"none", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:3 }}>
-              <span style={{ fontSize:24 }}>{tb.icon}</span>
-              <span style={{ fontSize:11, fontWeight:700, color:tab===tb.id?RED:MUTED }}>{tb.label}</span>
-              {tab===tb.id && <div style={{ width:5, height:5, borderRadius:"50%", background:RED }} />}
+        <div style={{display:"flex",borderTop:`1px solid ${DARK}`,flexShrink:0}}>
+          {[{id:"chat",icon:"💬",label:t.tabChat},{id:"journal",icon:"📓",label:t.tabJournal},{id:"academy",icon:"📚",label:t.tabAcademy}].map(tb=>(
+            <button key={tb.id} onClick={()=>setTab(tb.id)}
+              style={{flex:1,padding:"10px 8px 14px",background:"transparent",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,position:"relative"}}>
+              <span style={{fontSize:22}}>{tb.icon}</span>
+              <span style={{fontSize:10,fontWeight:700,color:tab===tb.id?RED:MUTED}}>{tb.label}</span>
+              {tab===tb.id&&<div style={{width:5,height:5,borderRadius:"50%",background:RED}}/>}
+              {tb.id==="journal"&&activeTrade&&<div style={{position:"absolute",top:8,right:"25%",width:8,height:8,borderRadius:"50%",background:GOLD,border:"2px solid #000"}}/>}
             </button>
           ))}
         </div>
@@ -1135,7 +1374,7 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
