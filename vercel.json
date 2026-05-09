@@ -2,10 +2,14 @@
   "version": 2,
   "builds": [
     { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/chat.js", "use": "@vercel/node" }
+    { "src": "api/chat.js", "use": "@vercel/node" },
+    { "src": "api/create-checkout.js", "use": "@vercel/node" },
+    { "src": "api/verify-payment.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/chat", "dest": "/api/chat.js" },
+    { "src": "/api/create-checkout", "dest": "/api/create-checkout.js" },
+    { "src": "/api/verify-payment", "dest": "/api/verify-payment.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
