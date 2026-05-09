@@ -254,7 +254,7 @@ async function generateLesson(chapter,lang){
   const sys=`You generate lesson content for a CRT trading education app. Return ONLY valid JSON.
 FORMAT: {"slides":[{"icon":"emoji","title":"max 5 words","body":"2-4 sentences with REAL market examples and specific numbers","donna":"1-2 sentences Donna voice — warm, direct, slightly funny"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"explanation"}]}
 RULES: Every slide needs a real price example. Quiz tests understanding not definitions. Mix mc and tf types. ${chapter.id<=2?"Avoid jargon — use plain English":"Use CRT terminology"}. ${isES?"ALL content in Spanish":"ALL content in English"}. EXACTLY ${cfg.slides} slides and ${cfg.minQ} questions. Return ONLY JSON.`;
-  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-3-5-sonnet-20241022",max_tokens:1200,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
+  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-3-5-haiku-20241022",max_tokens:800,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
   if(!res.ok)throw new Error(`API ${res.status}`);
   const data=await res.json();
   const text=data.content?.[0]?.text||"";
@@ -330,18 +330,28 @@ input,button,textarea,select{font-family:'DM Sans',sans-serif;}
    SVG FLAGS
 ═══════════════════════════════════ */
 function FlagUS({size=44}){
+  const h=Math.round(size*.65);
   return(
-    <img src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/svg/1f1fa-1f1f8.svg"
-      width={size} height={size} alt="🇺🇸"
-      style={{display:"block",borderRadius:6}}/>
+    <svg width={size} height={h} viewBox="0 0 60 40" style={{borderRadius:4,display:"block",flexShrink:0}}>
+      <rect width="60" height="40" fill="#B22234"/>
+      {[0,2,4,6,8,10,12].map(i=><rect key={i} y={i/13*40} width="60" height={40/13} fill="#fff"/>)}
+      <rect width="24" height={40*7/13} fill="#3C3B6E"/>
+      {[[4,3],[9,3],[14,3],[19,3],[6.5,6],[11.5,6],[16.5,6],
+        [4,9],[9,9],[14,9],[19,9],[6.5,12],[11.5,12],[16.5,12],
+        [4,15],[9,15],[14,15],[19,15]].map(([x,y],i)=>
+        <circle key={i} cx={x} cy={y} r="1.3" fill="#fff"/>)}
+    </svg>
   );
 }
 
 function FlagES({size=44}){
+  const h=Math.round(size*.65);
   return(
-    <img src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/svg/1f1ea-1f1f8.svg"
-      width={size} height={size} alt="🇪🇸"
-      style={{display:"block",borderRadius:6}}/>
+    <svg width={size} height={h} viewBox="0 0 60 40" style={{borderRadius:4,display:"block",flexShrink:0}}>
+      <rect width="60" height="40" fill="#AA151B"/>
+      <rect y="10" width="60" height="20" fill="#F1BF00"/>
+      <rect x="14" y="12" width="6" height="16" rx="1" fill="#AA151B" opacity=".6"/>
+    </svg>
   );
 }
 
