@@ -254,7 +254,7 @@ async function generateLesson(chapter,lang){
   const sys=`You generate lesson content for a CRT trading education app. Return ONLY valid JSON.
 FORMAT: {"slides":[{"icon":"emoji","title":"max 5 words","body":"2-4 sentences with REAL market examples and specific numbers","donna":"1-2 sentences Donna voice — warm, direct, slightly funny"}],"quiz":[{"q":"scenario question","type":"mc","opts":["A","B","C","D"],"a":0,"exp":"explanation"}]}
 RULES: Every slide needs a real price example. Quiz tests understanding not definitions. Mix mc and tf types. ${chapter.id<=2?"Avoid jargon — use plain English":"Use CRT terminology"}. ${isES?"ALL content in Spanish":"ALL content in English"}. EXACTLY ${cfg.slides} slides and ${cfg.minQ} questions. Return ONLY JSON.`;
-  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
+  const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-3-5-sonnet-20241022",max_tokens:1200,system:sys,messages:[{role:"user",content:`Chapter ${chapter.id}: "${chapter.title}". ${chapter.desc}. Level ${chapter.level} (${cfg.label}). Generate ${cfg.slides} slides and ${cfg.minQ} questions in ${lang}.`}]})});
   if(!res.ok)throw new Error(`API ${res.status}`);
   const data=await res.json();
   const text=data.content?.[0]?.text||"";
@@ -1107,7 +1107,7 @@ Let's start with the most important thing:`;
       });
       const cur=img?[{type:"image",source:{type:"base64",media_type:img.split(";")[0].split(":")[1],data:img.split(",")[1]}},{type:"text",text:userText}]:userText;
       history.push({role:"user",content:cur});
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:sys,messages:history})});
+      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-3-5-sonnet-20241022",max_tokens:800,system:sys,messages:history})});
       if(!res.ok){const ed=await res.json().catch(()=>({}));throw new Error(ed.error?.message||`API ${res.status}`);}
       const data=await res.json();
       const reply=data.content?.[0]?.text;
