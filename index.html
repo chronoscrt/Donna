@@ -802,7 +802,7 @@ function buildPrompt(profile,trades,activeTrade){
   const fomoL=closed.filter(t=>(t.emotion||"").includes("FOMO")&&t.result==="loss").length;
   const patternCtx=noKZ>=2?`\nPATTERN: ${noKZ} losses outside Kill Zone — address this proactively.`:"";
   const fomoCtx=fomoL>=2?`\nPATTERN: ${fomoL} FOMO-driven losses — call it out when relevant.`:"";
-  const voice=isAdv?"DONNA - ADVANCED MODE: This trader knows CRT. Your job is ACCOUNTABILITY, not teaching. When they share a trade or setup, respond naturally in 1-2 lines — give one sharp insight or one quick question, never both, never a list. When they log a trade, say something brief and ask if they want to review it. Track their patterns over time and call them out by name when you see them repeating. Celebrate good discipline: taking partials, respecting stops, staying patient. Never quiz them on basics they already know. Do NOT ask multiple questions in one message. Do NOT launch into a questionnaire. One thought. One line. Then stop.":"DONNA - BEGINNER MODE: You are a warm, encouraging coach — like a knowledgeable friend explaining trading over coffee. Teach one idea per message, really one. Use simple everyday analogies (no jargon without explaining it first). When they understand something, celebrate it. When they are wrong, be kind and explain the WHY. Never send a wall of text. Short messages. One question at the end to keep them thinking — not to interrogate them.";
+  const voice=isAdv?"DONNA - ADVANCED MODE: This trader knows CRT. Your job is ACCOUNTABILITY, not teaching. When they share a trade or setup, respond naturally in 1-2 lines — give one sharp insight or one quick question, never both, never a list. If they mention a trade, respond naturally in 1-2 lines. NEVER ask them to log through chat — tell them to use the + button at the top for logging. After they confirm they logged it, THEN offer to review it briefly. Track their patterns over time and call them out by name when you see them repeating. Celebrate good discipline: taking partials, respecting stops, staying patient. Never quiz them on basics they already know. Do NOT ask multiple questions in one message. Do NOT launch into a questionnaire. One thought. One line. Then stop.":"DONNA - BEGINNER MODE: You are a warm, encouraging coach — like a knowledgeable friend explaining trading over coffee. Teach one idea per message, really one. Use simple everyday analogies (no jargon without explaining it first). When they understand something, celebrate it. When they are wrong, be kind and explain the WHY. For trading/logging: always say to use the + button — never walk them through logging a trade via chat questions. Never send a wall of text. Short messages. One question at the end to keep them thinking — not to interrogate them.";
   const chartP=`CHART: 1.Identify timeframe/asset/structure. 2.CRT read: Turtle Soups? Model 1? FVG/OB/Breaker? Liquidity above/below? 3.ONE strongest feature and WHY. 4.ONE risk. 5.End: "What are you seeing here?" Never confirm a trade.`;
   const crt=`CRT: Turtle Soup(wick beyond,closes inside=fake) or True Break(close beyond=real). AMD: C1=Accumulation,C2=Manipulation,C3=Distribution. Model 1: thick candle,nails old high/low,closes inside,close=trigger,stop=above/below wick(fixed),T1=50%,T2=opposite extreme. KoD=always before target. 5 entries never backward. HTF=WHY,ITF=WHAT,LTF=WHEN/WHERE. SMT=divergence+Model1. ${kz}. Risk=1-2%max.`;
   return`You are Donna — CRT trading accountability mentor and coach.
@@ -919,9 +919,17 @@ function VoiceButton({onResult,lang}){
       r.continuous=false;r.interimResults=false;
       r.onresult=(e)=>{const txt=e.results[0][0].transcript;onResult(txt);};
       r.onend=()=>setListening(false);
-      r.onerror=()=>setListening(false);
+      r.onerror=(ev)=>{
+      setListening(false);
+      const msg={
+        "not-allowed":lang==="es"?"Permiso de micrófono denegado. Actívalo en la configuración del navegador.":"Mic permission denied. Enable it in browser settings.",
+        "no-speech":lang==="es"?"No se detectó voz. Inténtalo de nuevo.":"No speech detected. Try again.",
+        "network":lang==="es"?"Error de red con el micrófono.":"Network error with mic.",
+      }[ev.error]||(lang==="es"?"Micrófono no disponible.":"Mic unavailable.");
+      showNotif(msg);
+    };
       recRef.current=r;r.start();setListening(true);
-    }catch(e){setListening(false);}
+    }catch(e){setListening(false);showNotif(lang==="es"?"El micrófono no está disponible en este navegador. Prueba Chrome o Safari.":"Mic not available in this browser. Try Chrome or Safari.");}
   };
   return(
     <button onClick={toggle} style={{width:36,height:36,borderRadius:"50%",background:listening?RED:DARK2,border:"none",cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"#fff",transition:"background .2s",animation:listening?"pulseMic 1s ease-in-out infinite":"none"}}>
@@ -1187,7 +1195,13 @@ function LessonModal({chapter,lang,onClose,onComplete}){
 
   const load=useCallback(async()=>{
     if(chapter.static){
-      setData({slides:chapter.slides,quiz:chapter.quiz});
+      const slides=(lang==="es")
+        ?(chapter.slides_es||chapter.slides_en||chapter.slides||[])
+        :(chapter.slides_en||chapter.slides||[]);
+      const quiz=(lang==="es")
+        ?(chapter.quiz_es||chapter.quiz_en||chapter.quiz||[])
+        :(chapter.quiz_en||chapter.quiz||[]);
+      setData({slides,quiz});
       setLoading(false);return;
     }
     setLoading(true);setError(false);
@@ -1407,19 +1421,27 @@ function AcademyScreen({profile,completed,passedCh=new Set(),onOpen}){
       </div>
       <div style={{padding:"20px 16px 60px"}}>
         <div style={{fontSize:11,fontWeight:700,color:MUTED,letterSpacing:2,textAlign:"center",marginBottom:20}}>{lang==="es"?"RUTA DE APRENDIZAJE":"LEARNING PATH"}</div>
-        {CHAPTERS.map((ch,i)=>{
+        {/* Chapter 0 — always pinned at top */}
+        <div onClick={()=>onOpen(CHAPTERS[0])} style={{cursor:"pointer",marginBottom:24,background:completed.has(0)?"#0a0a0a":"#E50914",border:completed.has(0)?"2px solid #E50914":"none",borderRadius:16,padding:"18px 20px",textAlign:"left"}}>
+          <div style={{fontSize:10,fontWeight:700,letterSpacing:2,color:completed.has(0)?"#E50914":"rgba(255,255,255,0.7)",marginBottom:4}}>{completed.has(0)?(lang==="es"?"✅ COMPLETADO":"✅ COMPLETED"):"★ "+(lang==="es"?"EMPIEZA AQUÍ":"START HERE FIRST")}</div>
+          <div style={{fontFamily:"'Sora',sans-serif",fontWeight:900,fontSize:17,color:"#fff",marginBottom:2}}>{lang==="es"?CH_TITLES_ES[0]:"Start Here"}</div>
+          <div style={{fontSize:12,color:completed.has(0)?"#666":"rgba(255,255,255,0.8)"}}>{lang==="es"?"3 slides · 3 preguntas · Introducción al trading":"3 slides · 3 questions · Trading intro"}</div>
+        </div>
+        {CHAPTERS.filter(ch=>ch.id>0).map((ch,i)=>{
+          const realIdx=i+1;
           const done=completed.has(ch.id);
-          const prevPassed=i===0||passedCh.has?.(CHAPTERS[i-1]?.id)||ch.id===0;
-          const current=ch.id===0?!done:!done&&prevPassed;
-          const locked=ch.id===0?false:!done&&!prevPassed;
-          const isLeft=i%2===0;
+          const prevCh=CHAPTERS.find(x=>x.id===ch.id-1)||CHAPTERS[realIdx-1];
+          const prevPassed=realIdx===1?completed.has(0):passedCh.has?.(prevCh?.id);
+          const current=!done&&prevPassed;
+          const locked=!done&&!prevPassed;
+          const isLeft=realIdx%2===0;
           const displayTitle=lang==="es"?(CH_TITLES_ES[ch.id]||ch.title):ch.title;
           const displaySub=lang==="es"?(CH_SUBS_ES[ch.id]||ch.sub):ch.sub;
           const bc=done?RED:current?RED:DARK2;
           const cfg=COMPLEXITY[ch.level]||COMPLEXITY[1];
           return(
             <div key={ch.id} style={{display:"flex",flexDirection:"column",alignItems:isLeft?"flex-start":"flex-end"}}>
-              {i>0&&<div style={{width:2.5,height:22,background:completed.has(CHAPTERS[i-1]?.id)?RED:DARK2,marginLeft:isLeft?"22%":"auto",marginRight:!isLeft?"22%":"auto",transition:"background .3s"}}/>}
+              {realIdx>0&&<div style={{width:2.5,height:22,background:completed.has(CHAPTERS[i-1]?.id)?RED:DARK2,marginLeft:isLeft?"22%":"auto",marginRight:!isLeft?"22%":"auto",transition:"background .3s"}}/>}
               <div onClick={()=>!locked&&onOpen(ch)} className={current?"pulse":""}
                 style={{width:"74%",padding:"13px 14px",borderRadius:18,background:current?"rgba(232,37,60,.07)":done?"rgba(232,37,60,.06)":"#111",border:`1.5px solid ${bc}`,display:"flex",alignItems:"center",gap:12,opacity:locked?.38:1,cursor:locked?"default":"pointer"}}>
                 <div style={{width:48,height:48,borderRadius:14,flexShrink:0,background:done?RED:current?"rgba(232,37,60,.15)":DARK,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>
@@ -1641,34 +1663,8 @@ function App(){
       addMsg("donna",welcomeAdv);
     }else{
       const msg=p.lang==="es"
-        ?`¡Hola ${p.name}! 👋 Soy Donna, tu mentora de trading CRT.
-
-Si estás aquí, quizás alguien te habló del mercado, o viste que otros generaban dinero, o simplemente quieres entender cómo funciona todo esto. Sea cual sea la razón — estás en el lugar correcto.
-
-Estoy aquí para enseñarte desde cero. Sin jerga confusa. Sin pasos saltados.
-
-Aquí está lo que puedo hacer por ti:
-📊 Analizo tus gráficos — mándame una captura y te explico todo
-✅ Checklist pre-operación — antes de cada trade, lo revisamos juntos
-📝 Diario de operaciones — registra cada trade y yo lo recuerdo
-🎓 Academia completa — 22 capítulos de teoría CRT
-🎤 Habla conmigo — toca el micrófono para hablar
-
-Empecemos con lo más importante:` 
-        :`Hey ${p.name}! 👋 I'm Donna, your CRT trading mentor.
-
-If you're here, maybe someone told you about trading, or you saw others making money, or you just want to understand how markets actually work. Whatever brought you — you're in the right place.
-
-I'm here to teach you from zero. No confusing jargon. No skipped steps.
-
-Here's what I can do for you:
-📊 Chart analysis — send me a screenshot and I'll explain everything
-✅ Pre-trade checklist — before every trade, we check it together
-📝 Trade journal — log every trade and I remember it
-🎓 Full academy — 22 chapters of CRT from beginner to advanced
-🎤 Voice input — tap the mic to talk to me
-
-Let's start with the most important thing:`;
+        ?`Hola ${p.name}! Soy Donna — tu coach de trading. Estoy aquí para enseñarte desde cero y mantenerte responsable. Empieza con el Capítulo 0 en la Academia, o pregúntame lo que quieras.`
+        :`Hey ${p.name}! I'm Donna — your trading coach. I'll teach you from scratch and keep you accountable. Start with Chapter 0 in the Academy, or just ask me anything.`;
       addMsg("donna",msg);
       // No questionnaire - go straight to chat with helpful pills
       setContextPills(p.lang==="es"
@@ -1788,7 +1784,7 @@ Let's start with the most important thing:`;
     imgData?sendMessage(input,imgData):sendMessage(input);
   };
 
-  const handlePillTap=(pill)=>{
+  const handlePillTap=(pill)=>{try{
     if(pqStep>0){handlePQ(pill);return;}
     // Checklist triggers — catch all variants
     const isChecklistPill=["ready to trade","listo para operar","open checklist","abrir checklist","checklist"].some(k=>pill.toLowerCase().includes(k));
