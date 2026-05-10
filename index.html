@@ -1781,7 +1781,7 @@ Let's start with the most important thing:`;
     // Intercept checklist requests from typed input
     const inp=input.toLowerCase().trim();
     const isChkRequest=["checklist","check list","lista de verificación","lista de control"].some(k=>inp.includes(k));
-    if(isChkRequest&&!imgData){triggerChecklist();setInput("");return;}
+    if(isChkRequest&&!imgData){setShowCL(true);setInput("");return;}
     if(imgData&&userPlan!=="pro"&&userPlan!=="free_trial"){
       setShowPaywall(true);return;
     }
@@ -1792,7 +1792,7 @@ Let's start with the most important thing:`;
     if(pqStep>0){handlePQ(pill);return;}
     // Checklist triggers — catch all variants
     const isChecklistPill=["ready to trade","listo para operar","open checklist","abrir checklist","checklist"].some(k=>pill.toLowerCase().includes(k));
-    if(isChecklistPill){triggerChecklist();return;}
+    if(isChecklistPill){setShowCL(true);return;}
     // Trade log trigger
     if(pill.toLowerCase().includes("log a trade")||pill.toLowerCase().includes("registrar operación")||pill.toLowerCase().includes("registrar operacion")){setTradeLogMode("open");setShowTradeLog(true);return;}
     // Academy trigger
