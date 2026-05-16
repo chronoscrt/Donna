@@ -1,11 +1,21 @@
 const Stripe = require('stripe');
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const { plan } = req.body;
-  const priceId = plan === 'pro' ? process.env.STRIPE_PRICE_PRO : process.env.STRIPE_PRICE_BASIC;
-  if (!priceId) return res.status(400).json({ error: 'Invalid plan' });
+
+  const priceId = plan === 'pro'
+    ? process.env.STRIPE_PRICE_PRO
+    : process.env.STRIPE_PRICE_BASIC;
+
+  if (!priceId) {
+    return res.status(400).json({ error: 'Invalid plan' });
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
