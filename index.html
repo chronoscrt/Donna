@@ -2413,7 +2413,13 @@ function App(){
     if(isChkRequest&&!imgData){setShowCL(true);setInput("");return;}
     if(imgData&&userPlan!=="pro"&&userPlan!=="free_trial"){
       setInput("");setImgData(null);setImgPrev(null);
-      setShowPaywall(true);
+      if(userPlan==="basic"){
+        showNotif(lang==="es"
+          ?"📊 El análisis de gráficos requiere el plan Pro ($15/mes) — actualiza desde el menú."
+          :"📊 Chart analysis requires Pro ($15/mo) — upgrade from the menu.");
+      }else{
+        setShowPaywall(true);
+      }
       return;
     }
     imgData?sendMessage(input,imgData):sendMessage(input);
@@ -2661,7 +2667,7 @@ Want to log this trade now?`);
 
           {/* ACADEMY TAB */}
           {tab==="academy"&&(
-            <AcademyScreen lang={lang} profile={profile} completed={completedCh} passedCh={passedCh} onOpen={ch=>setOpenChapter(ch)}/>
+            <AcademyScreen lang={lang} profile={profile} completed={completedCh} passedCh={passedCh} onOpen={ch=>setOpenChapter(ch)} xp={xp} streak={streak} userLevel={userLevel} levelNames={levelNames} xpProgress={xpProgress} xpToNext={xpToNext}/>
           )}
         </div>
 
