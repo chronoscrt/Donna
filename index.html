@@ -1067,6 +1067,41 @@ function LevelUpModal({data,lang,xp,onClose,showNotif}){
 
 
 
+const LANDING_LINKS={
+  youtube:"https://youtube.com/@chronoscrtes?si=Njwit2vbZqUiL1ve",
+  mentorship:"https://discord.gg/PSD4J7wYhu" /* Discord: DM directo hasta tener link de mentoria 1:1 */
+};
+function Landing({lang,onEnter}){
+  const es=lang==="es";
+  const card={flex:"1 1 220px",maxWidth:300,background:"#111",border:"1px solid #222",borderRadius:20,padding:"26px 20px",textAlign:"center",textDecoration:"none",display:"flex",flexDirection:"column",alignItems:"center",gap:10,cursor:"pointer"};
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:10000,background:"#000",overflowY:"auto",display:"flex",flexDirection:"column",alignItems:"center",padding:"48px 20px 40px",fontFamily:"'Sora',sans-serif"}}>
+      <div style={{width:76,height:76,borderRadius:"50%",background:"linear-gradient(135deg,#E50914,#FF6B35)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:34,fontWeight:800,color:"#fff",marginBottom:18}}>C</div>
+      <div style={{fontSize:30,fontWeight:800,color:"#fff",letterSpacing:-1}}>CHRONOS CRT</div>
+      <div style={{fontSize:14,color:"#8E8E93",marginTop:10,maxWidth:520,textAlign:"center",lineHeight:1.7}}>
+        {es?"Soy Chronos. Trader y creador de CHRONOS CRT. Enseño Candle Range Theory, el sistema con el que leo los mercados todos los dias, para que aprendas a operar con reglas claras: tiempo, precio y paciencia.":"I am Chronos. Trader and creator of CHRONOS CRT. I teach Candle Range Theory, the system I use to read the markets every day, so you learn to trade with clear rules: time, price and patience."}
+      </div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:14,marginTop:34,width:"100%",maxWidth:760,justifyContent:"center"}}>
+        <a href={LANDING_LINKS.youtube} target="_blank" rel="noreferrer" style={card}>
+          <div style={{fontSize:34}}>▶️</div>
+          <div style={{fontSize:16,fontWeight:700,color:"#fff"}}>YouTube</div>
+          <div style={{fontSize:12,color:"#8E8E93"}}>{es?"Clases y analisis gratis":"Free lessons and analysis"}</div>
+        </a>
+        <div onClick={onEnter} style={{...card,background:"linear-gradient(135deg,#E50914,#B00610)",border:"1px solid #E50914"}}>
+          <div style={{fontSize:34}}>💬</div>
+          <div style={{fontSize:16,fontWeight:800,color:"#fff"}}>Donna</div>
+          <div style={{fontSize:12,color:"#ffd9d9"}}>{es?"Tu mentora de trading CRT. Entra aqui":"Your CRT trading mentor. Enter here"}</div>
+        </div>
+        <a href={LANDING_LINKS.mentorship} target="_blank" rel="noreferrer" style={card}>
+          <div style={{fontSize:34}}>🎯</div>
+          <div style={{fontSize:16,fontWeight:700,color:"#fff"}}>{es?"Mentoria 1:1":"1-on-1 Mentorship"}</div>
+          <div style={{fontSize:12,color:"#8E8E93"}}>{es?"Escribeme por DM en Discord":"DM me on Discord"}</div>
+        </a>
+      </div>
+      <div style={{marginTop:34,fontSize:11,color:"#48484A"}}>chronoscrt.com</div>
+    </div>
+  );
+}
 function LoginScreen({lang,onSent}){
   const[email,setEmail]=useState("");
   const[sent,setSent]=useState(false);
@@ -1078,12 +1113,10 @@ function LoginScreen({lang,onSent}){
     if(!email.trim()||!email.includes("@")){setErr(isES?"Email inválido":"Invalid email");return;}
     setLoading(true);setErr("");
     try{
-      const r=await fetch("/api/auth",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({action:"send_magic_link",email:email.trim().toLowerCase()})});
-      const d=await r.json();
-      if(d.success){setSent(true);onSent&&onSent(email);}
-      else setErr(isES?"Error al enviar. Intenta de nuevo.":"Error sending. Please try again.");
-    }catch(e){setErr(isES?"Error de conexión":"Connection error");}
+      const {error}=await supabaseClient.auth.signInWithOtp({email:email.trim().toLowerCase(),options:{emailRedirectTo:window.location.origin}});
+      if(!error){setSent(true);onSent&&onSent(email);}
+      else setErr((isES?"Error: ":"Error: ")+error.message);
+    }catch(e){setErr((isES?"Error de conexión: ":"Connection error: ")+(e&&e.message?e.message:String(e)));}
     setLoading(false);
   };
 
@@ -1152,6 +1185,7 @@ function LoginScreen({lang,onSent}){
 }
 
 function App(){
+  const[entered,setEntered]=useState(false);
   const[phase,setPhase]=useState("login");
   const[sbUser,setSbUser]=useState(null);
   const[sbLoading,setSbLoading]=useState(true);
@@ -1390,7 +1424,14 @@ function App(){
             body:JSON.stringify({action:'get_trades',user_id:session.user.id})});
           const dt = await rt.json();
           if(dt.trades) setTrades(dt.trades.map(t=>({...t,id:t.id})));
-        }catch(e){console.error('Load profile error',e); setPhase('onboard');}
+        }catch(e){
+          console.error('Load profile error',e);
+          try{
+            const lp=JSON.parse(localStorage.getItem("donna_profile")||"null");
+            if(lp&&lp.name){setProfile({name:lp.name||'',lang:lp.lang||'es',mode:lp.mode||'beginner'});setPhase('main');}
+            else setPhase('onboard');
+          }catch(e2){setPhase('onboard');}
+        }
       } else {
         setSbUser(null);
         setPhase('login');
@@ -1791,9 +1832,10 @@ Want to log this trade now?`);
           {xpAnim}
         </div>
       )}
-      {(phase==="login"||sbLoading)&&(
+      {entered&&(phase==="login"||sbLoading)&&(
         <LoginScreen lang={lang} onSent={()=>{}}/>
       )}
+      {!entered&&<Landing lang={lang} onEnter={()=>setEntered(true)}/>}
       </>
   );
 }
